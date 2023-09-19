@@ -22,7 +22,7 @@
                 v-model:name="selectedDocument.name" />
             <!-- mehr abstand hier...-->
             <BlockEditor v-model="editorData" :readOnly="false" :debug="false" :plugins="plugins"
-                :showAllBlockControls="true" />
+                :showAllBlockControls="true" :disableColumns="true" />
         </div>
     </div>
 </template>
@@ -49,7 +49,7 @@ const plugins = [
 
 // tree data
 const documentStore = useDocumentStore();
-const selectedDocumentId: Ref<null | string> = ref(null);
+const selectedDocumentId: Ref<{ [id: string]: boolean }> = ref({});
 const selectedDocument: Ref<null | DocumentItem> = ref(null);
 
 const selectTreeItem = (event: any) => {
@@ -79,12 +79,12 @@ const loadDocument = async () => {
  */
 const addDocument = async () => {
     mode.value = 'new';
-    selectedItem.value = null;
+    selectedDocumentId.value = {};
     editorData.value.blocks = [];
     selectedDocument.value = {
         version: 1,
         type: "document",
-        parent: null, // hier müsste selectedItem.value.key rein
+        parent: Object.keys(documentStore.documentTree).length > 0 ? Object.keys(documentStore.documentTree)[0] : null,
         id: guid(),
         name: 'New_Document',
         header: 'New_Document',
