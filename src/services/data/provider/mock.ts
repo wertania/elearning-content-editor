@@ -1,17 +1,15 @@
-// mock service with same interface as a normal dataprovider
-
 import { DocumentItem } from "../types";
 import type { DocumentTreeItem } from "../types";
 
-// demo data like it would be in the database.
-// flat list of items
+// Diese Daten sollen den originalen Daten entsprechen, die in einer DB lagern
+// Die Daten liegen flach in der DB und können über id und parent id verknüpft werden
 const demoData: DocumentItem[] = [
   {
     version: 1,
     id: "1",
     type: "document",
     parent: "3",
-    icon: "fa-file",
+    icon: "fa-solid fa-file",
     name: "Document 1",
     header: "This is the first document",
     description: "This is a short description of the first document",
@@ -32,7 +30,7 @@ const demoData: DocumentItem[] = [
     id: "2",
     type: "document",
     parent: null,
-    icon: "fa-file",
+    icon: "fa-solid fa-folder",
     name: "Document 2",
     header: "This is the second document",
     description: "This is a short description of the second document",
@@ -53,7 +51,7 @@ const demoData: DocumentItem[] = [
     id: "3",
     type: "folder",
     parent: null,
-    icon: "fa-folder",
+    icon: "fa-solid fa-folder",
     name: "Folder 1",
     header: "This is the first folder",
     description: "This is a short description of the first folder",
@@ -65,7 +63,7 @@ const demoData: DocumentItem[] = [
     id: "4",
     type: "folder",
     parent: "3",
-    icon: "fa-folder",
+    icon: "fa-solid fa-folder",
     name: "Folder 2",
     header: "This is the second folder",
     description: "This is a short description of the second folder",
@@ -77,7 +75,7 @@ const demoData: DocumentItem[] = [
     id: "5",
     type: "document",
     parent: "4",
-    icon: "fa-file",
+    icon: "fa-solid fa-file",
     name: "Document 3",
     header: "This is the third document",
     description: "This is a short description of the third document",
@@ -95,6 +93,9 @@ const demoData: DocumentItem[] = [
   },
 ];
 
+/**
+ * helper function to build the tree
+ */
 function buildTree(item: DocumentItem): DocumentTreeItem {
   const children = demoData
     .filter((childItem) => childItem.parent === item.id)
@@ -104,12 +105,14 @@ function buildTree(item: DocumentItem): DocumentTreeItem {
     label: item.name,
     icon: item.icon ?? null,
     type: item.type,
-    data: item,
+    // data: => leeve this empty that the tree size is smaller! load data on demand
     children: children.length ? children : undefined,
   };
 }
 
-/** the standard interface for data. here with mock data */
+/**
+ * Diese Stanardfunktionen braucht jeder Provider
+ */
 export default {
   name: "mock",
   async getDocumentTree(): Promise<DocumentTreeItem[]> {
@@ -117,5 +120,31 @@ export default {
 
     const tree = rootItems.map((rootItem) => buildTree(rootItem));
     return tree;
+  },
+
+  async getDataForDocument(id: string): Promise<DocumentItem> {
+    console.log("getDataForDocument");
+    const item = demoData.find((item) => item.id === id);
+    if (!item) {
+      throw new Error(`Document with id ${id} not found`);
+    }
+    return item;
+  },
+
+  async addDocument(document: DocumentItem): Promise<void> {
+    console.log("addDocument");
+    demoData.push(document);
+  },
+
+  async dropDocument(id: string): Promise<void> {
+    console.log("dropDocument");
+    const index = demoData.findIndex((item) => item.id === id);
+    demoData.splice(index, 1);
+  },
+
+  async updateDocument(document: DocumentItem): Promise<void> {
+    console.log("updateDocument");
+    const index = demoData.findIndex((item) => item.id === document.id);
+    demoData[index] = document;
   },
 };

@@ -1,8 +1,5 @@
 import { UniversalBlock } from "vue-blockful-editor";
 
-export interface DocumentBlock {
-}
-
 export interface DocumentItem {
   version: number;
   id: string; // GUID
@@ -25,6 +22,6 @@ export interface DocumentTreeItem {
   label: string;
   icon?: null | string; // e.g. 'pi pi-fw pi-inbox'
   type: "document" | "folder";
-  data: DocumentItem;
+  data?: DocumentItem;
   children?: DocumentTreeItem[];
 }
