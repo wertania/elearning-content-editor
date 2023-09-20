@@ -5,6 +5,7 @@ export interface DocumentItem {
   id: string; // GUID
   type: "document" | "folder";
   parent: null | string;
+  originId: null | string; // id of the original document (e.g. translations)
   icon: null | string; // fontawesome icon
   name: string; // short document name
   header: string; // long document name

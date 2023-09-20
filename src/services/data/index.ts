@@ -1,4 +1,5 @@
 import MockProvider from "./provider/mock";
+import CosmosDbProvider from "./provider/cosmosdb";
 import { DocumentItem } from "./types";
 // some more providers later...
 // es soll hier möglich sein, verschiedene Provider zu verwenden, damit das projekt nicht nur mit z.B. Azure funktioniert
@@ -14,10 +15,12 @@ export class DataProvider {
   /**
    * Returns the document tree for all documents in tree structure
    */
-  getDocumentTree() {
+  getDocumentTreeAndList() {
     switch (this.provider) {
       case "mock":
-        return MockProvider.getDocumentTree();
+        return MockProvider.getDocuments();
+      case "cosmosdb":
+        return CosmosDbProvider.getDocuments();
       default:
         throw new Error(`Provider ${this.provider} not found`);
     }
@@ -27,6 +30,8 @@ export class DataProvider {
     switch (this.provider) {
       case "mock":
         return MockProvider.getDataForDocument(id);
+      case "cosmosdb":
+        return CosmosDbProvider.getDataForDocument(id);
       default:
         throw new Error(`Provider ${this.provider} not found`);
     }
@@ -39,6 +44,8 @@ export class DataProvider {
     switch (this.provider) {
       case "mock":
         return MockProvider.addDocument(document);
+      case "cosmosdb":
+        return CosmosDbProvider.addDocument(document);
       default:
         throw new Error(`Provider ${this.provider} not found`);
     }
@@ -48,6 +55,8 @@ export class DataProvider {
     switch (this.provider) {
       case "mock":
         return MockProvider.dropDocument(id);
+      case "cosmosdb":
+        return CosmosDbProvider.dropDocument(id);
       default:
         throw new Error(`Provider ${this.provider} not found`);
     }
@@ -57,6 +66,8 @@ export class DataProvider {
     switch (this.provider) {
       case "mock":
         return MockProvider.updateDocument(document);
+      case "cosmosdb":
+        return CosmosDbProvider.updateDocument(document);
       default:
         throw new Error(`Provider ${this.provider} not found`);
     }

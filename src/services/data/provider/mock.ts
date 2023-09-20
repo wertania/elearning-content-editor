@@ -7,6 +7,7 @@ const demoData: DocumentItem[] = [
   {
     version: 1,
     id: "1",
+    originId: null,
     type: "document",
     parent: "3",
     icon: "fa-solid fa-file",
@@ -28,6 +29,7 @@ const demoData: DocumentItem[] = [
   {
     version: 1,
     id: "2",
+    originId: null,
     type: "document",
     parent: null,
     icon: "fa-solid fa-folder",
@@ -49,6 +51,7 @@ const demoData: DocumentItem[] = [
   {
     version: 1,
     id: "3",
+    originId: null,
     type: "folder",
     parent: null,
     icon: "fa-solid fa-folder",
@@ -61,6 +64,7 @@ const demoData: DocumentItem[] = [
   {
     version: 1,
     id: "4",
+    originId: null,
     type: "folder",
     parent: "3",
     icon: "fa-solid fa-folder",
@@ -73,6 +77,7 @@ const demoData: DocumentItem[] = [
   {
     version: 1,
     id: "5",
+    originId: null,
     type: "document",
     parent: "4",
     icon: "fa-solid fa-file",
@@ -115,11 +120,16 @@ function buildTree(item: DocumentItem): DocumentTreeItem {
  */
 export default {
   name: "mock",
-  async getDocumentTree(): Promise<DocumentTreeItem[]> {
+  async getDocuments(): Promise<
+    { tree: DocumentTreeItem[]; list: DocumentItem[] }
+  > {
     const rootItems = demoData.filter((item) => item.parent == null);
 
     const tree = rootItems.map((rootItem) => buildTree(rootItem));
-    return tree;
+    return {
+      tree,
+      list: demoData,
+    };
   },
 
   async getDataForDocument(id: string): Promise<DocumentItem> {
