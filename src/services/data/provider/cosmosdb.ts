@@ -69,7 +69,8 @@ export default {
   async getDataForDocument(id: string): Promise<DocumentItem> {
     console.log("getDataForDocument");
     const { resources } = await container.items
-      .query("SELECT * FROM document WHERE document.id = @id", {
+      .query({
+        query: "SELECT * FROM document d WHERE d.id = @id",
         parameters: [{ name: "@id", value: id }],
       })
       .fetchAll();
