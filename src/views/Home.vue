@@ -1,15 +1,20 @@
 <template>
-    <div style="margin: 0 auto; width:30%;">
-        <div style="width: 100%; text-align: center;">
-            <h1>{{ "Welcome" }}</h1>
-        </div>
-        <Button class="w-full" label="--> Editor" @click="router.push({ path: '/edit' })" />
+    <div class="text-center mt-5">
+        <Button @click="triggerSignIn()">Bei O365 anmelden</Button>
     </div>
 </template>
-
+  
 <script setup lang="ts">
-import Button from 'primevue/button';
-import { useRouter } from 'vue-router';
-const router = useRouter();
+import { signIn } from './../services/auth';
+import Button from "primevue/button";
+import { useGlobalStore } from './../stores/global';
 
+const store = useGlobalStore()
+
+const triggerSignIn = async () => {
+    const loginSuccess = await signIn('popup')
+    if (loginSuccess) {
+        await store.loginRedirect()
+    }
+}
 </script>
