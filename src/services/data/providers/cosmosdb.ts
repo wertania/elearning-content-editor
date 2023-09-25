@@ -1,11 +1,12 @@
 import { InteractiveBrowserCredential } from '@azure/identity';
 import { DocumentItem } from '../types';
-import type { DataProvider, DocumentTreeItem } from '../types';
+import type { DataProvider, DocumentTreeItem, Medium } from '../types';
 import { Container, CosmosClient } from '@azure/cosmos';
 import { buildTree } from '../helpers';
 
 let cosmosClient: CosmosClient;
 let container: Container;
+let mediaContainer: Container;
 
 export default {
   name: 'cosmosdb',
@@ -13,7 +14,6 @@ export default {
   initialize() {
     const endpoint = import.meta.env.VITE_AZURE_COSMOSDB_ENDPOINT;
     const databaseName = import.meta.env.VITE_AZURE_COSMOSDB_DATABASE;
-    const containerName = import.meta.env.VITE_AZURE_COSMOSDB_CONTAINER;
 
     cosmosClient = new CosmosClient({
       endpoint,
@@ -23,9 +23,13 @@ export default {
       }),
     });
 
-    container = cosmosClient.database(databaseName).container(containerName);
+    container = cosmosClient
+      .database(databaseName)
+      .container(import.meta.env.VITE_AZURE_COSMOSDB_CONTAINER);
 
-    container.read().then(console.log);
+    mediaContainer = cosmosClient
+      .database(databaseName)
+      .container(import.meta.env.VITE_AZURE_COSMOSDB_CONTAINER_MEDIA);
   },
 
   async getDocuments(): Promise<{
@@ -41,6 +45,10 @@ export default {
       list: resources,
     };
   },
+
+  // -------------
+  // | DOCUMENTS |
+  // -------------
 
   async getDataForDocument(id: string): Promise<DocumentItem> {
     const { resources } = await container.items
@@ -58,7 +66,7 @@ export default {
   },
 
   async addDocument(document: DocumentItem): Promise<void> {
-    await container.items.upsert(document);
+    await container.items.create(document);
   },
 
   async dropDocument(id: string): Promise<void> {
@@ -67,5 +75,14 @@ export default {
 
   async updateDocument(document: DocumentItem): Promise<void> {
     await container.item(document.id).replace(document);
+  },
+
+  // ---------
+  // | MEDIA |
+  // ---------
+
+  async getMedium(id) {
+    const response = await mediaContainer.item(id).read<Medium>();
+    return response.resource;
   },
 } satisfies DataProvider;
