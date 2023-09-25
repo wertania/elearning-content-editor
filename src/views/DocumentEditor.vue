@@ -2,7 +2,7 @@
   <App class="document-editor" title="e-Learning Plattform">
     <template #toolbar>
       <Button label="New" @click="addDocument" />
-      <Button label="Save" @click="saveDocument" />
+      <Button label="Save" @click="saveDocument" severity="success" />
       <Button
         label="Close"
         @click="closeDocument"
@@ -77,7 +77,7 @@ const handleSelection = (node: TreeNode) => {
  * Asynchronously load a document from API.
  */
 const loadDocument = async () => {
-  const selectedKeys = Object.keys(selection ?? {});
+  const selectedKeys = Object.keys(selection.value ?? {});
 
   if (!selectedKeys.length) return;
 
@@ -155,14 +155,10 @@ const closeDocument = () => {
 .document-editor {
   &__main {
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: minmax(300px, 1fr) 3fr;
     gap: 1rem;
     height: 100%;
     padding: 0.5rem;
-  }
-
-  &__tree {
-    min-width: 300px;
   }
 
   &__load-button {
