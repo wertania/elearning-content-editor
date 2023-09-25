@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import { router } from "./../router/index";
-import { checkForValidToken } from "../services/auth";
+import { defineStore } from 'pinia';
+import { router } from './../router/index';
+import { checkForValidToken } from '../services/auth';
 
-export const useGlobalStore = defineStore("global", {
+export const useGlobalStore = defineStore('global', {
   state: () => ({
     isLoggedIn: false,
   }),
@@ -15,7 +15,7 @@ export const useGlobalStore = defineStore("global", {
     },
     async loginRedirect() {
       this.isLoggedIn = true;
-      await router.push({ path: "/edit" });
+      await router.push({ path: '/edit' });
     },
   },
 });

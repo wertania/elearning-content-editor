@@ -1,13 +1,24 @@
 <template>
   <div class="w-full">
-    <div v-if="modelValue.data.src != null && modelValue.data.src !== ''" id="block-img" class="inline">
-      {{ "Video-Url: " + modelValue.data.src }}
+    <div
+      v-if="modelValue.data.src != null && modelValue.data.src !== ''"
+      id="block-img"
+      class="inline"
+    >
+      {{ 'Video-Url: ' + modelValue.data.src }}
     </div>
     <div v-else class="w-[50%] m-auto text-gray-400 text-center rounded-xl">
       <div class="flex m-auto mt-2">
         <div>{{ 'Video-Url' }}</div>
-        <input type="text" class="ml-2 border border-gray-600 w-[300px]" v-model="inputUrl" />
-        <i class="fa-solid fa-check ml-2 text-2xl cursor-pointer hover:bg-gray-300 rounded" @click="saveWithUrl()" />
+        <input
+          type="text"
+          class="ml-2 border border-gray-600 w-[300px]"
+          v-model="inputUrl"
+        />
+        <i
+          class="fa-solid fa-check ml-2 text-2xl cursor-pointer hover:bg-gray-300 rounded"
+          @click="saveWithUrl()"
+        />
       </div>
     </div>
   </div>
@@ -27,7 +38,7 @@ watch(props, () => {
   src.value = props.modelValue.data.src;
 });
 
-// directely set url
+// directly set url
 const inputUrl = ref('');
 const saveWithUrl = async () => {
   if (inputUrl.value != null && inputUrl.value !== '') {
