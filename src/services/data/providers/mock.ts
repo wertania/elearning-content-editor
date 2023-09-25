@@ -10,11 +10,8 @@ export default {
     tree: DocumentTreeItem[];
     list: DocumentItem[];
   }> {
-    const rootItems = demoData.filter((item) => item.parent == null);
-    const tree = rootItems.map((rootItem) => buildTree(rootItem, demoData));
-
     return {
-      tree,
+      tree: buildTree(demoData),
       list: demoData,
     };
   },

@@ -25,7 +25,7 @@ export default {
 
     container = cosmosClient.database(databaseName).container(containerName);
 
-    container.read().then(console.log)
+    container.read().then(console.log);
   },
 
   async getDocuments(): Promise<{
@@ -35,12 +35,9 @@ export default {
     // can be improved...
     const query = 'SELECT * FROM document'; // Modify this query as needed
     const { resources } = await container.items.query(query).fetchAll();
-    const rootItems: DocumentItem[] = resources.filter(
-      (item) => item.parent == null,
-    );
-    const tree = rootItems.map((rootItem) => buildTree(rootItem, resources));
+
     return {
-      tree,
+      tree: buildTree(resources),
       list: resources,
     };
   },
