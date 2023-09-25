@@ -36,15 +36,17 @@
 
         <div v-else class="g-center-content">
           <Button
-            v-if="selectedNode && selectedNode.type === 'document'"
             class="document-editor__load-button"
+            :disabled="!isDocumentSelected"
             @click="loadDocument"
           >
-            Load &nbsp;
-            <code><i class="fa fa-file" /> {{ selectedNode.name }}</code>
-          </Button>
+            <template v-if="isDocumentSelected">
+              Load &nbsp;
+              <code> <i class="fa fa-file" /> {{ selectedNode?.name }} </code>
+            </template>
 
-          <template v-else>Select a document node.</template>
+            <template v-else> Select a document node. </template>
+          </Button>
         </div>
       </div>
     </template>
@@ -52,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';
@@ -67,6 +69,10 @@ const documentStore = useDocumentStore();
 const selection = ref<Record<string, boolean>>({});
 const selectedDocument = ref<DocumentItem>();
 const selectedNode = ref<DocumentTreeItem>();
+
+const isDocumentSelected = computed(
+  () => selectedNode.value?.type === 'document',
+);
 
 // document handling
 const mode = ref<'new' | 'edit'>('new');
