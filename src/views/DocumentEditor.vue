@@ -1,112 +1,89 @@
 <template>
-  <Toolbar>
-    <template #start>
+  <App class="document-editor" title="e-Learning Plattform">
+    <template #toolbar>
+      <Button label="New" @click="addDocument" />
+      <Button label="Save" @click="saveDocument" severity="success" />
       <Button
-        label="Load"
-        class="mr-2"
-        @click="loadDocument()"
-        :disabled="selectedDocumentId == null"
-        severity="warning"
-      />
-      <Button
-        label="New"
-        class="mr-2"
-        @click="addDocument()"
-        severity="success"
+        label="Close"
+        @click="closeDocument"
+        :disabled="!selectedDocument"
+        severity="danger"
       />
     </template>
 
-    <template #end>
-      <Button
-        label="Save"
-        class="mr-2"
-        severity="success"
-        @click="saveDocument()"
-      />
+    <template #main>
+      <div class="document-editor__main">
+        <Tree
+          class="document-editor__tree"
+          selectionMode="single"
+          v-model:selectionKeys="selection"
+          :value="documentStore.documentTree"
+          @node-select="handleSelection"
+        />
+
+        <ContentEditor
+          v-if="selectedDocument"
+          :selected-document="selectedDocument"
+          v-model:editor-data="editorData"
+        />
+
+        <div v-else class="g-center-content">
+          <Button
+            v-if="selectedNode && selectedNode.type === 'document'"
+            class="document-editor__load-button"
+            @click="loadDocument"
+          >
+            Load &nbsp;
+            <code>{{ selectedNode.name }}</code>
+          </Button>
+
+          <template v-else>Select a document node.</template>
+        </div>
+      </div>
     </template>
-  </Toolbar>
-  <div class="grid" style="display: flex">
-    <!-- display:flex war nötig, weil tailwind styles die primeflex styles kaputt machen... -->
-    <div class="col-4">
-      <Tree
-        selectionMode="single"
-        v-model:selectionKeys="selectedDocumentId"
-        :value="documentStore.documentTree"
-        @node-select="selectTreeItem"
-      ></Tree>
-    </div>
-    <div class="col-8">
-      <MetaData
-        v-if="selectedDocument != null"
-        v-model:header="selectedDocument.header"
-        v-model:description="selectedDocument.description"
-        v-model:lang-code="selectedDocument.langCode"
-        v-model:name="selectedDocument.name"
-      />
-      <!-- mehr abstand hier...-->
-      <BlockEditor
-        v-model="editorData"
-        :readOnly="false"
-        :debug="false"
-        :plugins="plugins"
-        :showAllBlockControls="true"
-        :disableColumns="true"
-      />
-    </div>
-  </div>
+  </App>
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from 'vue';
-import {
-  BlockEditor,
-  PluginHeader,
-  PluginParagraph,
-  BlockPage,
-} from 'vue-blockful-editor';
-import Tree from 'primevue/tree';
+import { ref } from 'vue';
+import Tree, { TreeNode } from 'primevue/tree';
 import { useDocumentStore } from '../stores/documents';
-import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
-import MetaData from '../components/MetaData.vue';
-import { DocumentItem } from '../services/data/types';
+import { DocumentItem, DocumentTreeItem } from '../services/data/types';
 import { guid } from '../services/guid';
-import { PluginVideo } from './../services/blocks/video';
-
-// block editor plugins
-const plugins = [
-  PluginParagraph,
-  PluginHeader,
-  PluginVideo, // custom block zum speichern der video url.
-  // hier fehlt noch der markdown block. die anderen sind unrelevant. => https://thieleundklose.atlassian.net/browse/HH-390
-];
+import ContentEditor from '../components/ContentEditor.vue';
+import { App } from 'hh-components';
+import { BlockPage } from 'vue-blockful-editor';
 
 // tree data
 const documentStore = useDocumentStore();
-const selectedDocumentId: Ref<{ [id: string]: boolean }> = ref({});
-const selectedDocument: Ref<null | DocumentItem> = ref(null);
-
-const selectTreeItem = (event: any) => {
-  // not needed, because of v-model:selectionKeys="selectedDocument"
-  console.log(event);
-};
+const selection = ref<Record<string, boolean>>({});
+const selectedDocument = ref<DocumentItem>();
+const selectedNode = ref<DocumentTreeItem>();
 
 // document handling
-const mode: Ref<'new' | 'edit'> = ref('new');
+const mode = ref<'new' | 'edit'>('new');
+
+// interactive editor state
+const editorData = ref<BlockPage>({
+  blocks: [],
+});
+
+const handleSelection = (node: TreeNode) => {
+  selectedNode.value = node as DocumentTreeItem;
+};
 
 /**
  * Asynchronously load a document from API.
  */
 const loadDocument = async () => {
-  if (
-    selectedDocumentId.value == null ||
-    Object.keys(selectedDocumentId.value).length === 0
-  ) {
-    return;
-  }
+  const selectedKeys = Object.keys(selection.value ?? {});
+
+  if (!selectedKeys.length) return;
+
+  const id = selectedKeys[0];
+
   mode.value = 'edit';
-  const id = Object.keys(selectedDocumentId.value)[0];
-  console.log('load document', id);
   selectedDocument.value = await documentStore.getDocument(id);
   editorData.value.blocks = selectedDocument.value.content;
 };
@@ -116,15 +93,18 @@ const loadDocument = async () => {
  */
 const addDocument = async () => {
   mode.value = 'new';
-  selectedDocumentId.value = {};
+  selection.value = {};
   editorData.value.blocks = [];
+
+  const parent =
+    selectedNode.value?.type === 'folder'
+      ? selectedNode.value.key
+      : selectedNode.value?.parent;
+
   selectedDocument.value = {
     version: 1,
     type: 'document',
-    parent:
-      Object.keys(documentStore.documentTree).length > 0
-        ? Object.keys(documentStore.documentTree)[0]
-        : null,
+    parent,
     id: guid(),
     name: 'New_Document',
     header: 'New_Document',
@@ -138,8 +118,8 @@ const addDocument = async () => {
         },
       },
     ],
-    icon: 'fa-solid fa-file',
   };
+
   editorData.value.blocks = selectedDocument.value.content;
 };
 
@@ -147,53 +127,47 @@ const addDocument = async () => {
  * Save the current document depending on the mode.
  */
 const saveDocument = async () => {
-  if (selectedDocument.value == null) {
-    return;
-  }
+  if (!selectedDocument.value) return;
+
   if (mode.value === 'new') {
     await documentStore.addDocument(selectedDocument.value);
   } else {
     await documentStore.updateDocument(selectedDocument.value);
   }
-  selectedDocument.value = null;
+
+  selectedDocument.value = undefined;
   editorData.value.blocks = [];
 };
 
-// interactive editor state
-const editorData: Ref<BlockPage> = ref({
-  blocks: [],
-});
+const closeDocument = () => {
+  if (!selectedDocument.value) return;
+
+  const confirmed = confirm(
+    'Are you sure you want to close the document? Save your progress before confirming!',
+  );
+  if (!confirmed) return;
+
+  selectedDocument.value = undefined;
+};
 </script>
 
-<style>
-@import 'vue-blockful-editor/style.css';
-/**
-die styles hier machen die primeVue button styles etc. kaputt :-(
-das muss irgendwie besser gehen
-Ideal wäre es, die Tailwind Classes aus vue-blockful-editor mit einem präfix zu versehen direkt im package selbst... "vbe-" oder so
-*/
+<style lang="scss">
+.document-editor {
+  &__main {
+    display: grid;
+    grid-template-columns: minmax(300px, 1fr) 3fr;
+    gap: 1rem;
+    height: 100%;
+    padding: 0.5rem;
+  }
 
-h1 {
-  font-size: 2em;
-}
-
-h2 {
-  font-size: 1.5em;
-}
-
-h3 {
-  font-size: 1.17em;
-}
-
-h4 {
-  font-size: 1em;
-}
-
-h5 {
-  font-size: 0.83em;
-}
-
-h6 {
-  font-size: 0.67em;
+  &__load-button {
+    code {
+      display: inline;
+      background-color: var(--surface-500);
+      padding: 0.1rem 0.2rem;
+      border-radius: 0.2rem;
+    }
+  }
 }
 </style>

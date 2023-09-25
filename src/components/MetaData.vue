@@ -1,30 +1,33 @@
 <template>
-  <div class="flex flex-column gap-2">
-    <label for="name">Name (Menu)</label>
+  <div class="meta-data__item">
+    <label class="content-editor__label" for="name">Name (Menu)</label>
     <InputText
       id="name"
       :value="name"
       @update:model-value="$emit('update:name', $event)"
     />
   </div>
-  <div class="flex flex-column gap-2">
-    <label for="header">Header</label>
+
+  <div class="meta-data__item">
+    <label class="content-editor__label" for="header">Header</label>
     <InputText
       id="header"
       :value="header"
       @update:model-value="$emit('update:header', $event)"
     />
   </div>
-  <div class="flex flex-column gap-2">
-    <label for="description">Description</label>
+
+  <div class="meta-data__item">
+    <label class="content-editor__label" for="description">Description</label>
     <InputText
       id="description"
       :value="description"
       @update:model-value="$emit('update:description', $event)"
     />
   </div>
-  <div class="flex flex-column gap-2">
-    <label for="langCode">Language Code</label>
+
+  <div class="meta-data__item">
+    <label class="content-editor__label" for="langCode">Language Code</label>
     <Dropdown
       id="langCode"
       :options="[
@@ -42,9 +45,15 @@
 <script setup lang="ts">
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
-import { ref, Ref } from 'vue';
+import { ref } from 'vue';
 
-const props = defineProps(['name', 'header', 'description', 'langCode']);
+const props = defineProps<{
+  name: string;
+  header: string;
+  description: string;
+  langCode: string;
+}>();
+
 defineEmits([
   'update:name',
   'update:header',
@@ -52,6 +61,14 @@ defineEmits([
   'update:langCode',
 ]);
 
-// dropdown needs an inner state
-const selectedLangCode: Ref<string> = ref(props.langCode);
+const selectedLangCode = ref<string>(props.langCode);
 </script>
+
+<style lang="scss">
+.meta-data {
+  &__item {
+    display: flex;
+    flex-direction: column;
+  }
+}
+</style>

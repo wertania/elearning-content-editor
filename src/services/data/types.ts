@@ -5,9 +5,9 @@ export interface DocumentItem {
   version: number;
   id: string; // GUID
   type: 'document' | 'folder';
-  parent: null | string;
-  originId: null | string; // id of the original document (e.g. translations)
-  icon: null | string; // fontawesome icon
+  parent?: string;
+  originId?: string; // id of the original document (e.g. translations)
+  icon?: string; // fontawesome icon
   name: string; // short document name
   header: string; // long document name
   description: string; // short description
@@ -26,11 +26,8 @@ export interface DataProvider {
   updateDocument(document: DocumentItem): Promise<void>;
 }
 
-export interface DocumentTreeItem extends TreeNode {
-  key: string; // unique key = id
-  label: string;
-  icon?: string; // e.g. 'pi pi-fw pi-inbox'
+export interface DocumentTreeItem extends TreeNode, DocumentItem {
   type: 'document' | 'folder';
-  data?: DocumentItem;
   children?: DocumentTreeItem[];
+  // data: DocumentItem;
 }
