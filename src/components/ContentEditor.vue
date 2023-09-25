@@ -8,7 +8,7 @@
     />
 
     <div class="content-editor__label">Content</div>
-    <div class="block-editor">
+    <div class="content-editor__block-editor">
       <BlockEditor
         v-model="editorDataProxy"
         :readOnly="false"
@@ -18,11 +18,14 @@
         :disableColumns="true"
       />
     </div>
+
+    <!-- Dummy container that adds whitespace to the editor area for usability. -->
+    <div style="height: 50vh" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import {
   BlockEditor,
   PluginHeader,
@@ -32,6 +35,7 @@ import {
 import MetaData from '../components/MetaData.vue';
 import { DocumentItem } from '../services/data/types';
 import { PluginVideo } from './../blocks/video';
+import { PluginMarkdown } from './../blocks/markdown';
 
 const props = defineProps<{
   selectedDocument: DocumentItem;
@@ -48,12 +52,20 @@ const editorDataProxy = computed({
 });
 
 // block editor plugins
-const plugins = [
-  PluginParagraph,
-  PluginHeader,
-  PluginVideo, // custom block zum speichern der video url.
-  // hier fehlt noch der markdown block. die anderen sind unrelevant. => https://thieleundklose.atlassian.net/browse/HH-390
-];
+const plugins = [PluginParagraph, PluginHeader, PluginVideo, PluginMarkdown];
+
+const unloadEventListener = (e: BeforeUnloadEvent) => {
+  e.preventDefault();
+  e.returnValue = '';
+};
+
+onMounted(() => {
+  window.addEventListener('beforeunload', unloadEventListener);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', unloadEventListener);
+});
 </script>
 
 <style lang="scss">
@@ -73,7 +85,7 @@ const plugins = [
     margin-bottom: 0.25rem;
   }
 
-  .block-editor {
+  &__block-editor {
     @include vue-blockful-editor.styles;
 
     display: flex;

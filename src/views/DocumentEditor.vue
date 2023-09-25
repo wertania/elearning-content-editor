@@ -1,8 +1,15 @@
 <template>
   <App class="document-editor" title="e-Learning Plattform">
     <template #toolbar>
-      <Button label="New" @click="addDocument" />
-      <Button label="Save" @click="saveDocument" severity="success" />
+      <Button label="New" @click="addDocument" :disabled="!!selectedDocument" />
+
+      <Button
+        label="Save"
+        @click="saveDocument"
+        severity="success"
+        :disabled="!selectedDocument"
+      />
+
       <Button
         label="Close"
         @click="closeDocument"
@@ -29,15 +36,17 @@
 
         <div v-else class="g-center-content">
           <Button
-            v-if="selectedNode && selectedNode.type === 'document'"
             class="document-editor__load-button"
+            :disabled="!isDocumentSelected"
             @click="loadDocument"
           >
-            Load &nbsp;
-            <code>{{ selectedNode.name }}</code>
-          </Button>
+            <template v-if="isDocumentSelected">
+              Load &nbsp;
+              <code> <i class="fa fa-file" /> {{ selectedNode?.name }} </code>
+            </template>
 
-          <template v-else>Select a document node.</template>
+            <template v-else> Select a document node. </template>
+          </Button>
         </div>
       </div>
     </template>
@@ -45,14 +54,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';
 import { DocumentItem, DocumentTreeItem } from '../services/data/types';
 import { guid } from '../services/guid';
 import ContentEditor from '../components/ContentEditor.vue';
-import { App } from 'hh-components';
+import { App, toastService } from 'hh-components';
 import { BlockPage } from 'vue-blockful-editor';
 
 // tree data
@@ -60,6 +69,10 @@ const documentStore = useDocumentStore();
 const selection = ref<Record<string, boolean>>({});
 const selectedDocument = ref<DocumentItem>();
 const selectedNode = ref<DocumentTreeItem>();
+
+const isDocumentSelected = computed(
+  () => selectedNode.value?.type === 'document',
+);
 
 // document handling
 const mode = ref<'new' | 'edit'>('new');
@@ -106,8 +119,8 @@ const addDocument = async () => {
     type: 'document',
     parent,
     id: guid(),
-    name: 'New_Document',
-    header: 'New_Document',
+    name: 'New document',
+    header: '',
     description: '',
     langCode: 'de',
     content: [
@@ -120,7 +133,9 @@ const addDocument = async () => {
     ],
   };
 
-  editorData.value.blocks = selectedDocument.value.content;
+  editorData.value = {
+    blocks: selectedDocument.value.content,
+  };
 };
 
 /**
@@ -131,12 +146,14 @@ const saveDocument = async () => {
 
   if (mode.value === 'new') {
     await documentStore.addDocument(selectedDocument.value);
+
+    selectedDocument.value = undefined;
+    editorData.value.blocks = [];
   } else {
     await documentStore.updateDocument(selectedDocument.value);
-  }
 
-  selectedDocument.value = undefined;
-  editorData.value.blocks = [];
+    toastService.success('Successfully saved the document!');
+  }
 };
 
 const closeDocument = () => {
@@ -153,6 +170,11 @@ const closeDocument = () => {
 
 <style lang="scss">
 .document-editor {
+  &__main,
+  .content-editor {
+    overflow: auto;
+  }
+
   &__main {
     display: grid;
     grid-template-columns: minmax(300px, 1fr) 3fr;
@@ -165,8 +187,8 @@ const closeDocument = () => {
     code {
       display: inline;
       background-color: var(--surface-500);
-      padding: 0.1rem 0.2rem;
-      border-radius: 0.2rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.4rem;
     }
   }
 }

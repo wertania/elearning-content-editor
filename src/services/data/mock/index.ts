@@ -1,4 +1,5 @@
 import { DocumentItem } from '../types';
+import mdData from './mock.md?raw';
 
 /**
  * Diese Daten sollen den originalen Daten entsprechen, die in einer DB lagern.
@@ -18,11 +19,11 @@ export const mockData: DocumentItem[] = [
     content: [
       {
         type: 'paragraph',
-        data: 'This is the first paragraph of the first document',
+        data: { text: 'This is the first paragraph of the first document' },
       },
       {
         type: 'paragraph',
-        data: 'This is the second paragraph of the first document',
+        data: { text: 'This is the second paragraph of the first document' },
       },
     ],
   },
@@ -39,11 +40,13 @@ export const mockData: DocumentItem[] = [
     content: [
       {
         type: 'paragraph',
-        data: 'This is the first paragraph of the second document',
+        data: { text: 'This is the first paragraph of the second document' },
       },
       {
-        type: 'paragraph',
-        data: 'This is the second paragraph of the second document',
+        type: 'markdown',
+        data: {
+          code: mdData,
+        },
       },
     ],
   },
@@ -84,11 +87,11 @@ export const mockData: DocumentItem[] = [
     content: [
       {
         type: 'paragraph',
-        data: 'This is the first paragraph of the third document',
+        data: { text: 'This is the first paragraph of the third document' },
       },
       {
         type: 'paragraph',
-        data: 'This is the second paragraph of the third document',
+        data: { text: 'This is the second paragraph of the third document' },
       },
     ],
   },
