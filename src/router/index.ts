@@ -1,15 +1,15 @@
-import * as VueRouter from "vue-router";
+import * as VueRouter from 'vue-router';
 
 const routes = [
   {
-    path: "/",
-    component: () => import("@/views/Home.vue"),
-    name: "home",
+    path: '/',
+    component: () => import('@/views/Home.vue'),
+    name: 'home',
   },
   {
-    path: "/edit/:id?",
-    component: () => import("@/views/DocumentEditor.vue"),
-    home: "edit",
+    path: '/edit/:id?',
+    component: () => import('@/views/DocumentEditor.vue'),
+    home: 'edit',
   },
 ];
 

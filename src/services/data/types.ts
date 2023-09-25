@@ -1,9 +1,10 @@
-import { UniversalBlock } from "vue-blockful-editor";
+import { TreeNode } from 'primevue/tree';
+import type { UniversalBlock } from 'vue-blockful-editor';
 
 export interface DocumentItem {
   version: number;
   id: string; // GUID
-  type: "document" | "folder";
+  type: 'document' | 'folder';
   parent: null | string;
   originId: null | string; // id of the original document (e.g. translations)
   icon: null | string; // fontawesome icon
@@ -16,13 +17,20 @@ export interface DocumentItem {
 
 export interface DataProvider {
   name: string;
+
+  initialize?(): void;
+  getDocuments(): Promise<{ tree: DocumentTreeItem[]; list: DocumentItem[] }>;
+  getDataForDocument(id: string): Promise<DocumentItem>;
+  addDocument(document: DocumentItem): Promise<void>;
+  dropDocument(id: string): Promise<void>;
+  updateDocument(document: DocumentItem): Promise<void>;
 }
 
-export interface DocumentTreeItem {
+export interface DocumentTreeItem extends TreeNode {
   key: string; // unique key = id
   label: string;
-  icon?: null | string; // e.g. 'pi pi-fw pi-inbox'
-  type: "document" | "folder";
+  icon?: string; // e.g. 'pi pi-fw pi-inbox'
+  type: 'document' | 'folder';
   data?: DocumentItem;
   children?: DocumentTreeItem[];
 }
