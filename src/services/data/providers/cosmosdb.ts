@@ -43,31 +43,29 @@ export default {
   },
 
   async getDataForDocument(id: string): Promise<DocumentItem> {
-    console.log('getDataForDocument');
     const { resources } = await container.items
       .query({
         query: 'SELECT * FROM document d WHERE d.id = @id',
         parameters: [{ name: '@id', value: id }],
       })
       .fetchAll();
+
     if (resources.length === 0) {
       throw new Error(`Document with id ${id} not found`);
     }
+
     return resources[0];
   },
 
   async addDocument(document: DocumentItem): Promise<void> {
-    console.log('addDocument');
-    throw 'not implemented';
+    await container.items.upsert(document);
   },
 
   async dropDocument(id: string): Promise<void> {
-    console.log('dropDocument');
-    throw 'not implemented';
+    await container.item(id).delete();
   },
 
   async updateDocument(document: DocumentItem): Promise<void> {
-    console.log('updateDocument');
-    throw 'not implemented';
+    await container.item(document.id).replace(document);
   },
 } satisfies DataProvider;
