@@ -1,5 +1,5 @@
 import MenuExtEdit from './EditMenu.vue';
-import Block from './block.vue';
+import Block from './Block.vue';
 import { BlockVideo } from './types';
 import { BlockPlugin } from 'vue-blockful-editor';
 

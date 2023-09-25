@@ -1,6 +1,6 @@
 import { UniversalBlock } from 'vue-blockful-editor';
 
-export interface BlockData_Image {
+export interface BlockData_Video {
   src: string;
 }
 
@@ -8,6 +8,6 @@ export type BlockVideo = UniversalBlock<'video'>;
 
 declare module 'vue-blockful-editor/blocks' {
   interface BlockDefinitions {
-    image: BlockData_Image;
+    video: BlockData_Video;
   }
 }

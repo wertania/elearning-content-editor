@@ -1,7 +1,7 @@
 import { buildTree } from '../helpers';
 import { DocumentItem } from '../types';
 import type { DataProvider, DocumentTreeItem } from '../types';
-import { mockData as demoData } from './mockData';
+import { mockData as demoData } from '../mock';
 
 export default {
   name: 'mock',

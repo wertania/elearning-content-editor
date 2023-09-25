@@ -18,6 +18,9 @@
         :disableColumns="true"
       />
     </div>
+
+    <!-- Dummy container that adds whitespace to the editor area for usability. -->
+    <div style="height: 50vh" />
   </div>
 </template>
 
@@ -32,6 +35,7 @@ import {
 import MetaData from '../components/MetaData.vue';
 import { DocumentItem } from '../services/data/types';
 import { PluginVideo } from './../blocks/video';
+import { PluginMarkdown } from './../blocks/markdown';
 
 const props = defineProps<{
   selectedDocument: DocumentItem;
@@ -48,12 +52,7 @@ const editorDataProxy = computed({
 });
 
 // block editor plugins
-const plugins = [
-  PluginParagraph,
-  PluginHeader,
-  PluginVideo, // custom block zum speichern der video url.
-  // hier fehlt noch der markdown block. die anderen sind unrelevant. => https://thieleundklose.atlassian.net/browse/HH-390
-];
+const plugins = [PluginParagraph, PluginHeader, PluginVideo, PluginMarkdown];
 </script>
 
 <style lang="scss">
