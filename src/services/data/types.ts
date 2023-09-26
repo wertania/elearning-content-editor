@@ -15,19 +15,31 @@ export interface DocumentItem {
   content: UniversalBlock[];
 }
 
-export interface DataProvider {
-  name: string;
+export type MediumType = 'video' | 'audio' | 'image';
 
-  initialize?(): void;
-  getDocuments(): Promise<{ tree: DocumentTreeItem[]; list: DocumentItem[] }>;
-  getDataForDocument(id: string): Promise<DocumentItem>;
-  addDocument(document: DocumentItem): Promise<void>;
-  dropDocument(id: string): Promise<void>;
-  updateDocument(document: DocumentItem): Promise<void>;
+export interface Medium {
+  id: string;
+  url: string; // blob url
+  name: string;
+  hash: string; // Ein hash über die Datei, um ggf. in Zukunft festzustellen, ob sich ein Upload/Download lohnt.
+  type: MediumType;
 }
 
 export interface DocumentTreeItem extends TreeNode, DocumentItem {
   type: 'document' | 'folder';
   children?: DocumentTreeItem[];
-  // data: DocumentItem;
+}
+
+export interface DataProvider {
+  name: string;
+
+  initialize?(): void;
+
+  getDocuments(): Promise<{ tree: DocumentTreeItem[]; list: DocumentItem[] }>;
+  getDataForDocument(id: string): Promise<DocumentItem>;
+  addDocument(document: DocumentItem): Promise<void>;
+  dropDocument(id: string): Promise<void>;
+  updateDocument(document: DocumentItem): Promise<void>;
+
+  getMedium(id: string): Promise<Medium | undefined>;
 }
