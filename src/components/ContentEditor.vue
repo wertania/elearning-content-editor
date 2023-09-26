@@ -20,7 +20,7 @@
     </div>
 
     <!-- Dummy container that adds whitespace to the editor area for usability. -->
-    <div style="height: 50vh" />
+    <div style="flex: 0 0 50vh" />
   </div>
 </template>
 
@@ -34,7 +34,7 @@ import {
 } from 'vue-blockful-editor';
 import MetaData from '../components/MetaData.vue';
 import { DocumentItem } from '../services/data/types';
-import { PluginVideo } from './../blocks/video';
+import { PluginMedium } from './../blocks/medium';
 import { PluginMarkdown } from './../blocks/markdown';
 
 const props = defineProps<{
@@ -52,7 +52,7 @@ const editorDataProxy = computed({
 });
 
 // block editor plugins
-const plugins = [PluginParagraph, PluginHeader, PluginVideo, PluginMarkdown];
+const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown];
 
 const unloadEventListener = (e: BeforeUnloadEvent) => {
   e.preventDefault();

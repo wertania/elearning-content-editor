@@ -1,28 +1,22 @@
 import MenuExtEdit from './EditMenu.vue';
 import Block from './Block.vue';
-import { BlockVideo } from './types';
+import { BlockMedium } from './types';
 import { BlockPlugin } from 'vue-blockful-editor';
 
-const name = 'video';
-const emptyData: BlockVideo = {
+const name = 'medium';
+const emptyData: BlockMedium = {
   type: name,
-  // style: {
-  //   spaceTop: 0,
-  //   spaceBottom: 0,
-  // },
-  data: {
-    src: '',
-  },
+  data: {},
 };
 
-export const PluginVideo: BlockPlugin = {
+export const PluginMedium: BlockPlugin = {
   name: name,
   block: Block,
   emptyBlock: () => emptyData,
   menuExtension: {
     addMenuEntry: {
-      icon: 'fa-solid fa-video',
-      label: 'Video',
+      icon: 'fa-solid fa-image',
+      label: 'Medium',
     },
     editMenuTemplate: MenuExtEdit,
   },
