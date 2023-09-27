@@ -85,8 +85,8 @@ onUnmounted(() => {
     margin-bottom: 0.25rem;
   }
 
-  &__block-editor {
-    @include vue-blockful-editor.styles;
+  .vbe {
+    @include vue-blockful-editor.style;
 
     display: flex;
     flex-direction: column;

@@ -39,7 +39,7 @@ import { dataProvider } from '../../services/data';
 import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
 import { Button } from 'hh-components';
-import { Medium } from 'src/services/data/types';
+import { Medium } from '../../services/data/types';
 
 const props = defineProps<{
   readOnly: boolean;
