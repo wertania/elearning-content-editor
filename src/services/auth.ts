@@ -2,7 +2,6 @@ import * as msal from '@azure/msal-browser';
 
 const TENANT_ID = import.meta.env.VITE_AZURE_COSMOSDB_TENANT_ID;
 const CLIENT_ID = import.meta.env.VITE_AZURE_COSMOSDB_CLIENT_ID;
-export const BASE_URL = 'https://graph.microsoft.com/v1.0';
 
 // Config object to be passed to Msal on creation
 const msalConfig = {
@@ -53,9 +52,6 @@ const msalConfig = {
 // Add here scopes for id token to be used at MS Identity Platform endpoints.
 const loginRequest = {
   scopes: [
-    'User.Read',
-    'Calendars.Read',
-    'Calendars.Read.Shared',
     'https://cosmos.azure.com/user_impersonation',
   ],
   forceRefresh: false, // Set this to "true" to skip a cached token and go to the server to get a new token
@@ -80,14 +76,9 @@ myMSALObj.initialize().then(() => {
 });
 
 function handleResponse(resp: any): boolean {
-  console.log(resp);
-
   if (resp !== null) {
     accountId = resp.account.homeAccountId;
     myMSALObj.setActiveAccount(resp.account);
-
-    const test = myMSALObj.getActiveAccount();
-    console.log(test);
 
     token = resp.idToken ?? null;
     if (token) {
@@ -106,9 +97,6 @@ function handleResponse(resp: any): boolean {
       myMSALObj.setActiveAccount(activeAccount);
       accountId = activeAccount.homeAccountId;
 
-      console.log('accountId: ' + accountId);
-
-      console.log('logged in');
       token = activeAccount.idToken ?? null;
       // save token from idToken
       if (token) {
@@ -125,7 +113,9 @@ export async function signIn(method: 'popup' | 'redirect' = 'popup') {
   if (signInType === 'popup') {
     return myMSALObj
       .loginPopup({
-        ...loginRequest,
+        scopes: [
+          'https://cosmos.azure.com/user_impersonation',
+        ],
         redirectUri: '/redirect',
       })
       .then(handleResponse)
@@ -150,27 +140,6 @@ export function signOut(interactionType = 'popup') {
   } else {
     myMSALObj.logoutRedirect(logoutRequest);
   }
-}
-
-// ???????
-export async function getTokenPopup() {
-  // console.log(request);
-
-  // loginRequest.redirectUri = "/redirect"
-
-  return await myMSALObj
-    .acquireTokenSilent(loginRequest)
-    .catch(async (error) => {
-      console.error('silent token acquisition fails.');
-      if (error instanceof msal.InteractionRequiredAuthError) {
-        console.log('acquiring token using popup');
-        return myMSALObj.acquireTokenPopup(loginRequest).catch((error) => {
-          throw error;
-        });
-      } else {
-        throw error;
-      }
-    });
 }
 
 export async function checkForValidToken() {
