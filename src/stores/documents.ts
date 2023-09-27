@@ -55,5 +55,29 @@ export const useDocumentStore = defineStore('documents', {
     async getDocument(id: string): Promise<DocumentItem> {
       return await dataProvider.getDataForDocument(id);
     },
+
+    async dropNode(id: string) {
+      const node = this.$state.documentsFlat.find((item) => item.id === id);
+
+      if (!node) {
+        console.error(`Node with id ${id} not found`);
+        return;
+      }
+
+      const getNodes = (node: DocumentItem | DocumentTreeItem): string[] => {
+        if (node.type === 'folder' && 'children' in node && node.children) {
+          return [node.id, ...node.children.flatMap(getNodes)];
+        } else {
+          return [node.id];
+        }
+      };
+
+      const nodes = getNodes(node);
+
+      await dataProvider.dropNodes(nodes);
+
+      // update current tree
+      await this.initialize(); // TODO: optimize
+    },
   },
 });

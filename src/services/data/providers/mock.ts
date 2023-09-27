@@ -52,4 +52,15 @@ export default {
   async getMedium(id) {
     return mockMedia.find((item) => id === item.id);
   },
+
+  // ---------
+  // | Nodes |
+  // ---------
+
+  async dropNodes(ids: string[]): Promise<void> {
+    for (const id of ids) {
+      const index = demoData.findIndex((item) => item.id === id);
+      demoData.splice(index, 1);
+    }
+  }
 } satisfies DataProvider;

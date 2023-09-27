@@ -85,4 +85,16 @@ export default {
     const response = await mediaContainer.item(id).read<Medium>();
     return response.resource;
   },
+
+  // ---------
+  // | Nodes |
+  // ---------
+
+  async dropNodes(ids: string[]): Promise<void> {
+    await Promise.all(
+      ids.map(async (id) => {
+        await container.item(id, id).delete();
+      }),
+    );
+  },
 } satisfies DataProvider;
