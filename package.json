@@ -8,9 +8,9 @@
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
     "format": "prettier -w . \"./src/**/*.{vue,ts}\"",
-    "docs:dev": "VITE_AZURE_AUTHENTICATION_TYPE=\"connection-string\" vitepress dev viewer",
-    "docs:build": "VITE_AZURE_AUTHENTICATION_TYPE=\"connection-string\" vitepress build viewer",
-    "docs:preview": "VITE_AZURE_AUTHENTICATION_TYPE=\"connection-string\" vitepress preview viewer"
+    "docs:dev": "vitepress dev viewer",
+    "docs:build": "vitepress build viewer",
+    "docs:preview": "vitepress preview viewer"
   },
   "dependencies": {
     "@azure/cosmos": "^4.0.0",

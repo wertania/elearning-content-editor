@@ -3,18 +3,20 @@ import { DocumentItem } from '../types';
 import type { DataProvider, DocumentTreeItem, Medium } from '../types';
 import { Container, CosmosClient } from '@azure/cosmos';
 import { buildTree } from '../helpers';
-
-const AUTHENTICATION_TYPE: 'ad' | 'connection-string' =
-  import.meta.env.VITE_AUTHENTICATION_TYPE || 'ad';
+import env from '../../../services/env';
 
 let cosmosClient: CosmosClient;
 let container: Container;
 let mediaContainer: Container;
 
+const AUTHENTICATION_TYPE = env.VITE_AZURE_AUTHENTICATION_TYPE || 'ad';
+
 export default {
   name: 'cosmosdb',
 
   initialize() {
+    console.log(`Authentication to CosmosDB via '${AUTHENTICATION_TYPE}'...`);
+
     if (AUTHENTICATION_TYPE === 'ad') {
       const endpoint = import.meta.env.VITE_AZURE_COSMOSDB_ENDPOINT;
 
@@ -27,19 +29,21 @@ export default {
       });
     } else if (AUTHENTICATION_TYPE === 'connection-string') {
       cosmosClient = new CosmosClient(
-        import.meta.env.VITE_AZURE_COSMOSDB_CONNECTION_STRING,
+        env.VITE_AZURE_COSMOSDB_CONNECTION_STRING,
       );
+    } else {
+      throw Error(`Unknown authentication type.`);
     }
 
-    const databaseName = import.meta.env.VITE_AZURE_COSMOSDB_DATABASE;
+    const databaseName = env.VITE_AZURE_COSMOSDB_DATABASE;
 
     container = cosmosClient
       .database(databaseName)
-      .container(import.meta.env.VITE_AZURE_COSMOSDB_CONTAINER);
+      .container(env.VITE_AZURE_COSMOSDB_CONTAINER);
 
     mediaContainer = cosmosClient
       .database(databaseName)
-      .container(import.meta.env.VITE_AZURE_COSMOSDB_CONTAINER_MEDIA);
+      .container(env.VITE_AZURE_COSMOSDB_CONTAINER_MEDIA);
   },
 
   async getDocuments(): Promise<{
@@ -80,11 +84,11 @@ export default {
   },
 
   async dropDocument(id: string): Promise<void> {
-    await container.item(id).delete();
+    await container.item(id, id).delete();
   },
 
   async updateDocument(document: DocumentItem): Promise<void> {
-    await container.item(document.id).replace(document);
+    await container.item(document.id, document.id).replace(document);
   },
 
   // ---------
@@ -92,7 +96,7 @@ export default {
   // ---------
 
   async getMedium(id) {
-    const response = await mediaContainer.item(id).read<Medium>();
+    const response = await mediaContainer.item(id, id).read<Medium>();
     return response.resource;
   },
 } satisfies DataProvider;

@@ -10,7 +10,6 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
       'hh-components': resolve(__dirname, './src/ui'),
     },
   },

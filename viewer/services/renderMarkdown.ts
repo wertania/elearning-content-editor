@@ -1,5 +1,5 @@
 import type { UniversalBlock } from 'vue-blockful-editor';
-import { dataProvider } from 'src/services/data';
+import { vitepressDataProvider } from './vitepressDataService';
 
 export default async (blocks: UniversalBlock[]): Promise<string> => {
   const promises = blocks.map(async (block) => {
@@ -8,16 +8,23 @@ export default async (blocks: UniversalBlock[]): Promise<string> => {
         return block.data.text;
       }
 
+      case 'header': {
+        return '#'.repeat(block.data.level) + ' ' + block.data.text;
+      }
+
       case 'markdown': {
         return block.data.code;
       }
 
       case 'medium': {
-        // Fetch medium
         if (!block.data.id) return '';
 
-        const medium = await dataProvider.getMedium(block.data.id);
-        if (!medium) return '';
+        // Fetch medium
+        const medium = await vitepressDataProvider.getMedium(block.data.id);
+        if (!medium) {
+          console.warn(`Medium with ID ${block.data.id} could not be found.`);
+          return '';
+        }
 
         switch (medium.type) {
           case 'image':

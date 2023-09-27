@@ -1,13 +1,14 @@
 import MockProvider from './providers/mock';
 import CosmosDbProvider from './providers/cosmosdb';
 import type { DataProvider } from './types';
+import env from '../env';
 
 // Register your providers here.
 const providerOptions: DataProvider[] = [MockProvider, CosmosDbProvider];
 
 // Instantiate a provider.
 export const dataProvider = (() => {
-  const providerName = import.meta.env.VITE_DOCUMENT_DATASOURCE;
+  const providerName = env.VITE_DOCUMENT_DATASOURCE;
 
   for (const p of providerOptions) {
     if (p.name === providerName) {
