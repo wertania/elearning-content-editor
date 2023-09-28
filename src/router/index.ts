@@ -4,12 +4,12 @@ import { useGlobalStore } from '../stores/global';
 const routes = [
   {
     path: '/',
-    component: () => import('@/views/Home.vue'),
+    component: () => import('../views/Home.vue'),
     name: 'home',
   },
   {
     path: '/edit/:id?',
-    component: () => import('@/views/DocumentEditor.vue'),
+    component: () => import('../views/DocumentEditor.vue'),
     name: 'edit',
   },
 ];
