@@ -16,6 +16,13 @@
         :disabled="!selectedDocument"
         severity="danger"
       />
+
+      <Button
+        label="Delete"
+        @click="deleteSelected"
+        :disabled="!selectedNode"
+        severity="danger"
+      />
     </template>
 
     <template #main>
@@ -165,6 +172,21 @@ const closeDocument = () => {
   if (!confirmed) return;
 
   selectedDocument.value = undefined;
+};
+
+const deleteSelected = async () => {
+  if (!selectedNode.value) return;
+
+  const confirmed = confirm(
+    `Are you sure you want to delete the selected ${selectedNode.value.type}?`,
+  );
+
+  if (!confirmed) return;
+
+  await documentStore.dropNode(selectedNode.value.id);
+
+  selectedDocument.value = undefined;
+  selectedNode.value = undefined;
 };
 </script>
 
