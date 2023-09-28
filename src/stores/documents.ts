@@ -12,6 +12,19 @@ interface DocumentState {
   documentsFlat: DocumentItem[];
 }
 
+const isDescendant = (
+  parent: DocumentItem | DocumentTreeItem,
+  childId: string,
+): boolean => {
+  if (parent.type === 'folder' && 'children' in parent && parent.children) {
+    if (parent.children.some((child) => child.id === childId)) {
+      return true;
+    }
+    return parent.children.some((child) => isDescendant(child, childId));
+  }
+  return false;
+};
+
 export const useDocumentStore = defineStore('documents', {
   state: () =>
     ({
@@ -86,6 +99,24 @@ export const useDocumentStore = defineStore('documents', {
       await dataProvider.dropNodes(nodes);
 
       // update current tree
+      await this.initialize(); // TODO: optimize
+    },
+
+    async moveNode(nodeId: DocumentItem, parentId: DocumentItem | undefined) {
+      if (!parentId) {
+        // If parentId is undefined, it's probably being moved to the root or is not being moved to a different parent.
+        // Depending on your requirements, you might allow or disallow this.
+        // Assuming it is allowed, proceed with the move:
+        await dataProvider.moveNode(nodeId.id, undefined);
+        await this.initialize(); // TODO: optimize
+        return;
+      }
+
+      if (isDescendant(nodeId, parentId.id)) {
+        return;
+      }
+
+      await dataProvider.moveNode(nodeId.id, parentId.id);
       await this.initialize(); // TODO: optimize
     },
   },
