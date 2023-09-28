@@ -62,5 +62,16 @@ export default {
       const index = demoData.findIndex((item) => item.id === id);
       demoData.splice(index, 1);
     }
-  }
+  },
+
+  async moveNode(id: string, parentId: string | undefined): Promise<void> {
+    const node = demoData.find((item) => item.id === id);
+
+    if (!node) {
+      console.error(`Node with id ${id} not found`);
+      return;
+    }
+
+    node.parent = parentId;
+  },
 } satisfies DataProvider;
