@@ -4,6 +4,9 @@ import type { DataProvider, DocumentTreeItem, Medium } from '../types';
 import { Container, CosmosClient } from '@azure/cosmos';
 import { buildTree } from '../helpers';
 
+const AUTHENTICATION_TYPE: 'ad' | 'connection-string' =
+  import.meta.env.VITE_AUTHENTICATION_TYPE || 'ad';
+
 let cosmosClient: CosmosClient;
 let container: Container;
 let mediaContainer: Container;
@@ -12,16 +15,23 @@ export default {
   name: 'cosmosdb',
 
   initialize() {
-    const endpoint = import.meta.env.VITE_AZURE_COSMOSDB_ENDPOINT;
-    const databaseName = import.meta.env.VITE_AZURE_COSMOSDB_DATABASE;
+    if (AUTHENTICATION_TYPE === 'ad') {
+      const endpoint = import.meta.env.VITE_AZURE_COSMOSDB_ENDPOINT;
 
-    cosmosClient = new CosmosClient({
-      endpoint,
-      aadCredentials: new InteractiveBrowserCredential({
-        clientId: import.meta.env.VITE_AZURE_COSMOSDB_CLIENT_ID,
-        tenantId: import.meta.env.VITE_AZURE_COSMOSDB_TENANT_ID,
-      }),
-    });
+      cosmosClient = new CosmosClient({
+        endpoint,
+        aadCredentials: new InteractiveBrowserCredential({
+          clientId: import.meta.env.VITE_AZURE_COSMOSDB_CLIENT_ID,
+          tenantId: import.meta.env.VITE_AZURE_COSMOSDB_TENANT_ID,
+        }),
+      });
+    } else if (AUTHENTICATION_TYPE === 'connection-string') {
+      cosmosClient = new CosmosClient(
+        import.meta.env.VITE_AZURE_COSMOSDB_CONNECTION_STRING,
+      );
+    }
+
+    const databaseName = import.meta.env.VITE_AZURE_COSMOSDB_DATABASE;
 
     container = cosmosClient
       .database(databaseName)
