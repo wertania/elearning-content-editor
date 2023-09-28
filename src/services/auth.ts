@@ -85,7 +85,6 @@ function handleResponse(resp: any): boolean {
       return true;
     }
   } else {
-    // need to call getAccount here?
     const currentAccounts = myMSALObj.getAllAccounts();
     if (!currentAccounts || currentAccounts.length < 1) {
       return false;
