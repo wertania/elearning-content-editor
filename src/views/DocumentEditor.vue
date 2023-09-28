@@ -51,7 +51,7 @@
                 @drop="handleDragDrop($event, slotProps.node)"
                 @dragend="handleDragEnd"
               >
-                <span>{{ slotProps.node.name }} custom</span>
+                <span>{{ slotProps.node.name }}</span>
               </div>
             </template>
           </Tree>
