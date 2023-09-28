@@ -65,12 +65,23 @@ export const useDocumentStore = defineStore('documents', {
       }
 
       const getNodes = (node: DocumentItem | DocumentTreeItem): string[] => {
-        if (node.type === 'folder' && 'children' in node && node.children) {
-          return [node.id, ...node.children.flatMap(getNodes)];
-        } else {
-          return [node.id];
+        let nodes: string[] = [];
+
+        if (node.type === 'document') {
+          nodes.push(node.id);
+        } else if (node.type === 'folder') {
+          nodes.push(node.id);
+          this.$state.documentsFlat.forEach((item) => {
+            if (item.parent === node.id) {
+              nodes = nodes.concat(getNodes(item));
+            }
+          });
         }
+
+        return nodes;
       };
+
+      console.log('getNodes', getNodes(node));
 
       const nodes = getNodes(node);
 
