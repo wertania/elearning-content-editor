@@ -81,8 +81,6 @@ export const useDocumentStore = defineStore('documents', {
         return nodes;
       };
 
-      console.log('getNodes', getNodes(node));
-
       const nodes = getNodes(node);
 
       await dataProvider.dropNodes(nodes);
