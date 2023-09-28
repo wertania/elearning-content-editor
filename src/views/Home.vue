@@ -3,9 +3,7 @@
     <h1 class="login__title">E-Learning Platform</h1>
     <Button @click="triggerSignIn()" class="login__button" :disabled="loading">
       <div class="login__loading-spinner" v-if="loading"></div>
-      <span v-else>
-        Bei O365 anmelden
-      </span>
+      <span v-else> Bei O365 anmelden </span>
     </Button>
   </div>
 </template>
@@ -14,7 +12,7 @@
 import { signIn } from './../services/auth';
 import Button from 'primevue/button';
 import { useGlobalStore } from './../stores/global';
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 const store = useGlobalStore();
 
@@ -22,16 +20,16 @@ const loading = ref(false);
 
 const triggerSignIn = async () => {
   try {
-    loading.value = true
+    loading.value = true;
     const loginSuccess = await signIn('popup');
     if (loginSuccess) {
       await store.loginRedirect();
     }
-    loading.value = false
+    loading.value = false;
   } catch (error) {
-    console.error(error)
+    console.error(error);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 };
 </script>
@@ -39,20 +37,22 @@ const triggerSignIn = async () => {
 <style lang="scss">
 .login {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+
+  margin-top: 50px;
+
   &__title {
-    align-self: flex-start;
     margin: 10px 10px 10px 10px;
   }
+
   &__button {
     display: flex;
     justify-content: center;
     margin: 100px 10px 10px 10px;
     height: 45px;
-    width: 190px
+    width: 190px;
   }
   &__loading-spinner {
     border: 4px solid var(--primary-color);
@@ -67,12 +67,20 @@ const triggerSignIn = async () => {
   }
 }
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 /* Safari */
 @-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
 }
 </style>
