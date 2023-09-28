@@ -1,6 +1,6 @@
 import { buildTree } from '../helpers';
 import { DocumentItem } from '../types';
-import type { DataProvider, DocumentTreeItem } from '../types';
+import type { DataProvider, DocumentTreeItem, Medium } from '../types';
 import { mockData as demoData } from '../mock';
 import { mockMedia } from '../mock/media';
 
@@ -49,10 +49,14 @@ export default {
   // | MEDIA |
   // ---------
 
-  async getMedium(id) {
+  async getMedium(id: string): Promise<Medium | undefined> {
     return mockMedia.find((item) => id === item.id);
   },
 
+  async addMedium(medium: Medium): Promise<Medium> {
+    mockMedia.push(medium);
+    return medium;
+  },
   // ---------
   // | Nodes |
   // ---------

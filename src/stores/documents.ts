@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { dataProvider } from '../services/data';
-import { DocumentItem, DocumentTreeItem } from '../services/data/types';
+import { DocumentItem, DocumentTreeItem, Medium } from '../services/data/types';
 
 const DATASOURCE: string = import.meta.env.VITE_DOCUMENT_DATASOURCE ?? 'mock';
 
@@ -54,6 +54,11 @@ export const useDocumentStore = defineStore('documents', {
 
     async getDocument(id: string): Promise<DocumentItem> {
       return await dataProvider.getDataForDocument(id);
+    },
+
+
+    async addMedium(medium: Medium): Promise<Medium | undefined> {
+      return await dataProvider.addMedium(medium);
     },
 
     async dropNode(id: string) {

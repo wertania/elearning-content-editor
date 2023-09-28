@@ -81,9 +81,14 @@ export default {
   // | MEDIA |
   // ---------
 
-  async getMedium(id) {
+  async getMedium(id: string): Promise<Medium | undefined> {
     const response = await mediaContainer.item(id).read<Medium>();
     return response.resource;
+  },
+
+  async addMedium(medium: Medium): Promise<Medium | undefined> {
+    const res = await mediaContainer.items.create(medium);
+    return res.resource;
   },
 
   // ---------

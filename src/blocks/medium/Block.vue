@@ -15,15 +15,14 @@
     </template>
 
     <template v-else>
-      <form @submit.prevent="">
-        <InputText
-          placeholder="Medium ID..."
-          v-model="mediumId"
-          @blur="handleSubmit"
-        />
-
-        <Button type="submit" icon="check" @click="handleSubmit" />
-      </form>
+      <Button icon="upload" @click="openUpload" />
+      <input
+        ref="refInput"
+        type="file"
+        @change="handleUpload"
+        icon="upload"
+        hidden
+      />
     </template>
 
     <Message v-if="isNotFound" severity="warn" :closable="false">
@@ -36,10 +35,10 @@
 import { watch, ref, computed } from 'vue';
 import { BlockMedium } from './types';
 import { dataProvider } from '../../services/data';
-import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
 import { Button } from 'hh-components';
 import { Medium } from '../../services/data/types';
+import uploader from '../../services/data/upload';
 
 const props = defineProps<{
   readOnly: boolean;
@@ -51,16 +50,27 @@ const emit = defineEmits<{
 }>();
 
 const mediumId = ref<string>();
+
 const loadedMedium = ref<Medium>();
+
+const refInput = ref<HTMLInputElement>();
 
 const isNotFound = computed(
   () => props.modelValue.data.id && !loadedMedium.value?.url,
 );
 
+const openUpload = () => {
+  refInput.value?.click();
+};
+
 // Update the stored medium ID.
-const handleSubmit = () => {
+const handleUpload = async (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+
+  const id = await uploader.uploadMedium(file);
   const updated = { ...props.modelValue };
-  updated.data.id = mediumId.value;
+  updated.data.id = id;
   emit('update:modelValue', updated);
 };
 
