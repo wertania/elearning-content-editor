@@ -174,7 +174,7 @@ const closeDocument = () => {
   selectedDocument.value = undefined;
 };
 
-const deleteSelected = () => {
+const deleteSelected = async () => {
   if (!selectedNode.value) return;
 
   const confirmed = confirm(
@@ -183,7 +183,10 @@ const deleteSelected = () => {
 
   if (!confirmed) return;
 
-  documentStore.dropNode(selectedNode.value.id);
+  await documentStore.dropNode(selectedNode.value.id);
+
+  selectedDocument.value = undefined;
+  selectedNode.value = undefined;
 };
 </script>
 

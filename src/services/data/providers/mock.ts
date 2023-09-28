@@ -62,5 +62,5 @@ export default {
       const index = demoData.findIndex((item) => item.id === id);
       demoData.splice(index, 1);
     }
-  }
+  },
 } satisfies DataProvider;
