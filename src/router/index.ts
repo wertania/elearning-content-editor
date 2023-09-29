@@ -3,12 +3,12 @@ import * as VueRouter from 'vue-router';
 const routes = [
   {
     path: '/',
-    component: () => import('@/views/Home.vue'),
+    component: () => import('../views/Home.vue'),
     name: 'home',
   },
   {
     path: '/edit/:id?',
-    component: () => import('@/views/DocumentEditor.vue'),
+    component: () => import('../views/DocumentEditor.vue'),
     home: 'edit',
   },
 ];
