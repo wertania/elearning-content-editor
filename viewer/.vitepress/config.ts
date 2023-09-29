@@ -1,10 +1,27 @@
 import { defineConfig } from 'vitepress';
+import type { Page } from '../services/vitepressDataService';
+import { loadVitepressEnv } from '../../src/services/env';
+
+loadVitepressEnv();
 
 /**
- * Unfortunately, we cannot use a custom `.env` for Vitepress.
- * We have to set the environment variables here.
+ * This has to be imported lazily because the import immediately calls `initialize` on the data provider,
+ * which need the environment variables from `loadVitepressEnv`.
  */
-process.env.VITE_AZURE_AUTHENTICATION_TYPE = 'connection-string';
+const { loadPages } = await import('../services/vitepressDataService');
+const pages = await loadPages();
+
+const buildNavigation = (subTree?: Page[]) => {
+  subTree = subTree || pages.tree;
+
+  return subTree.map((item) => {
+    return {
+      text: item.name,
+      link: !item.children && '/' + item.path,
+      items: item.children && buildNavigation(item.children),
+    };
+  });
+};
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -18,18 +35,18 @@ export default defineConfig({
       { text: 'Examples', link: '/markdown-examples' },
     ],
 
-    sidebar: [
-      {
-        text: 'Examples',
-        items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' },
-        ],
-      },
-    ],
+    sidebar: buildNavigation(),
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/vuejs/vitepress' },
     ],
+  },
+
+  transformPageData: (pageData, { siteConfig }) => {
+    const docName = pageData.params?.name;
+
+    if (docName) {
+      pageData.title = docName;
+    }
   },
 });
