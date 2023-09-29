@@ -99,4 +99,35 @@ export default {
     const response = await mediaContainer.item(id, id).read<Medium>();
     return response.resource;
   },
+
+  // ---------
+  // | Nodes |
+  // ---------
+
+  async dropNodes(ids: string[]): Promise<void> {
+    await Promise.all(
+      ids.map(async (id) => {
+        await container.item(id, id).delete();
+      }),
+    );
+  },
+
+  async moveNode(id: string, parentId: string): Promise<void> {
+    const { resources } = await container.items
+      .query({
+        query: 'SELECT * FROM document d WHERE d.id = @id',
+        parameters: [{ name: '@id', value: id }],
+      })
+      .fetchAll();
+
+    if (resources.length === 0) {
+      throw new Error(`Document with id ${id} not found`);
+    }
+
+    const document = resources[0];
+
+    document.parent = parentId;
+
+    await container.item(document.id).replace(document);
+  },
 } satisfies DataProvider;

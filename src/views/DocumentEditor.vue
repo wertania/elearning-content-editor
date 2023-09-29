@@ -16,17 +16,46 @@
         :disabled="!selectedDocument"
         severity="danger"
       />
+
+      <Button
+        label="Delete"
+        @click="deleteSelected"
+        :disabled="!selectedNode"
+        severity="danger"
+      />
     </template>
 
     <template #main>
       <div class="document-editor__main">
-        <Tree
-          class="document-editor__tree"
-          selectionMode="single"
-          v-model:selectionKeys="selection"
-          :value="documentStore.documentTree"
-          @node-select="handleSelection"
-        />
+        <div
+          class="document-editor__tree-container"
+          @dragover="handleDragOverContainer"
+          @drop="handleContainerDrop"
+        >
+          <Tree
+            class="document-editor__tree"
+            selectionMode="single"
+            v-model:selectionKeys="selection"
+            :value="documentStore.documentTree"
+            @node-select="handleSelection"
+          >
+            <template #default="slotProps">
+              <div
+                class="document-editor__tree-draggable"
+                :class="{
+                  'node-dragover': slotProps.node.id === draggedOver?.id,
+                }"
+                :draggable="true"
+                @dragover="handleDragOver(slotProps.node)"
+                @dragstart="handleDragStart($event, slotProps.node)"
+                @drop="handleDragDrop($event, slotProps.node)"
+                @dragend="handleDragEnd"
+              >
+                <span>{{ slotProps.node.name }}</span>
+              </div>
+            </template>
+          </Tree>
+        </div>
 
         <ContentEditor
           v-if="selectedDocument"
@@ -69,6 +98,9 @@ const documentStore = useDocumentStore();
 const selection = ref<Record<string, boolean>>({});
 const selectedDocument = ref<DocumentItem>();
 const selectedNode = ref<DocumentTreeItem>();
+
+const draggedNode = ref<DocumentItem | null>(null);
+const draggedOver = ref<DocumentItem | null>(null);
 
 const isDocumentSelected = computed(
   () => selectedNode.value?.type === 'document',
@@ -166,6 +198,62 @@ const closeDocument = () => {
 
   selectedDocument.value = undefined;
 };
+
+const deleteSelected = async () => {
+  if (!selectedNode.value) return;
+
+  const confirmed = confirm(
+    `Are you sure you want to delete the selected ${selectedNode.value.type}?`,
+  );
+
+  if (!confirmed) return;
+
+  await documentStore.dropNode(selectedNode.value.id);
+
+  selectedDocument.value = undefined;
+  selectedNode.value = undefined;
+};
+
+const handleDragStart = (event: DragEvent, parent: DocumentItem) => {
+  if (!event.dataTransfer) return;
+  draggedNode.value = parent;
+};
+
+const handleDragDrop = (event: DragEvent, parent: DocumentItem) => {
+  event.preventDefault();
+
+  if (parent.type !== 'folder') return;
+  if (!event.dataTransfer) return;
+  if (!draggedNode.value) return;
+
+  documentStore.moveNode(draggedNode.value, parent);
+};
+
+const handleContainerDrop = (event: DragEvent) => {
+  if (event.target !== event.currentTarget) return;
+  if (!event.dataTransfer) return;
+  if (!draggedNode.value) return;
+
+  documentStore.moveNode(draggedNode.value, undefined);
+};
+
+const handleDragOver = (node: DocumentItem) => {
+  draggedOver.value = node;
+};
+
+const handleDragOverContainer = (event: DragEvent) => {
+  if (draggedOver.value?.type === 'document') return;
+
+  if (event.target === event.currentTarget) {
+    draggedOver.value = null;
+  }
+
+  event.preventDefault();
+};
+
+const handleDragEnd = () => {
+  draggedOver.value = null;
+};
 </script>
 
 <style lang="scss">
@@ -183,6 +271,14 @@ const closeDocument = () => {
     padding: 0.5rem;
   }
 
+  &__tree-container {
+    display: flex;
+    height: 100%;
+    overflow: auto;
+    padding: 1.25rem;
+    border: 1px solid #dee2e6;
+  }
+
   &__load-button {
     code {
       display: inline;
@@ -191,5 +287,18 @@ const closeDocument = () => {
       border-radius: 0.4rem;
     }
   }
+
+  &__tree-draggable {
+    padding: 0.5rem;
+  }
+}
+
+.p-tree {
+  border: none;
+  padding: 0;
+}
+
+.node-dragover {
+  background-color: var(--surface-100);
 }
 </style>
