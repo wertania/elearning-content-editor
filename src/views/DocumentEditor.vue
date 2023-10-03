@@ -1,34 +1,41 @@
 <template>
-  <App class="document-editor" title="e-Learning Plattform">
-    <template #toolbar>
-      <Button label="New" @click="addDocument" :disabled="!!selectedDocument" />
+  
+      <Toolbar>
+          <template #start>
+            <Button
+        @click="addDocument"
+        :disabled="!!selectedDocument"
+        icon="fa-solid fa-plus"
+      />               
+          <Button
+            icon="fa-solid fa-trash"
+            class="ml-1"
+            @click="deleteSelected"
+            v-show="selectedNode"
+            severity="danger"
+          />
+        </template>
+            <template #end>
+              <Button
+                icon="fa-solid fa-save"
+                class="ml-1"
+                @click="saveDocument"
+                severity="success"
+                v-show="selectedDocument"
+              />
+              <Button
+              icon="fa-solid fa-times"
+              class="ml-1"
+              @click="closeDocument"
+              v-show="selectedDocument"
+              severity="warning"
+          />
+        </template>
+      </Toolbar>     
 
-      <Button
-        label="Save"
-        @click="saveDocument"
-        severity="success"
-        :disabled="!selectedDocument"
-      />
-
-      <Button
-        label="Close"
-        @click="closeDocument"
-        :disabled="!selectedDocument"
-        severity="danger"
-      />
-
-      <Button
-        label="Delete"
-        @click="deleteSelected"
-        :disabled="!selectedNode"
-        severity="danger"
-      />
-    </template>
-
-    <template #main>
       <div class="document-editor__main">
         <div
-          class="document-editor__tree-container"
+          class="document-editor__tree-container document-tree"
           @dragover="handleDragOverContainer"
           @drop="handleContainerDrop"
         >
@@ -38,6 +45,7 @@
             v-model:selectionKeys="selection"
             :value="documentStore.documentTree"
             @node-select="handleSelection"
+            :disabled="true"
           >
             <template #default="slotProps">
               <div
@@ -78,8 +86,7 @@
           </Button>
         </div>
       </div>
-    </template>
-  </App>
+
 </template>
 
 <script setup lang="ts">
@@ -90,8 +97,9 @@ import Button from 'primevue/button';
 import { DocumentItem, DocumentTreeItem } from '../services/data/types';
 import { guid } from '../services/guid';
 import ContentEditor from '../components/ContentEditor.vue';
-import { App, toastService } from 'hh-components';
 import { BlockPage } from 'vue-blockful-editor';
+import { info } from './../services/toast';
+import Toolbar from 'primevue/toolbar';
 
 // tree data
 const documentStore = useDocumentStore();
@@ -184,7 +192,7 @@ const saveDocument = async () => {
   } else {
     await documentStore.updateDocument(selectedDocument.value);
 
-    toastService.success('Successfully saved the document!');
+    info('Successfully saved the document!');
   }
 };
 

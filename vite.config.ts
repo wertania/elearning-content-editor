@@ -9,8 +9,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   plugins: [vue()],
   resolve: {
-    alias: {
-      'hh-components': resolve(__dirname, './src/ui'),
-    },
+    alias: {},
   },
 });

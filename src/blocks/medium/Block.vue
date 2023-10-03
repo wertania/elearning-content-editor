@@ -38,7 +38,7 @@ import { BlockMedium } from './types';
 import { dataProvider } from '../../services/data';
 import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
-import { Button } from 'hh-components';
+import Button from 'primevue/button';
 import { Medium } from '../../services/data/types';
 
 const props = defineProps<{
