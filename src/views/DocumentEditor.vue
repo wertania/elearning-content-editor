@@ -175,7 +175,7 @@ const addDocument = async (type: "folder" | "document" = "document") => {
     name: 'New ' + type,
     header: '',
     description: '',
-    langCode: 'de',
+    langCode: import.meta.env.VITE_DEFAULT_LANG_CODE as string,
     content: type === "document" ? [
       {
         type: 'header',
