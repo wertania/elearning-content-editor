@@ -1,10 +1,11 @@
 import MockProvider from './providers/mock';
 import CosmosDbProvider from './providers/cosmosdb';
+import LocaldbProvider from './providers/localdb';
 import type { DataProvider } from './types';
 import env from '../env';
 
 // Register your providers here.
-const providerOptions: DataProvider[] = [MockProvider, CosmosDbProvider];
+const providerOptions: DataProvider[] = [MockProvider, CosmosDbProvider, LocaldbProvider];
 
 // Instantiate a provider.
 export const dataProvider = (() => {

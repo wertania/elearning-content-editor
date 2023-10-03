@@ -1,21 +1,28 @@
-import { defineStore } from 'pinia';
-import { router } from './../router/index';
-import { checkForValidToken } from '../services/auth';
+import { defineStore } from "pinia";
+import { router } from "./../router/index";
+import { checkForValidToken } from "../services/auth";
 
-export const useGlobalStore = defineStore('global', {
+const AUTHENTICATION_TYPE = import.meta.env.VITE_AZURE_AUTHENTICATION_TYPE ||
+  "None";
+
+export const useGlobalStore = defineStore("global", {
   state: () => ({
     isLoggedIn: false,
   }),
   actions: {
     async init() {
-      const token = await checkForValidToken();
-      if (token.accessToken) {
+      if (AUTHENTICATION_TYPE !== "None") {
+        const token = await checkForValidToken();
+        if (token.accessToken) {
+          this.isLoggedIn = true;
+        }
+      } else {
         this.isLoggedIn = true;
       }
     },
     async loginRedirect() {
       this.isLoggedIn = true;
-      await router.push({ path: '/edit' });
+      await router.push({ path: "/edit" });
     },
   },
 });
