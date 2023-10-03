@@ -48,7 +48,6 @@ import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import { ref } from 'vue';
 
-
 const baseLang = import.meta.env.VITE_BASE_LANGUAGE || "en";
 
 const props = defineProps<{
