@@ -1,6 +1,6 @@
 <template>
   <div class="meta-data__item">
-    <label class="content-editor__label" for="name">Name (Menu)</label>
+    <label class="content-editor__label" for="name">Name for Menu (please write in base language: {{ baseLang }})</label>
     <InputText
       id="name"
       :value="name"
@@ -27,9 +27,10 @@
   </div>
 
   <div class="meta-data__item">
-    <label class="content-editor__label" for="langCode">Language Code</label>
+    <label class="content-editor__label" for="langCode">Language Code {{ hasOrigin ? '' : ' (automatically set to base language)' }}</label>
     <Dropdown
       id="langCode"
+      :disabled="!hasOrigin"
       :options="[
         { label: 'German', val: 'de' },
         { label: 'English', val: 'en' },
@@ -47,11 +48,15 @@ import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import { ref } from 'vue';
 
+
+const baseLang = import.meta.env.VITE_BASE_LANGUAGE || "en";
+
 const props = defineProps<{
   name: string;
   header: string;
   description: string;
   langCode: string;
+  hasOrigin: boolean;
 }>();
 
 defineEmits([
@@ -62,6 +67,11 @@ defineEmits([
 ]);
 
 const selectedLangCode = ref<string>(props.langCode);
+
+// set to base language if no origin is set (== origianl document)
+if (!props.hasOrigin) {
+  selectedLangCode.value = baseLang;
+}
 </script>
 
 <style lang="scss">
