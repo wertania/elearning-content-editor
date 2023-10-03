@@ -1,35 +1,34 @@
-<template>
-  
+<template>  
       <Toolbar>
-          <template #start>
+          <template #start>            
+            <SplitButton
+              label="Add"
+              icon="fa-solid fa-plus"
+              :model="addmenu"
+            />
             <Button
-        @click="addDocument"
-        :disabled="!!selectedDocument"
-        icon="fa-solid fa-plus"
-      />               
-          <Button
-            icon="fa-solid fa-trash"
-            class="ml-1"
-            @click="deleteSelected"
-            v-show="selectedNode"
-            severity="danger"
-          />
-        </template>
-            <template #end>
-              <Button
-                icon="fa-solid fa-save"
-                class="ml-1"
-                @click="saveDocument"
-                severity="success"
-                v-show="selectedDocument"
-              />
-              <Button
-              icon="fa-solid fa-times"
+              icon="fa-solid fa-trash"
               class="ml-1"
-              @click="closeDocument"
-              v-show="selectedDocument"
-              severity="warning"
-          />
+              @click="deleteSelected"
+              v-show="selectedNode"
+              severity="danger"
+            />
+          </template>
+          <template #end>
+            <Button
+              icon="fa-solid fa-save"
+              class="ml-1"
+              @click="saveDocument"
+              severity="success"
+              v-show="selectedStore.$state.selectedDocument && changesDetected"
+            />
+            <Button
+            icon="fa-solid fa-times"
+            class="ml-1"
+            @click="closeDocument"
+            v-show="selectedStore.$state.selectedDocument && changesDetected"
+            severity="warning"
+            />
         </template>
       </Toolbar>     
 
@@ -66,16 +65,14 @@
         </div>
 
         <ContentEditor
-          v-if="selectedDocument"
-          :selected-document="selectedDocument"
-          v-model:editor-data="editorData"
+          v-if="selectedStore.$state.selectedDocument"
         />
 
         <div v-else class="g-center-content">
           <Button
             class="document-editor__load-button"
             :disabled="!isDocumentSelected"
-            @click="loadDocument"
+            @click="loadDocument()"
           >
             <template v-if="isDocumentSelected">
               Load &nbsp;
@@ -95,86 +92,99 @@ import Tree, { TreeNode } from 'primevue/tree';
 import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';
 import { DocumentItem, DocumentTreeItem } from '../services/data/types';
-import { guid } from '../services/guid';
 import ContentEditor from '../components/ContentEditor.vue';
-import { BlockPage } from 'vue-blockful-editor';
 import { info } from './../services/toast';
 import Toolbar from 'primevue/toolbar';
+import SplitButton from 'primevue/splitbutton';
+import { useSelectedStore } from '../stores/selected';
 
 // tree data
 const documentStore = useDocumentStore();
+const selectedStore = useSelectedStore();
 const selection = ref<Record<string, boolean>>({});
-const selectedDocument = ref<DocumentItem>();
+// const selectedDocument = ref<DocumentItem>();
 const selectedNode = ref<DocumentTreeItem>();
+
+// document handling
+// const mode = ref<'new' | 'edit'>('new');
 
 const draggedNode = ref<DocumentItem | null>(null);
 const draggedOver = ref<DocumentItem | null>(null);
+
+const changesDetected = ref(true);
 
 const isDocumentSelected = computed(
   () => selectedNode.value?.type === 'document',
 );
 
-// document handling
-const mode = ref<'new' | 'edit'>('new');
-
-// interactive editor state
-const editorData = ref<BlockPage>({
-  blocks: [],
-});
-
-const handleSelection = (node: TreeNode) => {
-  selectedNode.value = node as DocumentTreeItem;
-};
+// add documents
+const addmenu = [
+  {
+      label: 'Add document',
+      command: () => addDocument("document"),
+  }, 
+  {
+      label: 'Add folder',
+      command: () => addDocument("folder"),
+  }, 
+];
 
 /**
  * Asynchronously load a document from API.
  */
-const loadDocument = async () => {
-  const selectedKeys = Object.keys(selection.value ?? {});
+const loadDocument = async (id?: string) => {
+  let documentId = id ?? null;
+  if (!documentId) {
+    const selectedKeys = Object.keys(selection.value ?? {});
+    if (!selectedKeys.length) return;
+    documentId = selectedKeys[0];
+  }
+  selectedStore.$state.mode = 'edit';
+  const document = await documentStore.getDocument(documentId);
+  selectedStore.$state.selectedDocument = document;
+};
 
-  if (!selectedKeys.length) return;
-
-  const id = selectedKeys[0];
-
-  mode.value = 'edit';
-  selectedDocument.value = await documentStore.getDocument(id);
-  editorData.value.blocks = selectedDocument.value.content;
+/**
+ * Handle the selection of a tree node.
+ */
+const handleSelection = async (node: TreeNode) => {
+  // console.log('handleSelection', node);
+  selectedNode.value = node as DocumentTreeItem;
+  await loadDocument(selectedNode.value.id);
+  // changesDetected.value = false;
 };
 
 /**
  * Add a new document.
  */
-const addDocument = async () => {
-  mode.value = 'new';
+const addDocument = async (type: "folder" | "document" = "document") => {
+  // console.log('addDocument', type);
+  selectedStore.$state.mode = 'new';
   selection.value = {};
-  editorData.value.blocks = [];
 
   const parent =
     selectedNode.value?.type === 'folder'
       ? selectedNode.value.key
       : selectedNode.value?.parent;
 
-  selectedDocument.value = {
+    selectedStore.$state.selectedDocument = {
     version: 1,
-    type: 'document',
+    type,
     parent,
-    id: guid(),
-    name: 'New document',
+    id: 'new-document-xxx',
+    name: 'New ' + type,
     header: '',
     description: '',
     langCode: 'de',
-    content: [
+    content: type === "document" ? [
       {
-        type: 'paragraph',
+        type: 'header',
         data: {
-          text: 'Some text here...',
+          level: 1,
+          text: 'New ' + type,
         },
       },
-    ],
-  };
-
-  editorData.value = {
-    blocks: selectedDocument.value.content,
+    ] : [],
   };
 };
 
@@ -182,29 +192,30 @@ const addDocument = async () => {
  * Save the current document depending on the mode.
  */
 const saveDocument = async () => {
-  if (!selectedDocument.value) return;
+  if (!selectedStore.$state.selectedDocument) return;
 
-  if (mode.value === 'new') {
-    await documentStore.addDocument(selectedDocument.value);
+  if (selectedStore.$state.mode === 'new') {
+    await documentStore.addDocument(selectedStore.$state.selectedDocument);
 
-    selectedDocument.value = undefined;
-    editorData.value.blocks = [];
+    // selectedDocument.value = undefined;
+    // editorData.value.blocks = [];
+    selectedStore.$state.mode = 'edit';
   } else {
-    await documentStore.updateDocument(selectedDocument.value);
+    await documentStore.updateDocument(selectedStore.$state.selectedDocument);
 
     info('Successfully saved the document!');
   }
 };
 
 const closeDocument = () => {
-  if (!selectedDocument.value) return;
+  if (!selectedStore.$state.selectedDocument) return;
 
   const confirmed = confirm(
     'Are you sure you want to close the document? Save your progress before confirming!',
   );
   if (!confirmed) return;
 
-  selectedDocument.value = undefined;
+  selectedStore.$state.selectedDocument = null;
 };
 
 const deleteSelected = async () => {
@@ -213,12 +224,11 @@ const deleteSelected = async () => {
   const confirmed = confirm(
     `Are you sure you want to delete the selected ${selectedNode.value.type}?`,
   );
-
   if (!confirmed) return;
 
   await documentStore.dropNode(selectedNode.value.id);
 
-  selectedDocument.value = undefined;
+  selectedStore.$state.selectedDocument = null;
   selectedNode.value = undefined;
 };
 
