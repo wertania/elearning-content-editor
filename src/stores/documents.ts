@@ -70,34 +70,32 @@ export const useDocumentStore = defineStore('documents', {
     },
 
     async dropNode(id: string) {
-      const node = this.$state.documentsFlat.find((item) => item.id === id);
+      // const node = this.$state.documentsFlat.find((item) => item.id === id);
 
-      if (!node) {
-        console.error(`Node with id ${id} not found`);
-        return;
-      }
+      // if (!node) {
+      //   console.error(`Node with id ${id} not found`);
+      //   return;
+      // }
 
-      const getNodes = (node: DocumentItem | DocumentTreeItem): string[] => {
-        let nodes: string[] = [];
+      // const getNodes = (node: DocumentItem | DocumentTreeItem): string[] => {
+      //   let nodes: string[] = [];
 
-        if (node.type === 'document') {
-          nodes.push(node.id);
-        } else if (node.type === 'folder') {
-          nodes.push(node.id);
-          this.$state.documentsFlat.forEach((item) => {
-            if (item.parent === node.id) {
-              nodes = nodes.concat(getNodes(item));
-            }
-          });
-        }
+      //   if (node.type === 'document') {
+      //     nodes.push(node.id);
+      //   } else if (node.type === 'folder') {
+      //     nodes.push(node.id);
+      //     this.$state.documentsFlat.forEach((item) => {
+      //       if (item.parent === node.id) {
+      //         nodes = nodes.concat(getNodes(item));
+      //       }
+      //     });
+      //   }
 
-        return nodes;
-      };
+      //   return nodes;
+      // };
 
-      const nodes = getNodes(node);
-
-      await dataProvider.dropNodes(nodes);
-
+      // const nodes = getNodes(node);
+      await dataProvider.dropNodes([id]);
       // update current tree
       await this.initialize(); // TODO: optimize
     },
