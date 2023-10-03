@@ -18,7 +18,7 @@ export default {
     tree: DocumentTreeItem[];
     list: DocumentItem[];
   }> {
-    const res = await fetch(URL + "/document");
+    const res = await fetch(DOCUMENTS_URL);
     const documents = await res.json();
 
     return {
@@ -34,6 +34,7 @@ export default {
   async getDataForDocument(id: string): Promise<DocumentItem> {
     const res = await fetch(DOCUMENTS_URL + id);
     const document = await res.json();
+    // console.log(document);
     return document;
   },
 
@@ -51,6 +52,7 @@ export default {
   },
 
   async dropDocument(id: string): Promise<void> {
+    console.log("dropDocument", id);
     const res = await fetch(DOCUMENTS_URL + id, {
       method: "DELETE",
     });
@@ -87,8 +89,11 @@ export default {
   // ---------
 
   async dropNodes(ids: string[]): Promise<void> {
-    // to do
-    console.log(ids);
+    for (const id of ids) {
+      await fetch(DOCUMENTS_URL + id, {
+        method: "DELETE",
+      });
+    }
   },
 
   async moveNode(id: string, parentId: string): Promise<void> {
