@@ -1,13 +1,24 @@
 <template>
   <div class="content-editor" v-if="selectedDocument">
-    <MetaData v-model:header="selectedDocument.header" v-model:description="selectedDocument.description"
-      v-model:lang-code="selectedDocument.langCode" v-model:name="selectedDocument.name"
-      :hasOrigin="selectedDocument.originId != null" />
+    <MetaData
+      v-model:header="selectedDocument.header"
+      v-model:description="selectedDocument.description"
+      v-model:lang-code="selectedDocument.langCode"
+      v-model:name="selectedDocument.name"
+      :hasOrigin="selectedDocument.originId != null"
+    />
 
     <div class="content-editor__label">Content</div>
     <div class="content-editor__block-editor">
-      <BlockEditor v-if="selectedDocument.type === 'document'" v-model="page" :readOnly="false" :debug="false"
-        :plugins="plugins" :showAllBlockControls="true" :disableColumns="true" />
+      <BlockEditor
+        v-if="selectedDocument.type === 'document'"
+        v-model="page"
+        :readOnly="false"
+        :debug="false"
+        :plugins="plugins"
+        :showAllBlockControls="true"
+        :disableColumns="true"
+      />
     </div>
 
     <!-- Dummy container that adds whitespace to the editor area for usability. -->
@@ -25,7 +36,7 @@ import {
 import MetaData from '../components/MetaData.vue';
 import { PluginMedium } from './../blocks/medium';
 import { PluginMarkdown } from './../blocks/markdown';
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useSelectedStore } from '../stores/selected';
 
 // computed selectedDocument
@@ -37,8 +48,8 @@ const selectedDocument = computed({
   set(newValue) {
     console.log('set selected document');
     selectedStore.$state.selectedDocument = newValue;
-  }
-})
+  },
+});
 const content = computed({
   get() {
     return selectedStore.$state.selectedDocument?.content || [];
@@ -46,7 +57,7 @@ const content = computed({
   set(newValue) {
     if (selectedStore.$state.selectedDocument == null) return;
     selectedStore.$state.selectedDocument.content = newValue;
-  }
+  },
 });
 
 const page = ref<BlockPage>({

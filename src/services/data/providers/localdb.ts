@@ -1,17 +1,17 @@
-import { DocumentItem } from "../types";
-import type { DataProvider, DocumentTreeItem, Medium } from "../types";
-import { buildTree } from "../helpers";
-import env from "../../env";
+import { DocumentItem } from '../types';
+import type { DataProvider, DocumentTreeItem } from '../types';
+import { buildTree } from '../helpers';
+import env from '../../env';
 
-const URL = env.VITE_LOCALDB_HOST || "http://localhost:8077";
-const DOCUMENTS_URL = URL + "/document/";
-const MEDIA_URL = URL + "/media/";
+const URL = env.VITE_LOCALDB_HOST || 'http://localhost:8077';
+const DOCUMENTS_URL = URL + '/document/';
+const MEDIA_URL = URL + '/media/';
 
 export default {
-  name: "localdb",
+  name: 'localdb',
 
   initialize() {
-    console.log("nothing to initialize");
+    console.log('nothing to initialize');
   },
 
   async getDocuments(): Promise<{
@@ -39,11 +39,11 @@ export default {
   },
 
   async addDocument(document: DocumentItem): Promise<void> {
-    const res = await fetch(URL + "/document", {
-      method: "POST",
+    const res = await fetch(URL + '/document', {
+      method: 'POST',
       body: JSON.stringify(document),
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
     const newDocument = await res.json();
@@ -52,9 +52,9 @@ export default {
   },
 
   async dropDocument(id: string): Promise<void> {
-    console.log("dropDocument", id);
+    console.log('dropDocument', id);
     const res = await fetch(DOCUMENTS_URL + id, {
-      method: "DELETE",
+      method: 'DELETE',
     });
     const deletedDocument = await res.json();
     console.log(deletedDocument);
@@ -63,10 +63,10 @@ export default {
 
   async updateDocument(document: DocumentItem): Promise<void> {
     const res = await fetch(DOCUMENTS_URL + document.id, {
-      method: "PUT",
+      method: 'PUT',
       body: JSON.stringify(document),
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
     const updatedDocument = await res.json();
@@ -91,7 +91,7 @@ export default {
   async dropNodes(ids: string[]): Promise<void> {
     for (const id of ids) {
       await fetch(DOCUMENTS_URL + id, {
-        method: "DELETE",
+        method: 'DELETE',
       });
     }
   },

@@ -1,6 +1,8 @@
 <template>
   <div class="meta-data__item">
-    <label class="content-editor__label" for="name">Name for Menu (please write in base language: {{ baseLang }})</label>
+    <label class="content-editor__label" for="name">
+      Name for menu (please write in base language: {{ baseLang }})
+    </label>
     <InputText
       id="name"
       :value="name"
@@ -27,7 +29,10 @@
   </div>
 
   <div class="meta-data__item">
-    <label class="content-editor__label" for="langCode">Language Code {{ hasOrigin ? '' : ' (automatically set to base language)' }}</label>
+    <label class="content-editor__label" for="langCode">
+      Language Code
+      {{ hasOrigin ? '' : ' (automatically set to base language)' }}
+    </label>
     <Dropdown
       id="langCode"
       :disabled="!hasOrigin"
@@ -46,9 +51,9 @@
 <script setup lang="ts">
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
-import { ref } from 'vue';
+import { computed } from 'vue';
 
-const baseLang = import.meta.env.VITE_BASE_LANGUAGE || "en";
+const baseLang = import.meta.env.VITE_BASE_LANGUAGE;
 
 const props = defineProps<{
   name: string;
@@ -58,19 +63,17 @@ const props = defineProps<{
   hasOrigin: boolean;
 }>();
 
-defineEmits([
+const emit = defineEmits([
   'update:name',
   'update:header',
   'update:description',
   'update:langCode',
 ]);
 
-const selectedLangCode = ref<string>(props.langCode);
-
-// set to base language if no origin is set (== origianl document)
-if (!props.hasOrigin) {
-  selectedLangCode.value = baseLang;
-}
+const selectedLangCode = computed<string>({
+  get: () => props.langCode,
+  set: (value) => emit('update:langCode', value),
+});
 </script>
 
 <style lang="scss">
