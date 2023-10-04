@@ -37,3 +37,5 @@ debug.baseLangList.json
 debug.fullTree.json
 debug.navigation.json
 debug.paths.json
+viewer/assets/**/*
+!viewer/assets/placeholder

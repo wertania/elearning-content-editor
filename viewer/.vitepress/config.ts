@@ -13,6 +13,7 @@ const { loadPages } = await import("../services/vitepressDataService");
 const { tree, availableLanguages } = await loadPages();
 
 const companyName = process.env.VITE_COMPANY_NAME || "";
+const logoPath = process.env.VITE_LOGO_PATH;
 
 const buildNavigation = (subTree?: Page[]) => {
   subTree = subTree || tree;
@@ -48,8 +49,8 @@ writeFileSync("debug.navigation.json", JSON.stringify(navigation, null, 2));
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "e-Learning Platform",
-  description: "Your learning platform",
+  title: process.env.VITE_PAGE_TITLE ?? "e-Learning Platform",
+  description: process.env.VITE_PAGE_DESCRIPTION ?? "Your learning platform",
   // base: "/some-sub/path/",
 
   themeConfig: {
@@ -68,6 +69,8 @@ export default defineConfig({
       message: "Made with ❤️",
       copyright: companyName !== "" ? `Copyright © ${companyName}` : "",
     },
+
+    logo: logoPath,
   },
 
   lastUpdated: false,
