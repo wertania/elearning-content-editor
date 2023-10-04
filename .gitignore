@@ -36,3 +36,4 @@ __azurite_*
 debug.baseLangList.json
 debug.fullTree.json
 debug.navigation.json
+debug.paths.json

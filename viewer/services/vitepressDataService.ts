@@ -27,7 +27,7 @@ export interface Page {
 }
 
 // internal simple cache
-let pagesCache: { list: Page[]; tree: Page[], availableLanguages: string[] };
+let pagesCache: { list: Page[]; tree: Page[]; availableLanguages: string[] };
 
 export const loadPages = async () => {
   // check cache first!
@@ -81,27 +81,39 @@ export const loadPages = async () => {
   const baseLangList = base.list.map((i) => mapItem(i));
   const baseLangTree = base.tree.map(mapTreeItem);
 
+  // object creator
+  const createLanguagePageDummey = (
+    langCode: string,
+    childs?: Page[],
+  ): Page => {
+    return {
+      name: "Language: " + langCode.toUpperCase(),
+      path: `${langCode}/main`,
+      doc: { // some empty dummy document
+        version: 1,
+        id: "dummy_" + langCode,
+        type: "document",
+        name: langCode,
+        header: "",
+        description: "",
+        langCode: langCode,
+        content: [{
+          type: "paragraph",
+          data: { text: "" },
+        }],
+      },
+      children: childs ?? undefined,
+      isTopic: true,
+    };
+  };
+
   // main tree
   // create a sub-path for each additional language if some languages are available
   const fullTree: Page[] = [];
   if (additionalLanguages.length > 0) {
     // add base language
-    fullTree.push({
-      name: "Language: " + baseLang,
-      path: `/${baseLang}/`,
-      doc: { // some empty dummy document#
-        version: 1,
-        id: "dummy_" + baseLang,
-        type: "folder",
-        name: baseLang,
-        header: baseLang,
-        description: "",
-        langCode: baseLang,
-        content: [],
-      },
-      children: baseLangTree,
-      isTopic: true,
-    });
+    fullTree.push(createLanguagePageDummey(baseLang, baseLangTree));
+    baseLangList.push(createLanguagePageDummey(baseLang));
 
     // add additional languages
     // --------------------------------
@@ -149,22 +161,9 @@ export const loadPages = async () => {
       const copyBaseLangTree = JSON.parse(JSON.stringify(baseLangTree));
       const treeForLang = mapPageTree(copyBaseLangTree, lang);
       // add to full tree
-      fullTree.push({
-        name: "Language: " + lang,
-        path: `/${lang}`,
-        doc: { // some empty dummy document
-          version: 1,
-          id: "dummy_" + lang,
-          type: "folder",
-          name: lang,
-          header: lang,
-          description: "",
-          langCode: lang,
-          content: [],
-        },
-        children: treeForLang,
-        isTopic: true,
-      });
+      const langPage = createLanguagePageDummey(lang, treeForLang);
+      fullTree.push(langPage);
+      baseLangList.push(langPage);
     }
   } // simple case: no additional languages
   else {

@@ -1,5 +1,6 @@
 import renderMarkdown from './services/renderMarkdown';
 import { loadPages } from './services/vitepressDataService';
+import { writeFileSync } from 'fs';
 
 export default {
   async paths() {
@@ -17,10 +18,9 @@ export default {
             content: await renderMarkdown(page.doc.content),
           };
         }),
-    );
-
+    );    
     // debug:
-    // console.log("entries", entries);
+    writeFileSync("debug.paths.json", JSON.stringify(entries, null, 2));
     return entries;
   },
 };

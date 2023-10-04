@@ -16,7 +16,6 @@ const companyName = process.env.VITE_COMPANY_NAME || "";
 
 const buildNavigation = (subTree?: Page[]) => {
   subTree = subTree || tree;
-
   return subTree.map((item) => {
     return {
       text: item.name,
@@ -26,7 +25,25 @@ const buildNavigation = (subTree?: Page[]) => {
   });
 };
 
-const navigation = buildNavigation();
+// build navigation tree
+// if there is only one language, all will be on the root level
+// if there are more languages, the first level will be the language code as "topic"/sub-menu
+let navigation: any = null;
+if (availableLanguages.length > 1) {
+  navigation = {
+    "/": availableLanguages.map((langCode) => {
+      return {
+        text: langCode.toUpperCase(),
+        link: langCode + "/main",       
+      };
+    }),
+  };
+  for (const firstLevelItem of tree) {
+    navigation["/" + firstLevelItem.doc.name + "/"] = buildNavigation(firstLevelItem.children);
+  }
+} else {
+  navigation = buildNavigation();
+}
 writeFileSync("debug.navigation.json", JSON.stringify(navigation, null, 2));
 
 // https://vitepress.dev/reference/site-config
