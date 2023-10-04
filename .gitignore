@@ -28,4 +28,8 @@ viewer/.vitepress/cache
 
 .env
 .env.vitepress
-.hochhuth/*
+.hochhuth/
+
+# Blob storage
+__blobstorage__/
+__azurite_*
