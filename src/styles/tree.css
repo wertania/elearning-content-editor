@@ -1,115 +1,136 @@
 /* special styles for Tree Component */
 
 .document-tree .p-tree .p-tree-container .p-treenode .p-treenode-content {
-    border: none !important;
-    padding: 0rem !important;
-    /* -webkit-transition: background-color 0.2s, box-shadow 0.2s;
+  border: none !important;
+  padding: 0rem !important;
+  /* -webkit-transition: background-color 0.2s, box-shadow 0.2s;
       transition: background-color 0.2s, box-shadow 0.2s;
       border-radius: 3px; */
 }
 
-.document-tree .p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight .p-tree-toggler {
-    color: #edc87e !important;
+.document-tree
+  .p-tree
+  .p-tree-container
+  .p-treenode
+  .p-treenode-content.p-highlight
+  .p-tree-toggler {
+  color: #edc87e !important;
 }
 
-.document-tree .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler {
-    width: 1.3rem !important;
-    height: 1.2rem !important;
-    color: #edc87e !important;
-    margin-right: 0.1rem !important;
+.document-tree
+  .p-tree
+  .p-tree-container
+  .p-treenode
+  .p-treenode-content
+  .p-tree-toggler {
+  width: 1.3rem !important;
+  height: 1.2rem !important;
+  color: #edc87e !important;
+  margin-right: 0.1rem !important;
 }
 
-.document-tree .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:hover {
-    color: #edc87e !important;
+.document-tree
+  .p-tree
+  .p-tree-container
+  .p-treenode
+  .p-treenode-content
+  .p-tree-toggler:hover {
+  color: #edc87e !important;
 }
 
 /* add custom SELECTION style */
-.document-tree .p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight .p-treenode-label {
-    /* background-color: #aaaaaa !important; */
-    border-radius: 3px !important;
-    padding-left: 3px !important;
-    padding-top: 1px !important;
-    padding-right: 4px !important;
-    padding-bottom: 1px !important;
+.document-tree
+  .p-tree
+  .p-tree-container
+  .p-treenode
+  .p-treenode-content.p-highlight
+  .p-treenode-label {
+  /* background-color: #aaaaaa !important; */
+  border-radius: 3px !important;
+  padding-left: 3px !important;
+  padding-top: 1px !important;
+  padding-right: 4px !important;
+  padding-bottom: 1px !important;
 }
 
 /* GENERAL shared styles */
 
 /* MAIN SIZE */
 .p-tree {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .p-tree-container {
-    height: 100%;
-    width: 100%;
-    /* overflow: scroll !important; */
+  height: 100%;
+  width: 100%;
+  /* overflow: scroll !important; */
 }
 
 .p-tree-wrapper {
-    height: 100%;
-    width: 100%;
+  height: 100%;
+  width: 100%;
 }
 
 /* MAIN Styling: Tree Spacing, colors etc. */
 .p-tree,
 .p-treenode {
-    padding: 0 !important;
-    font-family: Open Sans, Helvetica Neue, sans-serif !important;
-    font-size: 14px !important;
-    color: rgb(51, 51, 51) !important;
+  padding: 0 !important;
+  font-family:
+    Open Sans,
+    Helvetica Neue,
+    sans-serif !important;
+  font-size: 14px !important;
+  color: rgb(51, 51, 51) !important;
 }
 
 body .p-tree {
-    border: none;
-    background-color: transparent !important;
+  border: none;
+  background-color: transparent !important;
 }
 
 .p-tree .p-tree-container .p-treenode .p-treenode-content .p-treenode-label {
-    padding-left: 3px !important;
-    padding-top: 1px !important;
-    padding-right: 4px !important;
-    padding-bottom: 1px !important;
+  padding-left: 3px !important;
+  padding-top: 1px !important;
+  padding-right: 4px !important;
+  padding-bottom: 1px !important;
 }
 
 /* remove blue circle from toggler background (hack) */
-.p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:focus {
-    outline: 0 none;
-    outline-offset: 0;
-    box-shadow: 0 0 0 0rem white !important;
+.p-tree
+  .p-tree-container
+  .p-treenode
+  .p-treenode-content
+  .p-tree-toggler:focus {
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0rem white !important;
 }
 
 /* no border for items */
 .p-tree .p-tree-container .p-treenode .p-treenode-content:focus {
-    /* border: none !important; */
-    box-shadow: none !important;
-    border-left: 0px solid rgb(94, 94, 94) !important;
-    border-radius: 0 !important;
+  /* border: none !important; */
+  box-shadow: none !important;
+  border-left: 0px solid rgb(94, 94, 94) !important;
+  border-radius: 0 !important;
 }
 
 /* remove primevue std. SELECTION and HOVER color */
 .p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight {
-    background-color: white !important;
+  background-color: white !important;
 }
 
-.p-tree .p-tree-container .p-treenode .p-treenode-content.p-treenode-selectable:not(.p-highlight):hover {
-    background-color: white !important;
+.p-tree
+  .p-tree-container
+  .p-treenode
+  .p-treenode-content.p-treenode-selectable:not(.p-highlight):hover {
+  background-color: white !important;
 }
 
 /* ICON Colors */
 
 /* Folder item: color and size */
 .fa-folder::before {
-    color: #edc87e;
-    font-size: 1.5em;
+  color: #edc87e;
+  font-size: 1.5em;
 }
-
-/* .fa-folder-open::before {
-    color: #edc87e;
-    font-size: 1.5em;
-  } */
-/* .fa-file::before {
-    color: #dbcaa7;
-    font-size: 1.5em;
-  } */

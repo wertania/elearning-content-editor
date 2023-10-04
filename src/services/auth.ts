@@ -51,9 +51,7 @@ const msalConfig = {
 
 // Add here scopes for id token to be used at MS Identity Platform endpoints.
 const loginRequest = {
-  scopes: [
-    'https://cosmos.azure.com/user_impersonation',
-  ],
+  scopes: ['https://cosmos.azure.com/user_impersonation'],
   forceRefresh: false, // Set this to "true" to skip a cached token and go to the server to get a new token
 };
 
@@ -112,9 +110,7 @@ export async function signIn(method: 'popup' | 'redirect' = 'popup') {
   if (signInType === 'popup') {
     return myMSALObj
       .loginPopup({
-        scopes: [
-          'https://cosmos.azure.com/user_impersonation',
-        ],
+        scopes: ['https://cosmos.azure.com/user_impersonation'],
         redirectUri: '/redirect',
       })
       .then(handleResponse)

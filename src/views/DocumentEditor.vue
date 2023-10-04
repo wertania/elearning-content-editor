@@ -1,89 +1,87 @@
-<template>  
-      <Toolbar>
-          <template #start>            
-            <SplitButton
-              label="Add"
-              icon="fa-solid fa-plus"
-              :model="addmenu"
-            />
-            <Button
-              icon="fa-solid fa-trash"
-              class="ml-1"
-              @click="deleteSelected"
-              v-show="selectedNode"
-              severity="danger"
-            />
-          </template>
-          <template #end>
-            <Button
-              icon="fa-solid fa-save"
-              class="ml-1"
-              @click="saveDocument"
-              severity="success"
-              v-show="selectedStore.$state.selectedDocument && changesDetected"
-            />
-            <Button
-            icon="fa-solid fa-times"
-            class="ml-1"
-            @click="closeDocument"
-            v-show="selectedStore.$state.selectedDocument && changesDetected"
-            severity="warning"
-            />
+<template>
+  <Toolbar>
+    <template #start>
+      <SplitButton
+        @click="addDocument('document')"
+        label="Add"
+        icon="fa-solid fa-plus"
+        :model="addmenu"
+      />
+      <Button
+        icon="fa-solid fa-trash"
+        class="ml-1"
+        @click="deleteSelected"
+        v-show="selectedNode"
+        severity="danger"
+      />
+    </template>
+    <template #end>
+      <Button
+        icon="fa-solid fa-save"
+        class="ml-1"
+        @click="saveDocument"
+        severity="success"
+        v-show="selectedStore.$state.selectedDocument && changesDetected"
+      />
+      <Button
+        icon="fa-solid fa-times"
+        class="ml-1"
+        @click="closeDocument"
+        v-show="selectedStore.$state.selectedDocument && changesDetected"
+        severity="warning"
+      />
+    </template>
+  </Toolbar>
+
+  <div class="document-editor__main">
+    <div
+      class="document-editor__tree-container document-tree"
+      @dragover="handleDragOverContainer"
+      @drop="handleContainerDrop"
+    >
+      <Tree
+        class="document-editor__tree"
+        selectionMode="single"
+        v-model:selectionKeys="selection"
+        :value="documentStore.documentTree"
+        @node-select="handleSelection"
+        :disabled="true"
+      >
+        <template #default="slotProps">
+          <div
+            class="document-editor__tree-draggable"
+            :class="{
+              'node-dragover': slotProps.node.id === draggedOver?.id,
+            }"
+            :draggable="true"
+            @dragover="handleDragOver(slotProps.node)"
+            @dragstart="handleDragStart($event, slotProps.node)"
+            @drop="handleDragDrop($event, slotProps.node)"
+            @dragend="handleDragEnd"
+          >
+            <span>{{ slotProps.node.name }}</span>
+          </div>
         </template>
-      </Toolbar>     
+      </Tree>
+    </div>
 
-      <div class="document-editor__main">
-        <div
-          class="document-editor__tree-container document-tree"
-          @dragover="handleDragOverContainer"
-          @drop="handleContainerDrop"
-        >
-          <Tree
-            class="document-editor__tree"
-            selectionMode="single"
-            v-model:selectionKeys="selection"
-            :value="documentStore.documentTree"
-            @node-select="handleSelection"
-            :disabled="true"
-          >
-            <template #default="slotProps">
-              <div
-                class="document-editor__tree-draggable"
-                :class="{
-                  'node-dragover': slotProps.node.id === draggedOver?.id,
-                }"
-                :draggable="true"
-                @dragover="handleDragOver(slotProps.node)"
-                @dragstart="handleDragStart($event, slotProps.node)"
-                @drop="handleDragDrop($event, slotProps.node)"
-                @dragend="handleDragEnd"
-              >
-                <span>{{ slotProps.node.name }}</span>
-              </div>
-            </template>
-          </Tree>
-        </div>
+    <ContentEditor v-if="selectedStore.$state.selectedDocument" />
 
-        <ContentEditor
-          v-if="selectedStore.$state.selectedDocument"
-        />
+    <div v-else class="g-center-content">
+      <Button
+        class="document-editor__load-button"
+        :disabled="!isDocumentSelected"
+        @click="loadDocument()"
+      >
+        <template v-if="isDocumentSelected">
+          Load &nbsp;
+          <code> <i class="fa fa-file" /> {{ selectedNode?.name }} </code>
+        </template>
 
-        <div v-else class="g-center-content">
-          <Button
-            class="document-editor__load-button"
-            :disabled="!isDocumentSelected"
-            @click="loadDocument()"
-          >
-            <template v-if="isDocumentSelected">
-              Load &nbsp;
-              <code> <i class="fa fa-file" /> {{ selectedNode?.name }} </code>
-            </template>
-
-            <template v-else> Select a document node. </template>
-          </Button>
-        </div>
-      </div>
-
+        <template v-else> Select a document node. </template>
+      </Button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -120,13 +118,13 @@ const isDocumentSelected = computed(
 // add documents
 const addmenu = [
   {
-      label: 'Add document',
-      command: () => addDocument("document"),
-  }, 
+    label: 'Add document',
+    command: () => addDocument('document'),
+  },
   {
-      label: 'Add folder',
-      command: () => addDocument("folder"),
-  }, 
+    label: 'Add folder',
+    command: () => addDocument('folder'),
+  },
 ];
 
 /**
@@ -157,7 +155,7 @@ const handleSelection = async (node: TreeNode) => {
 /**
  * Add a new document.
  */
-const addDocument = async (type: "folder" | "document" = "document") => {
+const addDocument = async (type: 'folder' | 'document' = 'document') => {
   // console.log('addDocument', type);
   selectedStore.$state.mode = 'new';
   selection.value = {};
@@ -167,7 +165,7 @@ const addDocument = async (type: "folder" | "document" = "document") => {
       ? selectedNode.value.key
       : selectedNode.value?.parent;
 
-    selectedStore.$state.selectedDocument = {
+  selectedStore.$state.selectedDocument = {
     version: 1,
     type,
     parent,
@@ -175,16 +173,19 @@ const addDocument = async (type: "folder" | "document" = "document") => {
     name: 'New ' + type,
     header: '',
     description: '',
-    langCode: import.meta.env.VITE_DEFAULT_LANG_CODE as string,
-    content: type === "document" ? [
-      {
-        type: 'header',
-        data: {
-          level: 1,
-          text: 'New ' + type,
-        },
-      },
-    ] : [],
+    langCode: import.meta.env.VITE_BASE_LANGUAGE as string,
+    content:
+      type === 'document'
+        ? [
+            {
+              type: 'header',
+              data: {
+                level: 1,
+                text: 'New ' + type,
+              },
+            },
+          ]
+        : [],
   };
 };
 
