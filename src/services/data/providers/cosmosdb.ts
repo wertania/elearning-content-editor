@@ -1,6 +1,6 @@
 import { InteractiveBrowserCredential } from '@azure/identity';
 import { DocumentItem } from '../types';
-import type { DataProvider, DocumentTreeItem, Medium } from '../types';
+import type { DataProvider, DocumentTreeItem, Medium, DocumentQuery } from '../types';
 import { Container, CosmosClient } from '@azure/cosmos';
 import { buildTree } from '../helpers';
 import env from '../../../services/env';
@@ -46,13 +46,18 @@ export default {
       .container(env.VITE_AZURE_COSMOSDB_CONTAINER_MEDIA);
   },
 
-  async getDocuments(): Promise<{
+  async getDocuments(query?: DocumentQuery): Promise<{
     tree: DocumentTreeItem[];
     list: DocumentItem[];
   }> {
     // can be improved...
-    const query = 'SELECT * FROM document'; // Modify this query as needed
-    const { resources } = await container.items.query(query).fetchAll();
+    let sql = 'SELECT * FROM document'; // Modify this query as needed
+    // filter by langCode if set
+    if (query?.langCode) {
+      sql += ` WHERE document.langCode = '${query.langCode}'`;
+    }
+
+    const { resources } = await container.items.query(sql).fetchAll();
 
     return {
       tree: buildTree(resources),

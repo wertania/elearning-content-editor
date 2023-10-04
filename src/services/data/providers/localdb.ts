@@ -1,5 +1,5 @@
 import { DocumentItem } from "../types";
-import type { DataProvider, DocumentTreeItem, Medium } from "../types";
+import type { DataProvider, DocumentQuery, DocumentTreeItem } from "../types";
 import { buildTree } from "../helpers";
 import env from "../../env";
 
@@ -11,15 +11,22 @@ export default {
   name: "localdb",
 
   initialize() {
-    console.log("nothing to initialize");
+    // console.log("nothing to initialize");
   },
 
-  async getDocuments(): Promise<{
+  async getDocuments(query?: DocumentQuery): Promise<{
     tree: DocumentTreeItem[];
     list: DocumentItem[];
   }> {
     const res = await fetch(DOCUMENTS_URL);
-    const documents = await res.json();
+    let documents: DocumentItem[] = await res.json();
+
+    // filter by langCode
+    if (query?.langCode) {
+      documents = documents.filter(
+        (doc) => doc.langCode === query.langCode,
+      );
+    }
 
     return {
       tree: buildTree(documents),

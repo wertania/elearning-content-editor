@@ -19,7 +19,8 @@ export default {
         }),
     );
 
-    console.log(entries);
+    // debug:
+    console.log("entries", entries);
     return entries;
   },
 };

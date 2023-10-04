@@ -3,6 +3,9 @@ import { dataProvider } from '../../src/services/data';
 
 export const vitepressDataProvider = dataProvider;
 
+const baseLang = process.env.VITE_BASE_LANGUAGE || 'en';
+
+
 /**
  * Converts a string to a part of a URL.
  * @example toUrl("My Folder 1") === "my-folder-1"
@@ -44,7 +47,7 @@ export const loadPages = async () => {
   const mapItem = (item: DocumentItem): Page => ({
     doc: item,
     name: item.name,
-    path: /*(item.langCode ?? '')*/ 'en' + getPath(item),
+    path: /*(item.langCode ?? '')*/ baseLang + getPath(item),
   });
 
   const mapTreeItem = (item: DocumentTreeItem): Page => ({

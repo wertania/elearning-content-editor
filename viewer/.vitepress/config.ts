@@ -11,6 +11,8 @@ loadVitepressEnv();
 const { loadPages } = await import("../services/vitepressDataService");
 const pages = await loadPages();
 
+const companyName = process.env.VITE_COMPANY_NAME || "";
+
 const buildNavigation = (subTree?: Page[]) => {
   subTree = subTree || pages.tree;
 
@@ -24,6 +26,7 @@ const buildNavigation = (subTree?: Page[]) => {
 };
 
 const navigation = buildNavigation();
+// debug:
 console.log("navigation", navigation);
 
 // https://vitepress.dev/reference/site-config
@@ -35,16 +38,17 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      // { text: 'Home', link: '/' },
       { text: "Start", link: "/markdown-examples" },
     ],
     search: {
       provider: "local",
     },
+
     sidebar: navigation,
+
     footer: {
       message: "Made with ❤️",
-      copyright: "Copyright © by Company",
+      copyright: companyName !== "" ? "Copyright © by " + companyName : "",
     },
   },
 
