@@ -23,23 +23,45 @@ const buildNavigation = (subTree?: Page[]) => {
   });
 };
 
+const navigation = buildNavigation();
+console.log('navigation', navigation);
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: 'My Awesome Project',
-  description: 'A VitePress Site',
+  title: 'e-Learning Platform',
+  description: 'Your learning platform',
+  // base: "/some-sub/path/",
 
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' },
+      // { text: 'Home', link: '/' },
+      { text: 'Start', link: '/markdown-examples' },
     ],
+    search: {
+      provider: 'local',
+    },
+    sidebar: navigation,
+    footer: {
+      message: 'Made with ❤️',
+      copyright: 'Copyright © by Company',
+    },
+  },
 
-    sidebar: buildNavigation(),
-
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' },
-    ],
+  lastUpdated: false,
+  locales: {
+    root: {
+      label: 'English',
+      lang: 'en',
+    },
+    en: {
+      label: 'English',
+      lang: 'en',
+    },
+    de: {
+      label: 'Deutsch',
+      lang: 'de',
+    },
   },
 
   transformPageData: (pageData, { siteConfig }) => {

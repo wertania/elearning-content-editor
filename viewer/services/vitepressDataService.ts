@@ -44,7 +44,7 @@ export const loadPages = async () => {
   const mapItem = (item: DocumentItem): Page => ({
     doc: item,
     name: item.name,
-    path: (item.langCode ?? '') + getPath(item),
+    path: /*(item.langCode ?? '')*/ 'en' + getPath(item),
   });
 
   const mapTreeItem = (item: DocumentTreeItem): Page => ({

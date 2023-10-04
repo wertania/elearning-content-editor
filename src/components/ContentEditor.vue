@@ -1,16 +1,18 @@
 <template>
-  <div class="content-editor">
+  <div class="content-editor" v-if="selectedDocument">
     <MetaData
       v-model:header="selectedDocument.header"
       v-model:description="selectedDocument.description"
       v-model:lang-code="selectedDocument.langCode"
       v-model:name="selectedDocument.name"
+      :hasOrigin="selectedDocument.originId != null"
     />
 
     <div class="content-editor__label">Content</div>
     <div class="content-editor__block-editor">
       <BlockEditor
-        v-model="editorDataProxy"
+        v-if="selectedDocument.type === 'document'"
+        v-model="page"
         :readOnly="false"
         :debug="false"
         :plugins="plugins"
@@ -25,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue';
 import {
   BlockEditor,
   PluginHeader,
@@ -33,39 +34,38 @@ import {
   BlockPage,
 } from 'vue-blockful-editor';
 import MetaData from '../components/MetaData.vue';
-import { DocumentItem } from '../services/data/types';
 import { PluginMedium } from './../blocks/medium';
 import { PluginMarkdown } from './../blocks/markdown';
+import { ref, computed } from 'vue';
+import { useSelectedStore } from '../stores/selected';
 
-const props = defineProps<{
-  selectedDocument: DocumentItem;
-  editorData: BlockPage;
-}>();
+// computed selectedDocument
+const selectedStore = useSelectedStore();
+const selectedDocument = computed({
+  get() {
+    return selectedStore.$state.selectedDocument;
+  },
+  set(newValue) {
+    console.log('set selected document');
+    selectedStore.$state.selectedDocument = newValue;
+  },
+});
+const content = computed({
+  get() {
+    return selectedStore.$state.selectedDocument?.content || [];
+  },
+  set(newValue) {
+    if (selectedStore.$state.selectedDocument == null) return;
+    selectedStore.$state.selectedDocument.content = newValue;
+  },
+});
 
-const emit = defineEmits<{
-  'update:editorData': [typeof props.editorData];
-}>();
-
-const editorDataProxy = computed({
-  get: () => props.editorData,
-  set: (value) => emit('update:editorData', value),
+const page = ref<BlockPage>({
+  blocks: content.value,
 });
 
 // block editor plugins
 const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown];
-
-const unloadEventListener = (e: BeforeUnloadEvent) => {
-  e.preventDefault();
-  e.returnValue = '';
-};
-
-onMounted(() => {
-  window.addEventListener('beforeunload', unloadEventListener);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('beforeunload', unloadEventListener);
-});
 </script>
 
 <style lang="scss">

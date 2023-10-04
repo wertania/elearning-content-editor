@@ -36,7 +36,7 @@ import { watch, ref, computed } from 'vue';
 import { BlockMedium } from './types';
 import { dataProvider } from '../../services/data';
 import Message from 'primevue/message';
-import { Button } from 'hh-components';
+import Button from 'primevue/button';
 import { Medium } from '../../services/data/types';
 import uploader from '../../services/data/upload';
 

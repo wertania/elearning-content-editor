@@ -28,3 +28,4 @@ viewer/.vitepress/cache
 
 .env
 .env.vitepress
+.hochhuth/*
