@@ -56,6 +56,10 @@ export default {
     if (query?.langCode) {
       sql += ` WHERE document.langCode = '${query.langCode}'`;
     }
+    // filter by hasOrigin if set
+    if (query?.hasOrigin) {
+      sql += ` ${Object.keys(query).length > 1 ? 'AND' : 'WHERE'} document.originId != null`;
+    }
 
     const { resources } = await container.items.query(sql).fetchAll();
 

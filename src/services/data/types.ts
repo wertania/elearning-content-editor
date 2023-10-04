@@ -32,6 +32,7 @@ export interface DocumentTreeItem extends TreeNode, DocumentItem {
 
 export interface DocumentQuery {
   langCode?: string;
+  hasOrigin?: boolean;
 }
 
 export interface DataProvider {

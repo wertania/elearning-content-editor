@@ -27,6 +27,9 @@ export default {
         (doc) => doc.langCode === query.langCode,
       );
     }
+    if (query?.hasOrigin) {
+      documents = documents.filter((doc) => doc.originId != null);
+    }
 
     return {
       tree: buildTree(documents),
