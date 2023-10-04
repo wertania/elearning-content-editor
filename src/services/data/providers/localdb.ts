@@ -21,15 +21,19 @@ export default {
     const res = await fetch(DOCUMENTS_URL);
     let documents: DocumentItem[] = await res.json();
 
-    // filter by langCode
-    if (query?.langCode) {
+    // filters are applied here. should be moved to API later...
+    if (query?.langCodes) {
       documents = documents.filter(
-        (doc) => doc.langCode === query.langCode,
+        (doc) => doc.langCode && (query.langCodes ?? []).includes(doc.langCode),
       );
     }
     if (query?.hasOrigin) {
       documents = documents.filter((doc) => doc.originId != null);
     }
+    if (query?.originId) {
+      documents = documents.filter((doc) => doc.originId === query.originId);
+    }
+    // "noContent" not implemented yet
 
     return {
       tree: buildTree(documents),

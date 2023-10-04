@@ -34,7 +34,7 @@ export const loadPages = async () => {
   if (pagesCache) return pagesCache;
 
   // get tree and list for base language. this will build the main tree also
-  const base = await vitepressDataProvider.getDocuments({ langCode: baseLang });
+  const base = await vitepressDataProvider.getDocuments({ langCodes: [baseLang] });
 
   // get full list of all non-base-language documents
   // and create a dict with [originId + langCode] as key

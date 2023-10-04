@@ -31,8 +31,10 @@ export interface DocumentTreeItem extends TreeNode, DocumentItem {
 }
 
 export interface DocumentQuery {
-  langCode?: string;
-  hasOrigin?: boolean;
+  langCodes?: string[]; // only documents with given langCode(s)
+  hasOrigin?: boolean; // only documents with originId
+  originId?: string; // id of the original document (e.g. translations)
+  noContent?: boolean; // to minimize the data transfer
 }
 
 export interface DataProvider {

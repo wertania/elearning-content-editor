@@ -53,13 +53,18 @@ export default {
     // can be improved...
     let sql = 'SELECT * FROM document'; // Modify this query as needed
     // filter by langCode if set
-    if (query?.langCode) {
-      sql += ` WHERE document.langCode = '${query.langCode}'`;
+    if (query?.langCodes) {
+      sql += ` WHERE document.langCode = '${query.langCodes.join(`' OR document.langCode = '`)}'`;
     }
     // filter by hasOrigin if set
     if (query?.hasOrigin) {
       sql += ` ${Object.keys(query).length > 1 ? 'AND' : 'WHERE'} document.originId != null`;
     }
+    // filter by originId if set
+    if (query?.originId) {
+      sql += ` ${Object.keys(query).length > 1 ? 'AND' : 'WHERE'} document.originId = '${query.originId}'`;
+    }
+    // "noContent" not implemented yet
 
     const { resources } = await container.items.query(sql).fetchAll();
 
