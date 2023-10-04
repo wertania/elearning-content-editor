@@ -20,7 +20,7 @@ export default {
     );
 
     // debug:
-    console.log("entries", entries);
+    // console.log("entries", entries);
     return entries;
   },
 };
