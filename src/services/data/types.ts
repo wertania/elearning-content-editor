@@ -42,7 +42,8 @@ export interface DataProvider {
   updateDocument(document: DocumentItem): Promise<void>;
 
   getMedium(id: string): Promise<Medium | undefined>;
-  addMedium(medium: Medium): Promise<Medium | undefined>;
+  addMedium(file: File): Promise<Medium>;
+  // generateMediumUrl(mediumId: string): Promise<string>
 
   dropNodes(ids: string[]): Promise<void>;
   moveNode(id: string, parentId: string | undefined): Promise<void>;

@@ -1,4 +1,5 @@
 import * as msal from '@azure/msal-browser';
+import pkg from '../../package.json';
 
 const TENANT_ID = import.meta.env.VITE_AZURE_COSMOSDB_TENANT_ID;
 const CLIENT_ID = import.meta.env.VITE_AZURE_COSMOSDB_CLIENT_ID;
@@ -43,8 +44,8 @@ const msalConfig = {
   },
   telemetry: {
     application: {
-      appName: 'internal-calendar-checker',
-      appVersion: '0.0.1',
+      appName: pkg.name,
+      appVersion: pkg.version,
     },
   },
 };
@@ -110,7 +111,7 @@ export async function signIn(method: 'popup' | 'redirect' = 'popup') {
   if (signInType === 'popup') {
     return myMSALObj
       .loginPopup({
-        scopes: ['https://cosmos.azure.com/user_impersonation'],
+        scopes: [],
         redirectUri: '/redirect',
       })
       .then(handleResponse)

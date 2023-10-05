@@ -84,6 +84,10 @@ export default {
     return medium;
   },
 
+  async addMedium(_file) {
+    throw Error(`Not implemented`);
+  },
+
   // ---------
   // | Nodes |
   // ---------

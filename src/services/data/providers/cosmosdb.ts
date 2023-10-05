@@ -2,8 +2,10 @@ import { InteractiveBrowserCredential } from '@azure/identity';
 import { DocumentItem } from '../types';
 import type { DataProvider, DocumentTreeItem, Medium } from '../types';
 import { Container, CosmosClient } from '@azure/cosmos';
-import { buildTree } from '../helpers';
+import { buildTree, fileTypeToMediaType } from '../helpers';
 import env from '../../../services/env';
+import { blobService } from '../../../../src/services/blob';
+import { guid } from '../../../../src/services/guid';
 
 let cosmosClient: CosmosClient;
 let container: Container;
@@ -100,8 +102,27 @@ export default {
     return response.resource;
   },
 
-  async addMedium(medium: Medium): Promise<Medium | undefined> {
+  async addMedium(file: File): Promise<Medium> {
+    // Upload to the blob storage.
+    const { url } = await blobService.upload(file.name, file);
+
+    // Create medium object.
+    const medium: Medium = {
+      id: guid(),
+      // TODO
+      hash: '',
+      name: file.name,
+      type: fileTypeToMediaType(file),
+      url,
+    };
+
+    // Create CosmosDB entry.
     const res = await mediaContainer.items.create(medium);
+
+    if (!res.resource) {
+      throw Error(`Failed to create a medium with name "${file.name}".`);
+    }
+
     return res.resource;
   },
 

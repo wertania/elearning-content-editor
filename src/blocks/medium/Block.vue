@@ -12,16 +12,18 @@
         v-else-if="loadedMedium.type === 'audio'"
         :src="loadedMedium.url"
       />
+
+      <Message v-else severity="warn">
+        Unknown medium type "{{ loadedMedium.type }}".
+      </Message>
     </template>
 
     <template v-else>
-      <Button icon="upload" @click="openUpload" />
-      <input
-        ref="refInput"
-        type="file"
-        @change="handleUpload"
-        icon="upload"
-        hidden
+      <FileUpload
+        custom-upload
+        :multiple="false"
+        @uploader="uploader"
+        mode="advanced"
       />
     </template>
 
@@ -36,9 +38,20 @@ import { watch, ref, computed } from 'vue';
 import { BlockMedium } from './types';
 import { dataProvider } from '../../services/data';
 import Message from 'primevue/message';
-import Button from 'primevue/button';
+import FileUpload, { type FileUploadUploaderEvent } from 'primevue/fileupload';
 import { Medium } from '../../services/data/types';
-import uploader from '../../services/data/upload';
+
+const uploader = async (e: FileUploadUploaderEvent) => {
+  const file = Array.isArray(e.files) ? e.files[0] : e.files;
+
+  // Upload the medium and receive an ID.
+  const { id } = await dataProvider.addMedium(file);
+
+  // Update the stored medium ID.
+  const updated = props.modelValue;
+  updated.data.id = id;
+  emit('update:modelValue', updated);
+};
 
 const props = defineProps<{
   readOnly: boolean;
@@ -50,29 +63,10 @@ const emit = defineEmits<{
 }>();
 
 const mediumId = ref<string>();
-
 const loadedMedium = ref<Medium>();
-
-const refInput = ref<HTMLInputElement>();
-
 const isNotFound = computed(
   () => props.modelValue.data.id && !loadedMedium.value?.url,
 );
-
-const openUpload = () => {
-  refInput.value?.click();
-};
-
-// Update the stored medium ID.
-const handleUpload = async (e: Event) => {
-  const file = (e.target as HTMLInputElement).files?.[0];
-  if (!file) return;
-
-  const id = await uploader.uploadMedium(file);
-  const updated = { ...props.modelValue };
-  updated.data.id = id;
-  emit('update:modelValue', updated);
-};
 
 // Load the medium when the ID changes.
 watch(
