@@ -1,4 +1,22 @@
 <template>
+
+  <Dialog v-model:visible="showAddLanguage" modal header="Add language" :style="{ width: '40vw' }">
+      <template #default>
+          <div class="p-1">
+              <label>Select a language</label>
+              <Dropdown :options="['de', 'en']" placeholder="Select a language" class="w-full mt-2" v-model="languageToAdd" />
+              <div class="flex flex-row flex-wrap h-4 mt-4">
+                <label class="block">Translate via AI?</label>
+                <Checkbox :binary="true" class="ml-2" v-model="translateViaAI" />
+              </div>
+              <div class="flex flex-row flex-wrap h-4 mt-5">
+                <Button icon="fa-solid fa-check" label="Add language" @click="addLanguage()"></Button>
+                <Button icon="fa-solid fa-close" label="Cancel" class="ml-1" @click="showAddLanguage = false"></Button>
+              </div>
+          </div>
+      </template>
+  </Dialog>
+
   <Toolbar>
     <template #start>
       <SplitButton
@@ -21,80 +39,85 @@
         class="ml-1"
         @click="saveDocument"
         severity="success"
-        v-show="selectedStore.$state.selectedDocument && changesDetected"
+        v-show="selectedStore.$state.selectedDocument"
       />
       <Button
         icon="fa-solid fa-times"
         class="ml-1"
         @click="closeDocument"
-        v-show="selectedStore.$state.selectedDocument && changesDetected"
+        v-show="selectedStore.$state.selectedDocument"
         severity="warning"
       />
     </template>
   </Toolbar>
 
   <div class="document-editor__main">
-    <div
-      class="document-editor__tree-container document-tree"
-      @dragover="handleDragOverContainer"
-      @drop="handleContainerDrop"
-    >
-      <Tree
-        class="document-editor__tree"
-        selectionMode="single"
-        v-model:selectionKeys="selection"
-        :value="documentStore.documentTree"
-        @node-select="handleSelection"
-        :disabled="true"
+    <div class="document-editor__sidebar flex flex-column card-container">
+      <div
+        class="document-editor__tree-container document-tree"
+        @dragover="handleDragOverContainer"
+        @drop="handleContainerDrop"
       >
-        <template #default="slotProps">
-          <div
-            class="document-editor__tree-draggable"
-            :class="{
-              'node-dragover': slotProps.node.id === draggedOver?.id,
-            }"
-            :draggable="true"
-            @dragover="handleDragOver(slotProps.node)"
-            @dragstart="handleDragStart($event, slotProps.node)"
-            @drop="handleDragDrop($event, slotProps.node)"
-            @dragend="handleDragEnd"
-          >
-            <span>{{ slotProps.node.name }}</span>
+        <Tree
+          class="document-editor__tree"
+          selectionMode="single"
+          v-model:selectionKeys="selection"
+          :value="documentStore.documentTree"
+          @node-select="handleSelection"
+          :disabled="true"
+        >
+          <template #default="slotProps">
+            <div
+              class="document-editor__tree-draggable"
+              :class="{
+                'node-dragover': slotProps.node.id === draggedOver?.id,
+              }"
+              :draggable="true"
+              @dragover="handleDragOver(slotProps.node)"
+              @dragstart="handleDragStart($event, slotProps.node)"
+              @drop="handleDragDrop($event, slotProps.node)"
+              @dragend="handleDragEnd"
+            >
+              <span>{{ slotProps.node.name }}</span>
+            </div>
+          </template>
+        </Tree>        
+      </div>
+      <div class="document-editor__settings-container flex-end" v-show="documentStore.$state.selectedDocument != null">
+        <div class="document-editor__settings-content flex flex-column card-container">
+          <div class="flex m-1 h-2rem p-2">
+            <i class="fa-solid fa-gears ml-1 mr-2"></i>Assigned translations
           </div>
-        </template>
-      </Tree>
+          <div class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2">
+            <Button icon="fa-solid fa-plus" @click="showAddLanguage = true"></Button>
+            <Dropdown v-model="documentStore.$state.selectedLanguage" :options="documentStore.$state.availableLanguages" class="ml-1 flex-auto" :disabled="documentStore.availableLanguages.length < 2" @change="switchLanguage" />
+          </div>
+        </div>
+      </div>
     </div>
 
     <ContentEditor v-if="selectedStore.$state.selectedDocument" />
 
     <div v-else class="g-center-content">
-      <Button
-        class="document-editor__load-button"
-        :disabled="!isDocumentSelected"
-        @click="loadDocument()"
-      >
-        <template v-if="isDocumentSelected">
-          Load &nbsp;
-          <code> <i class="fa fa-file" /> {{ selectedNode?.name }} </code>
-        </template>
-
-        <template v-else> Select a document node. </template>
-      </Button>
+      Select a document node.
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';
 import { DocumentItem, DocumentTreeItem } from '../services/data/types';
 import ContentEditor from '../components/ContentEditor.vue';
-import { info } from './../services/toast';
+import { error, info } from './../services/toast';
 import Toolbar from 'primevue/toolbar';
 import SplitButton from 'primevue/splitbutton';
 import { useSelectedStore } from '../stores/selected';
+import Dropdown from 'primevue/dropdown';
+import Dialog from 'primevue/dialog';
+import Checkbox from 'primevue/checkbox';
 
 // tree data
 const documentStore = useDocumentStore();
@@ -103,17 +126,15 @@ const selection = ref<Record<string, boolean>>({});
 // const selectedDocument = ref<DocumentItem>();
 const selectedNode = ref<DocumentTreeItem>();
 
+const showAddLanguage = ref(false);
+const translateViaAI = ref(true);
+const languageToAdd = ref('en');
+
 // document handling
 // const mode = ref<'new' | 'edit'>('new');
 
 const draggedNode = ref<DocumentItem | null>(null);
 const draggedOver = ref<DocumentItem | null>(null);
-
-const changesDetected = ref(true);
-
-const isDocumentSelected = computed(
-  () => selectedNode.value?.type === 'document',
-);
 
 // add documents
 const addmenu = [
@@ -143,13 +164,26 @@ const loadDocument = async (id?: string) => {
 };
 
 /**
+ * change the language
+ */
+const switchLanguage = async(data: any) => {
+  await documentStore.switchLanguage(data.value);  
+}
+
+/** 
+ * add a new language
+ */
+const addLanguage = async() => {
+  error('Not implemented yet!');
+}
+
+/**
  * Handle the selection of a tree node.
  */
 const handleSelection = async (node: TreeNode) => {
   // console.log('handleSelection', node);
   selectedNode.value = node as DocumentTreeItem;
   await loadDocument(selectedNode.value.id);
-  // changesDetected.value = false;
 };
 
 /**
@@ -276,6 +310,7 @@ const handleDragEnd = () => {
 </script>
 
 <style lang="scss">
+
 .document-editor {
   &__main,
   .content-editor {
@@ -287,15 +322,29 @@ const handleDragEnd = () => {
     grid-template-columns: minmax(300px, 1fr) 3fr;
     gap: 1rem;
     height: 100%;
-    padding: 0.5rem;
+    padding-top: 5px;
+  }
+
+  &__sidebar {
+    display: flex;
+    height: calc(100vh - 95px);
+    overflow: auto;
+    padding-top: 1.25rem;
+    border: 1px solid #dee2e6;
   }
 
   &__tree-container {
-    display: flex;
-    height: 100%;
-    overflow: auto;
-    padding: 1.25rem;
+    height: calc(90vh);
+  }
+
+  &__settings-container {
+    // height: calc(20vh);
+  }
+
+  &__settings-content {
+    margin: 5px;
     border: 1px solid #dee2e6;
+    background-color: rgb(240, 240, 240);
   }
 
   &__load-button {

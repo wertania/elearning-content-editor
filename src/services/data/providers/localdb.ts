@@ -18,21 +18,19 @@ export default {
     tree: DocumentTreeItem[];
     list: DocumentItem[];
   }> {
-    const res = await fetch(DOCUMENTS_URL);
-    let documents: DocumentItem[] = await res.json();
-
-    // filters are applied here. should be moved to API later...
+    let q = "?";
     if (query?.langCodes) {
-      documents = documents.filter(
-        (doc) => doc.langCode && (query.langCodes ?? []).includes(doc.langCode),
-      );
+      q += `langCodes=${query.langCodes.join(',')}&`;
     }
     if (query?.hasOrigin) {
-      documents = documents.filter((doc) => doc.originId != null);
+      q += `hasOrigin=${query.hasOrigin}&`;
     }
     if (query?.originId) {
-      documents = documents.filter((doc) => doc.originId === query.originId);
+      q += `originId=${query.originId}&`;
     }
+    const url = DOCUMENTS_URL + "query" + q;
+    const res = await fetch(url);
+    let documents: DocumentItem[] = await res.json();
     // "noContent" not implemented yet
 
     return {
