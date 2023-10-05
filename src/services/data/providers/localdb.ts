@@ -1,5 +1,5 @@
 import { DocumentItem } from '../types';
-import type { DataProvider, DocumentTreeItem } from '../types';
+import type { DataProvider, DocumentTreeItem, DocumentQuery } from '../types';
 import { buildTree } from '../helpers';
 import env from '../../env';
 
@@ -14,12 +14,26 @@ export default {
     console.log('nothing to initialize');
   },
 
-  async getDocuments(): Promise<{
+  async getDocuments(query?: DocumentQuery): Promise<{
     tree: DocumentTreeItem[];
     list: DocumentItem[];
   }> {
     const res = await fetch(DOCUMENTS_URL);
-    const documents = await res.json();
+    let documents: DocumentItem[] = await res.json();
+
+    // filters are applied here. should be moved to API later...
+    if (query?.langCodes) {
+      documents = documents.filter(
+        (doc) => doc.langCode && (query.langCodes ?? []).includes(doc.langCode),
+      );
+    }
+    if (query?.hasOrigin) {
+      documents = documents.filter((doc) => doc.originId != null);
+    }
+    if (query?.originId) {
+      documents = documents.filter((doc) => doc.originId === query.originId);
+    }
+    // "noContent" not implemented yet
 
     return {
       tree: buildTree(documents),

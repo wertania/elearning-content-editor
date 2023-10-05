@@ -1,6 +1,6 @@
 import { InteractiveBrowserCredential } from '@azure/identity';
 import { DocumentItem } from '../types';
-import type { DataProvider, DocumentTreeItem, Medium } from '../types';
+import type { DataProvider, DocumentTreeItem, Medium, DocumentQuery } from '../types';
 import { Container, CosmosClient } from '@azure/cosmos';
 import { buildTree, fileTypeToMediaType } from '../helpers';
 import env from '../../../services/env';
@@ -48,13 +48,27 @@ export default {
       .container(env.VITE_AZURE_COSMOSDB_CONTAINER_MEDIA);
   },
 
-  async getDocuments(): Promise<{
+  async getDocuments(query?: DocumentQuery): Promise<{
     tree: DocumentTreeItem[];
     list: DocumentItem[];
   }> {
     // can be improved...
-    const query = 'SELECT * FROM document'; // Modify this query as needed
-    const { resources } = await container.items.query(query).fetchAll();
+    let sql = 'SELECT * FROM document'; // Modify this query as needed
+    // filter by langCode if set
+    if (query?.langCodes) {
+      sql += ` WHERE document.langCode = '${query.langCodes.join(`' OR document.langCode = '`)}'`;
+    }
+    // filter by hasOrigin if set
+    if (query?.hasOrigin) {
+      sql += ` ${Object.keys(query).length > 1 ? 'AND' : 'WHERE'} document.originId != null`;
+    }
+    // filter by originId if set
+    if (query?.originId) {
+      sql += ` ${Object.keys(query).length > 1 ? 'AND' : 'WHERE'} document.originId = '${query.originId}'`;
+    }
+    // "noContent" not implemented yet
+
+    const { resources } = await container.items.query(sql).fetchAll();
 
     return {
       tree: buildTree(resources),

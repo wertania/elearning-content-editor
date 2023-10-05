@@ -30,12 +30,19 @@ export interface DocumentTreeItem extends TreeNode, DocumentItem {
   children?: DocumentTreeItem[];
 }
 
+export interface DocumentQuery {
+  langCodes?: string[]; // only documents with given langCode(s)
+  hasOrigin?: boolean; // only documents with originId
+  originId?: string; // id of the original document (e.g. translations)
+  noContent?: boolean; // to minimize the data transfer
+}
+
 export interface DataProvider {
   name: string;
 
   initialize?(): void;
 
-  getDocuments(): Promise<{ tree: DocumentTreeItem[]; list: DocumentItem[] }>;
+  getDocuments(query?: DocumentQuery): Promise<{ tree: DocumentTreeItem[]; list: DocumentItem[] }>;
   getDataForDocument(id: string): Promise<DocumentItem>;
   addDocument(document: DocumentItem): Promise<void>;
   dropDocument(id: string): Promise<void>;
