@@ -10,7 +10,7 @@ export default {
       list
         .filter((item) => item.doc.type === 'document')
         .map(async (page) => {
-          const { content, params } = await renderMarkdown(page.doc.content);
+          const { content, params } = await renderMarkdown(page.doc);
 
           return {
             params: {

@@ -1,5 +1,6 @@
-import type { UniversalBlock } from 'vue-blockful-editor';
+import { UniversalBlock } from 'vue-blockful-editor';
 import { vitepressDataProvider } from './vitepressDataService';
+import { DocumentItem } from 'src/services/data/types';
 
 type Params = Record<string, any>;
 
@@ -8,13 +9,15 @@ type Params = Record<string, any>;
  * into the `.md` file to be used by the template.
  */
 export default async (
-  blocks: UniversalBlock[],
+  doc: DocumentItem,
 ): Promise<{ content: string; params: Params }> => {
   /**
    * The params can be collected during the markdown compilation
    * and are injected into the `[path].md` file's params.
    * They can then be accessed through `params["my-param"]`.
    */
+
+  const blocks: UniversalBlock[] = doc.content;
   const params: Params = {};
 
   const promises = blocks.map(async (block) => {
@@ -58,8 +61,9 @@ export default async (
 
   const renderedBlocks = await Promise.all(promises);
 
-  let content = `<UsersActivity :id="'id-placeholder-xxx'" />\n`;
-  content += `<MediaViewer :type="'image'" :src="'https://some-placeholder-here'" />\n`;
+  // The content of the `.md` virtual file with embedded Vue components.
+  // The `UsersActivity` component is always rendered at the top.
+  let content = `<UsersActivity :documentId="'${doc.id}'" />\n`;
   content += renderedBlocks.join('\n\n');
   
   return { content, params };

@@ -1,5 +1,5 @@
 <template>
-    [Hidden tracker]
+    [Hidden tracker]: {{ documentId + "" }}
 </template>
 
 <script setup lang="ts">
@@ -20,10 +20,10 @@ const startReading = new Date();
 onBeforeUnmount(() => {
     const endReading = new Date();
     const timeSpent = endReading.getTime() - startReading.getTime();
-    // time in minutes (rounded)
-    const timeSpentInMinutes = Math.round(timeSpent / 60000);
+    // time in seconds (rounded)
+    const timeSpentInSeconds = Math.round(timeSpent / 1000);
     // send timeSpent to the server
     // to do...
-    console.log(`User ${user} spent ${timeSpentInMinutes} minutes on page ${props.documentId}`);
+    console.log(`User ${user} spent ${timeSpentInSeconds}s on page ${props.documentId}`);
 });
 </script>
