@@ -12,18 +12,19 @@
         v-else-if="loadedMedium.type === 'audio'"
         :src="loadedMedium.url"
       />
+
+      <Message v-else severity="warn">
+        Unknown medium type "{{ loadedMedium.type }}".
+      </Message>
     </template>
 
     <template v-else>
-      <form @submit.prevent="">
-        <InputText
-          placeholder="Medium ID..."
-          v-model="mediumId"
-          @blur="handleSubmit"
-        />
-
-        <Button type="submit" icon="check" @click="handleSubmit" />
-      </form>
+      <FileUpload
+        custom-upload
+        :multiple="false"
+        @uploader="uploader"
+        mode="advanced"
+      />
     </template>
 
     <Message v-if="isNotFound" severity="warn" :closable="false">
@@ -36,10 +37,21 @@
 import { watch, ref, computed } from 'vue';
 import { BlockMedium } from './types';
 import { dataProvider } from '../../services/data';
-import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
-import Button from 'primevue/button';
+import FileUpload, { type FileUploadUploaderEvent } from 'primevue/fileupload';
 import { Medium } from '../../services/data/types';
+
+const uploader = async (e: FileUploadUploaderEvent) => {
+  const file = Array.isArray(e.files) ? e.files[0] : e.files;
+
+  // Upload the medium and receive an ID.
+  const { id } = await dataProvider.addMedium(file);
+
+  // Update the stored medium ID.
+  const updated = props.modelValue;
+  updated.data.id = id;
+  emit('update:modelValue', updated);
+};
 
 const props = defineProps<{
   readOnly: boolean;
@@ -52,17 +64,9 @@ const emit = defineEmits<{
 
 const mediumId = ref<string>();
 const loadedMedium = ref<Medium>();
-
 const isNotFound = computed(
   () => props.modelValue.data.id && !loadedMedium.value?.url,
 );
-
-// Update the stored medium ID.
-const handleSubmit = () => {
-  const updated = { ...props.modelValue };
-  updated.data.id = mediumId.value;
-  emit('update:modelValue', updated);
-};
 
 // Load the medium when the ID changes.
 watch(

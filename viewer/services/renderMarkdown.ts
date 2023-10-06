@@ -1,7 +1,22 @@
 import type { UniversalBlock } from 'vue-blockful-editor';
 import { vitepressDataProvider } from './vitepressDataService';
 
-export default async (blocks: UniversalBlock[]): Promise<string> => {
+type Params = Record<string, any>;
+
+/**
+ * Renders markdown and collects params that will be injected
+ * into the `.md` file to be used by the template.
+ */
+export default async (
+  blocks: UniversalBlock[],
+): Promise<{ content: string; params: Params }> => {
+  /**
+   * The params can be collected during the markdown compilation
+   * and are injected into the `[path].md` file's params.
+   * They can then be accessed through `params["my-param"]`.
+   */
+  const params: Params = {};
+
   const promises = blocks.map(async (block) => {
     switch (block.type) {
       case 'paragraph': {
@@ -26,14 +41,12 @@ export default async (blocks: UniversalBlock[]): Promise<string> => {
           return '';
         }
 
-        switch (medium.type) {
-          case 'image':
-            return `<img src="${medium.url}">`;
-          case 'video':
-            return `<video src="${medium.url}">`;
-          case 'audio':
-            return `<audio src="${medium.url}">`;
-        }
+        // Store the medium in a parameter to access it in the template.
+        const paramName = `medium-${medium.id}`;
+        params[paramName] = medium;
+
+        // Pass the medium to the Vue component from the params object.
+        return `<Medium :medium="params['${paramName}']" />`;
       }
 
       default: {
@@ -48,6 +61,6 @@ export default async (blocks: UniversalBlock[]): Promise<string> => {
   let content = `<UsersActivity :id="'id-placeholder-xxx'" />\n`;
   content += `<MediaViewer :type="'image'" :src="'https://some-placeholder-here'" />\n`;
   content += renderedBlocks.join('\n\n');
-
-  return content;
+  
+  return { content, params };
 };

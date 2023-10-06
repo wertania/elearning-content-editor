@@ -1,4 +1,4 @@
-import type { DocumentItem, DocumentTreeItem } from './types';
+import type { DocumentItem, DocumentTreeItem, MediumType } from './types';
 
 export const buildTree = (items: DocumentItem[]): DocumentTreeItem[] => {
   const rootItems = items.filter((item) => !item.parent).sort(sorter);
@@ -33,3 +33,6 @@ const buildTreeItem = (
     children: children.length ? children : undefined,
   };
 };
+
+export const fileTypeToMediaType = (file: File) =>
+  file.type.split('/')[0] as MediumType;

@@ -96,6 +96,14 @@ export default {
     return medium;
   },
 
+  async addMedium(_file) {
+    throw Error(`Not implemented`);
+  },
+
+  async getMediumUrl(_mediumId) {
+    throw Error('Not implemented');
+  },
+
   // ---------
   // | Nodes |
   // ---------
