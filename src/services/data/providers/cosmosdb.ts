@@ -1,6 +1,11 @@
 import { InteractiveBrowserCredential } from '@azure/identity';
 import { DocumentItem } from '../types';
-import type { DataProvider, DocumentTreeItem, Medium, DocumentQuery } from '../types';
+import type {
+  DataProvider,
+  DocumentTreeItem,
+  Medium,
+  DocumentQuery,
+} from '../types';
 import { Container, CosmosClient } from '@azure/cosmos';
 import { buildTree, fileTypeToMediaType } from '../helpers';
 import env from '../../../services/env';
@@ -56,15 +61,21 @@ export default {
     let sql = 'SELECT * FROM document'; // Modify this query as needed
     // filter by langCode if set
     if (query?.langCodes) {
-      sql += ` WHERE document.langCode = '${query.langCodes.join(`' OR document.langCode = '`)}'`;
+      sql += ` WHERE document.langCode = '${query.langCodes.join(
+        `' OR document.langCode = '`,
+      )}'`;
     }
     // filter by hasOrigin if set
     if (query?.hasOrigin) {
-      sql += ` ${Object.keys(query).length > 1 ? 'AND' : 'WHERE'} document.originId != null`;
+      sql += ` ${
+        Object.keys(query).length > 1 ? 'AND' : 'WHERE'
+      } document.originId != null`;
     }
     // filter by originId if set
     if (query?.originId) {
-      sql += ` ${Object.keys(query).length > 1 ? 'AND' : 'WHERE'} document.originId = '${query.originId}'`;
+      sql += ` ${
+        Object.keys(query).length > 1 ? 'AND' : 'WHERE'
+      } document.originId = '${query.originId}'`;
     }
     // "noContent" not implemented yet
 
@@ -138,6 +149,15 @@ export default {
     }
 
     return res.resource;
+  },
+
+  async getMediumUrl(mediumId) {
+    const medium = await this.getMedium(mediumId);
+    if (!medium) {
+      throw Error(`The medium with ID "${mediumId}" could not be found.`);
+    }
+
+    return await blobService.generateSasUrl(medium.url);
   },
 
   // ---------

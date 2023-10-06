@@ -68,6 +68,10 @@ export default {
     return medium;
   },
 
+  async getMediumUrl(mediumId) {
+    return mockMedia.find((item) => mediumId === item.id)!.url;
+  },
+
   // ---------
   // | Nodes |
   // ---------

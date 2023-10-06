@@ -4,13 +4,8 @@
 </template>
 
 <script setup lang="ts">
-import './styles/globals.scss';
-import { useDocumentStore } from './stores/documents';
 import Toast from 'primevue/toast';
-
-// get the document store and initialize it
-const documentStore = useDocumentStore();
-documentStore.initialize();
+import './styles/globals.scss';
 </script>
 
 <style lang="scss">

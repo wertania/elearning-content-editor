@@ -42,7 +42,9 @@ export interface DataProvider {
 
   initialize?(): void;
 
-  getDocuments(query?: DocumentQuery): Promise<{ tree: DocumentTreeItem[]; list: DocumentItem[] }>;
+  getDocuments(
+    query?: DocumentQuery,
+  ): Promise<{ tree: DocumentTreeItem[]; list: DocumentItem[] }>;
   getDataForDocument(id: string): Promise<DocumentItem>;
   addDocument(document: DocumentItem): Promise<void>;
   dropDocument(id: string): Promise<void>;
@@ -50,7 +52,7 @@ export interface DataProvider {
 
   getMedium(id: string): Promise<Medium | undefined>;
   addMedium(file: File): Promise<Medium>;
-  // generateMediumUrl(mediumId: string): Promise<string>
+  getMediumUrl(mediumId: string): Promise<string>;
 
   dropNodes(ids: string[]): Promise<void>;
   moveNode(id: string, parentId: string | undefined): Promise<void>;

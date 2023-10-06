@@ -1,11 +1,21 @@
 import * as msal from '@azure/msal-browser';
 import pkg from '../../package.json';
+import { router } from '../router';
 
 const TENANT_ID = import.meta.env.VITE_AZURE_COSMOSDB_TENANT_ID;
 const CLIENT_ID = import.meta.env.VITE_AZURE_COSMOSDB_CLIENT_ID;
 
-// Config object to be passed to Msal on creation
-const msalConfig = {
+// Add here scopes for id token to be used at MS Identity Platform endpoints.
+const loginRequest: msal.SilentRequest = {
+  scopes: [
+    // 'https://storage.azure.com/.default',
+    // 'https://cosmos.azure.com/user_impersonation',
+  ],
+  forceRefresh: false, // Set this to "true" to skip a cached token and go to the server to get a new token
+};
+
+// Create the main MSAL instance.
+export const msalInstance = new msal.PublicClientApplication({
   auth: {
     clientId: CLIENT_ID,
     authority: 'https://login.microsoftonline.com/' + TENANT_ID,
@@ -48,102 +58,43 @@ const msalConfig = {
       appVersion: pkg.version,
     },
   },
-};
-
-// Add here scopes for id token to be used at MS Identity Platform endpoints.
-const loginRequest = {
-  scopes: ['https://cosmos.azure.com/user_impersonation'],
-  forceRefresh: false, // Set this to "true" to skip a cached token and go to the server to get a new token
-};
-
-export let signInType = 'popup';
-let accountId = '';
-export let token: null | string = null;
-
-// Create the main myMSALObj instance
-// configuration parameters are located at authConfig.js
-export const myMSALObj = new msal.PublicClientApplication(msalConfig);
-
-myMSALObj.initialize().then(() => {
-  // Redirect: once login is successful and redirects with tokens, call Graph API
-  myMSALObj
-    .handleRedirectPromise()
-    .then(handleResponse)
-    .catch((err) => {
-      console.error(err);
-    });
 });
 
-function handleResponse(resp: any): boolean {
-  if (resp !== null) {
-    accountId = resp.account.homeAccountId;
-    myMSALObj.setActiveAccount(resp.account);
-
-    token = resp.idToken ?? null;
-    if (token) {
-      return true;
-    }
-  } else {
-    const currentAccounts = myMSALObj.getAllAccounts();
-    if (!currentAccounts || currentAccounts.length < 1) {
-      return false;
-    } else if (currentAccounts.length > 1) {
-      // Add choose account code here
-      return false;
-    } else if (currentAccounts.length === 1) {
-      const activeAccount = currentAccounts[0];
-      myMSALObj.setActiveAccount(activeAccount);
-      accountId = activeAccount.homeAccountId;
-
-      token = activeAccount.idToken ?? null;
-      // save token from idToken
-      if (token) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
+await msalInstance.initialize();
 
 export async function signIn(method: 'popup' | 'redirect' = 'popup') {
-  signInType = method;
-
-  if (signInType === 'popup') {
-    return myMSALObj
+  if (method === 'popup') {
+    return msalInstance
       .loginPopup({
-        scopes: [],
-        redirectUri: '/redirect',
+        scopes: loginRequest.scopes,
+        // redirectUri: '/redirect',
       })
-      .then(handleResponse)
+      .then(() => {
+        return true;
+      })
       .catch(function (error) {
         console.log(error);
+
+        // Route back to home.
+        router.replace({ name: 'home' });
+
         return false;
       });
-  } else if (signInType === 'redirect') {
-    return myMSALObj.loginRedirect(loginRequest);
+  } else if (method === 'redirect') {
+    return msalInstance.loginRedirect(loginRequest);
   }
 }
 
-export function signOut(interactionType = 'popup') {
-  const logoutRequest = {
-    account: myMSALObj.getAccountByHomeId(accountId),
-  };
+// export function signOut(interactionType = 'popup') {
+//   const logoutRequest = {
+//     account: msalInstance.getAccountByHomeId(accountId),
+//   };
 
-  if (interactionType === 'popup') {
-    myMSALObj.logoutPopup(logoutRequest).then(() => {
-      window.location.reload();
-    });
-  } else {
-    myMSALObj.logoutRedirect(logoutRequest);
-  }
-}
-
-export async function checkForValidToken() {
-  return await myMSALObj
-    .acquireTokenSilent(loginRequest)
-    .catch(async (error) => {
-      console.error('silent token acquisition fails.');
-      console.log(error);
-      return { accessToken: '' };
-    });
-}
+//   if (interactionType === 'popup') {
+//     msalInstance.logoutPopup(logoutRequest).then(() => {
+//       window.location.reload();
+//     });
+//   } else {
+//     msalInstance.logoutRedirect(logoutRequest);
+//   }
+// }

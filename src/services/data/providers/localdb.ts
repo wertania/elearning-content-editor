@@ -102,6 +102,10 @@ export default {
     throw Error(`Not implemented`);
   },
 
+  async getMediumUrl(_mediumId) {
+    throw Error('Not implemented');
+  },
+
   // ---------
   // | Nodes |
   // ---------

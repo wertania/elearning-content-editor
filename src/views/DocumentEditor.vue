@@ -65,7 +65,10 @@
       </Tree>
     </div>
 
-    <ContentEditor v-if="selectedStore.$state.selectedDocument" />
+    <ContentEditor
+      :key="selectedStore.$state.selectedDocument.id"
+      v-if="selectedStore.$state.selectedDocument"
+    />
 
     <div v-else class="g-center-content">
       <Button
@@ -85,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';
@@ -95,6 +98,7 @@ import { info } from './../services/toast';
 import Toolbar from 'primevue/toolbar';
 import SplitButton from 'primevue/splitbutton';
 import { useSelectedStore } from '../stores/selected';
+import { guid } from '../services/guid';
 
 // tree data
 const documentStore = useDocumentStore();
@@ -169,7 +173,7 @@ const addDocument = async (type: 'folder' | 'document' = 'document') => {
     version: 1,
     type,
     parent,
-    id: 'new-document-xxx',
+    id: guid(),
     name: 'New ' + type,
     header: '',
     description: '',
@@ -273,6 +277,11 @@ const handleDragOverContainer = (event: DragEvent) => {
 const handleDragEnd = () => {
   draggedOver.value = null;
 };
+
+onMounted(() => {
+  // get the document store and initialize it
+  documentStore.initialize();
+});
 </script>
 
 <style lang="scss">

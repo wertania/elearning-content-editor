@@ -27,7 +27,7 @@ export const mockData: DocumentItem[] = [
     name: 'Document 1',
     header: 'This is the first document',
     description: 'This is a short description of the first document',
-    langCode: 'de',
+    langCode: 'en',
     content: [
       {
         type: 'paragraph',
@@ -48,7 +48,7 @@ export const mockData: DocumentItem[] = [
     name: 'Document 2',
     header: 'This is the second document',
     description: 'This is a short description of the second document',
-    langCode: 'de',
+    langCode: 'en',
     content: [
       {
         type: 'paragraph',
@@ -71,7 +71,7 @@ export const mockData: DocumentItem[] = [
     name: 'Folder 1',
     header: 'This is the first folder',
     description: 'This is a short description of the first folder',
-    langCode: 'de',
+    langCode: 'en',
     content: [],
   },
   {
@@ -83,7 +83,7 @@ export const mockData: DocumentItem[] = [
     name: 'Folder 2',
     header: 'This is the second folder',
     description: 'This is a short description of the second folder',
-    langCode: 'de',
+    langCode: 'en',
     content: [],
   },
   {
@@ -95,7 +95,7 @@ export const mockData: DocumentItem[] = [
     name: 'Document 3',
     header: 'This is the third document',
     description: 'This is a short description of the third document',
-    langCode: 'de',
+    langCode: 'en',
     content: [
       {
         type: 'paragraph',
@@ -104,6 +104,23 @@ export const mockData: DocumentItem[] = [
       {
         type: 'paragraph',
         data: { text: 'This is the second paragraph of the third document' },
+      },
+    ],
+  },
+  {
+    version: 1,
+    id: '6',
+    // originId: null,
+    type: 'document',
+    // parent: '4',
+    name: 'With medium',
+    header: 'With medium.',
+    description: 'I have a Medium.',
+    langCode: 'en',
+    content: [
+      {
+        type: 'medium',
+        data: { id: '123' },
       },
     ],
   },
