@@ -5,6 +5,15 @@ import { writeFileSync } from "fs";
 export const vitepressDataProvider = dataProvider;
 const baseLang = process.env.VITE_BASE_LANGUAGE || "en";
 
+const languageLookup: { code: string; name: string }[] = await import(
+  "./../../globals/languageCodes.json"
+);
+// create dict with language code as key and language name as value
+export const languageNames = languageLookup.reduce((acc, item) => {
+  acc[item.code] = item.name;
+  return acc;
+}, {} as { [langCode: string]: string });
+
 /**
  * Converts a string to a part of a URL.
  * @example toUrl("My Folder 1") === "my-folder-1"
@@ -34,7 +43,9 @@ export const loadPages = async () => {
   if (pagesCache) return pagesCache;
 
   // get tree and list for base language. this will build the main tree also
-  const base = await vitepressDataProvider.getDocuments({ langCodes: [baseLang] });
+  const base = await vitepressDataProvider.getDocuments({
+    langCodes: [baseLang],
+  });
 
   // get full list of all non-base-language documents
   // and create a dict with [originId + langCode] as key
@@ -87,7 +98,7 @@ export const loadPages = async () => {
     childs?: Page[],
   ): Page => {
     return {
-      name: "Language: " + langCode.toUpperCase(),
+      name: "Language: " + (languageNames[langCode] ?? langCode.toUpperCase()),
       path: `${langCode}/main`,
       doc: { // some empty dummy document
         version: 1,
