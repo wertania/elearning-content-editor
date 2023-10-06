@@ -45,5 +45,9 @@ export default async (blocks: UniversalBlock[]): Promise<string> => {
 
   const renderedBlocks = await Promise.all(promises);
 
-  return renderedBlocks.join('\n\n');
+  let content = `<UsersActivity :id="'id-placeholder-xxx'" />\n`;
+  content += `<MediaViewer :type="'image'" :src="'https://some-placeholder-here'" />\n`;
+  content += renderedBlocks.join('\n\n');
+
+  return content;
 };
