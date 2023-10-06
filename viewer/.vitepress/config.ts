@@ -12,6 +12,17 @@ loadVitepressEnv();
  */
 const { loadPages } = await import('../services/loadPages');
 const { tree, availableLanguages } = await loadPages();
+const languageLookup: { code: string; name: string }[] = await import(
+  './../../globals/languageCodes.json'
+);
+// create dict with language code as key and language name as value
+export const languageNames = languageLookup.reduce(
+  (acc, item) => {
+    acc[item.code] = item.name;
+    return acc;
+  },
+  {} as { [langCode: string]: string },
+);
 
 const companyName = process.env.VITE_COMPANY_NAME || '';
 const logoPath = process.env.VITE_LOGO_PATH;
@@ -35,7 +46,7 @@ if (availableLanguages.length > 1) {
   navigation = {
     '/': availableLanguages.map((langCode) => {
       return {
-        text: langCode.toUpperCase(),
+        text: languageNames[langCode] ?? langCode.toUpperCase(),
         link: langCode + '/main',
       };
     }),
@@ -102,7 +113,7 @@ export default defineConfig({
       },
     },
     server: {
-      port: 5001
-    }
+      port: 5001,
+    },
   },
 });
