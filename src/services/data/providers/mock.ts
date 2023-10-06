@@ -1,8 +1,9 @@
-import { buildTree } from '../helpers';
+import { buildTree, fileTypeToMediaType } from '../helpers';
 import { DocumentItem } from '../types';
-import type { DataProvider, DocumentTreeItem } from '../types';
+import type { DataProvider, DocumentTreeItem, Medium } from '../types';
 import { mockData as demoData } from '../mock';
 import { mockMedia } from '../mock/media';
+import { guid } from '../../../../src/services/guid';
 
 export default {
   name: 'mock',
@@ -49,8 +50,26 @@ export default {
   // | MEDIA |
   // ---------
 
-  async getMedium(id) {
+  async getMedium(id: string): Promise<Medium | undefined> {
     return mockMedia.find((item) => id === item.id);
+  },
+
+  async addMedium(file: File): Promise<Medium> {
+    const medium: Medium = {
+      id: guid(),
+      // TODO
+      hash: '',
+      name: file.name,
+      type: fileTypeToMediaType(file),
+      url: URL.createObjectURL(file),
+    };
+
+    mockMedia.push(medium);
+    return medium;
+  },
+
+  async getMediumUrl(mediumId) {
+    return mockMedia.find((item) => mediumId === item.id)!.url;
   },
 
   // ---------

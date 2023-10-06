@@ -1,20 +1,38 @@
 <template>
-
-  <Dialog v-model:visible="showAddLanguage" modal header="Add language" :style="{ width: '40vw' }">
-      <template #default>
-          <div class="p-1">
-              <label>Select a language</label>
-              <Dropdown :options="['de', 'en']" placeholder="Select a language" class="w-full mt-2" v-model="languageToAdd" />
-              <div class="flex flex-row flex-wrap h-4 mt-4">
-                <label class="block">Translate via AI?</label>
-                <Checkbox :binary="true" class="ml-2" v-model="translateViaAI" />
-              </div>
-              <div class="flex flex-row flex-wrap h-4 mt-5">
-                <Button icon="fa-solid fa-check" label="Add language" @click="addLanguage()"></Button>
-                <Button icon="fa-solid fa-close" label="Cancel" class="ml-1" @click="showAddLanguage = false"></Button>
-              </div>
-          </div>
-      </template>
+  <Dialog
+    v-model:visible="showAddLanguage"
+    modal
+    header="Add language"
+    :style="{ width: '40vw' }"
+  >
+    <template #default>
+      <div class="p-1">
+        <label>Select a language</label>
+        <Dropdown
+          :options="['de', 'en']"
+          placeholder="Select a language"
+          class="w-full mt-2"
+          v-model="languageToAdd"
+        />
+        <div class="flex flex-row flex-wrap h-4 mt-4">
+          <label class="block">Translate via AI?</label>
+          <Checkbox :binary="true" class="ml-2" v-model="translateViaAI" />
+        </div>
+        <div class="flex flex-row flex-wrap h-4 mt-5">
+          <Button
+            icon="fa-solid fa-check"
+            label="Add language"
+            @click="addLanguage()"
+          ></Button>
+          <Button
+            icon="fa-solid fa-close"
+            label="Cancel"
+            class="ml-1"
+            @click="showAddLanguage = false"
+          ></Button>
+        </div>
+      </div>
+    </template>
   </Dialog>
 
   <Toolbar>
@@ -81,31 +99,48 @@
               <span>{{ slotProps.node.name }}</span>
             </div>
           </template>
-        </Tree>        
+        </Tree>
       </div>
-      <div class="document-editor__settings-container flex-end" v-show="documentStore.$state.selectedDocument != null">
-        <div class="document-editor__settings-content flex flex-column card-container">
+      <div
+        class="document-editor__settings-container flex-end"
+        v-show="documentStore.$state.selectedDocument != null"
+      >
+        <div
+          class="document-editor__settings-content flex flex-column card-container"
+        >
           <div class="flex m-1 h-2rem p-2">
             <i class="fa-solid fa-gears ml-1 mr-2"></i>Assigned translations
           </div>
-          <div class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2">
-            <Button icon="fa-solid fa-plus" @click="showAddLanguage = true"></Button>
-            <Dropdown v-model="documentStore.$state.selectedLanguage" :options="documentStore.$state.availableLanguages" class="ml-1 flex-auto" :disabled="documentStore.availableLanguages.length < 2" @change="switchLanguage" />
+          <div
+            class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2"
+          >
+            <Button
+              icon="fa-solid fa-plus"
+              @click="showAddLanguage = true"
+            ></Button>
+            <Dropdown
+              v-model="documentStore.$state.selectedLanguage"
+              :options="documentStore.$state.availableLanguages"
+              class="ml-1 flex-auto"
+              :disabled="documentStore.availableLanguages.length < 2"
+              @change="switchLanguage"
+            />
           </div>
         </div>
       </div>
     </div>
 
-    <ContentEditor v-if="selectedStore.$state.selectedDocument" />
+    <ContentEditor
+      :key="selectedStore.$state.selectedDocument.id"
+      v-if="selectedStore.$state.selectedDocument"
+    />
 
-    <div v-else class="g-center-content">
-      Select a document node.
-    </div>
+    <div v-else class="g-center-content">Select a document node.</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';
@@ -115,6 +150,7 @@ import { error, info } from './../services/toast';
 import Toolbar from 'primevue/toolbar';
 import SplitButton from 'primevue/splitbutton';
 import { useSelectedStore } from '../stores/selected';
+import { guid } from '../services/guid';
 import Dropdown from 'primevue/dropdown';
 import Dialog from 'primevue/dialog';
 import Checkbox from 'primevue/checkbox';
@@ -166,16 +202,16 @@ const loadDocument = async (id?: string) => {
 /**
  * change the language
  */
-const switchLanguage = async(data: any) => {
-  await documentStore.switchLanguage(data.value);  
-}
+const switchLanguage = async (data: any) => {
+  await documentStore.switchLanguage(data.value);
+};
 
-/** 
+/**
  * add a new language
  */
-const addLanguage = async() => {
+const addLanguage = async () => {
   error('Not implemented yet!');
-}
+};
 
 /**
  * Handle the selection of a tree node.
@@ -203,7 +239,7 @@ const addDocument = async (type: 'folder' | 'document' = 'document') => {
     version: 1,
     type,
     parent,
-    id: 'new-document-xxx',
+    id: guid(),
     name: 'New ' + type,
     header: '',
     description: '',
@@ -307,10 +343,14 @@ const handleDragOverContainer = (event: DragEvent) => {
 const handleDragEnd = () => {
   draggedOver.value = null;
 };
+
+onMounted(() => {
+  // get the document store and initialize it
+  documentStore.initialize();
+});
 </script>
 
 <style lang="scss">
-
 .document-editor {
   &__main,
   .content-editor {

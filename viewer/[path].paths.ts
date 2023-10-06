@@ -1,5 +1,5 @@
 import renderMarkdown from './services/renderMarkdown';
-import { loadPages } from './services/vitepressDataService';
+import { loadPages } from './services/loadPages';
 import { writeFileSync } from 'fs';
 
 export default {
@@ -10,17 +10,22 @@ export default {
       list
         .filter((item) => item.doc.type === 'document')
         .map(async (page) => {
+          const { content, params } = await renderMarkdown(page.doc.content);
+
           return {
             params: {
               name: page.name,
               path: page.path,
+              ...params,
             },
-            content: await renderMarkdown(page.doc.content),
+            content,
           };
         }),
-    );    
+    );
+
     // debug:
-    writeFileSync("debug.paths.json", JSON.stringify(entries, null, 2));
+    writeFileSync('debug.paths.json', JSON.stringify(entries, null, 2));
+
     return entries;
   },
 };
