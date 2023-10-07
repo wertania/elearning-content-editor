@@ -44,8 +44,9 @@ export const loadPages = async () => {
   });
   // extract all possible language codes from allWithOrigin list
   const allLangCodes = allWithOrigin.list.map((item) => item.langCode);
-  // create list without baseLang inside (only to be sure to have no duplicates later)
-  const additionalLanguages = allLangCodes.filter((lang) => lang !== baseLang);
+  // create list without baseLang inside (only to be sure to have no duplicates later).
+  // each language must be unique
+  const additionalLanguages = allLangCodes.filter((lang) => lang !== baseLang).filter((lang, index, self) => self.indexOf(lang) === index);
 
   let dictWithOriginAndLangCode: { [id: string]: DocumentItem } = {};
   // form list to dictionary with id as key
@@ -116,9 +117,11 @@ export const loadPages = async () => {
 
   // main tree
   // create a sub-path for each additional language if some languages are available
+  // at least add base language
   const fullTree: Page[] = [];
   if (additionalLanguages.length > 0) {
-    // add base language
+    // console.log('additionalLanguages', additionalLanguages);
+    // add base language first
     fullTree.push(createLanguagePageDummy(baseLang, baseLangTree));
     baseLangList.push(createLanguagePageDummy(baseLang));
 
