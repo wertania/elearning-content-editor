@@ -1,10 +1,11 @@
-import { TreeNode } from 'primevue/tree';
-import type { UniversalBlock } from 'vue-blockful-editor';
+import { type } from "os";
+import { TreeNode } from "primevue/tree";
+import type { UniversalBlock } from "vue-blockful-editor";
 
 export interface DocumentItem {
   version: number;
   id: string; // GUID
-  type: 'document' | 'folder';
+  type: "document" | "folder";
   parent?: string;
   originId?: string; // id of the original document (e.g. translations)
   icon?: string; // fontawesome icon
@@ -15,7 +16,7 @@ export interface DocumentItem {
   content: UniversalBlock[];
 }
 
-export type MediumType = 'video' | 'audio' | 'image';
+export type MediumType = "video" | "audio" | "image";
 
 export interface Medium {
   id: string;
@@ -23,10 +24,12 @@ export interface Medium {
   name: string;
   hash: string; // Ein hash über die Datei, um ggf. in Zukunft festzustellen, ob sich ein Upload/Download lohnt.
   type: MediumType;
+  langCode: string;
+  originId?: string; // id of the original document (e.g. translations)
 }
 
 export interface DocumentTreeItem extends TreeNode, DocumentItem {
-  type: 'document' | 'folder';
+  type: "document" | "folder";
   children?: DocumentTreeItem[];
 }
 
@@ -35,6 +38,11 @@ export interface DocumentQuery {
   hasOrigin?: boolean; // only documents with originId
   originId?: string; // id of the original document (e.g. translations)
   noContent?: boolean; // to minimize the data transfer
+}
+
+export interface MediumQuery {
+  type?: MediumType;
+  documentId?: string;
 }
 
 export interface DataProvider {
@@ -50,8 +58,9 @@ export interface DataProvider {
   dropDocument(id: string): Promise<void>;
   updateDocument(document: DocumentItem): Promise<DocumentItem>;
 
+  getMediums(query?: MediumQuery): Promise<Medium[]>;
   getMedium(id: string): Promise<Medium | undefined>;
-  addMedium(file: File): Promise<Medium>;
+  addMedium(file: File, langCode: string, originId?: string): Promise<Medium>;
   getMediumUrl(mediumId: string): Promise<string>;
 
   dropNodes(ids: string[]): Promise<void>;

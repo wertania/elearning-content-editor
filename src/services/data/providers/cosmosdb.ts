@@ -5,6 +5,7 @@ import type {
   DocumentTreeItem,
   Medium,
   DocumentQuery,
+  MediumQuery,
 } from '../types';
 import { Container, CosmosClient } from '@azure/cosmos';
 import { buildTree, fileTypeToMediaType } from '../helpers';
@@ -131,7 +132,12 @@ export default {
     return response.resource;
   },
 
-  async addMedium(file: File): Promise<Medium> {
+  async getMediums(query?: MediumQuery): Promise<Medium[]> {
+    const response = await mediaContainer.items.readAll<Medium>().fetchAll();
+    return response.resources;
+  },
+
+  async addMedium(file: File, langCode: string, originId?: string): Promise<Medium> {
     // Upload to the blob storage.
     const { url } = await blobService.upload(file.name, file);
 
@@ -143,6 +149,8 @@ export default {
       name: file.name,
       type: fileTypeToMediaType(file),
       url,
+      langCode,
+      originId,
     };
 
     // Create CosmosDB entry.

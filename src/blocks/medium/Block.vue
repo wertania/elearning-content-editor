@@ -3,15 +3,9 @@
     <template v-if="mediumUrl && loadedMedium">
       <img v-if="loadedMedium.type === 'image'" :src="mediumUrl" />
 
-      <video
-        v-else-if="loadedMedium.type === 'video'"
-        :src="loadedMedium.url"
-      />
+      <video v-else-if="loadedMedium.type === 'video'" :src="loadedMedium.url" />
 
-      <audio
-        v-else-if="loadedMedium.type === 'audio'"
-        :src="loadedMedium.url"
-      />
+      <audio v-else-if="loadedMedium.type === 'audio'" :src="loadedMedium.url" />
 
       <Message v-else severity="warn">
         Unknown medium type "{{ loadedMedium.type }}".
@@ -19,12 +13,7 @@
     </template>
 
     <template v-else>
-      <FileUpload
-        custom-upload
-        :multiple="false"
-        @uploader="uploader"
-        mode="advanced"
-      />
+      <FileUpload custom-upload :multiple="false" @uploader="uploader" mode="advanced" />
     </template>
 
     <Message v-if="isNotFound" severity="warn" :closable="false">
@@ -40,12 +29,15 @@ import { dataProvider } from '../../services/data';
 import Message from 'primevue/message';
 import FileUpload, { type FileUploadUploaderEvent } from 'primevue/fileupload';
 import { Medium } from '../../services/data/types';
+import { useDocumentStore } from '../../stores/documents';
+
+const $documents = useDocumentStore();
 
 const uploader = async (e: FileUploadUploaderEvent) => {
   const file = Array.isArray(e.files) ? e.files[0] : e.files;
 
   // Upload the medium and receive an ID.
-  const { id } = await dataProvider.addMedium(file);
+  const { id } = await dataProvider.addMedium(file, $documents.selectedDocument?.langCode || $documents.baseLanguage);
 
   // Update the stored medium ID.
   const updated = props.modelValue;
