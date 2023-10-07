@@ -1,24 +1,13 @@
 <template>
   <div class="content-editor" v-if="selectedDocument">
-    <MetaData
-      v-model:header="selectedDocument.header"
-      v-model:description="selectedDocument.description"
-      v-model:lang-code="selectedDocument.langCode"
-      v-model:name="selectedDocument.name"
-      :hasOrigin="selectedDocument.originId != null"
-    />
+    <MetaData v-model:header="selectedDocument.header" v-model:description="selectedDocument.description"
+      v-model:lang-code="selectedDocument.langCode" v-model:name="selectedDocument.name"
+      :hasOrigin="selectedDocument.originId != null" />
 
-    <div class="content-editor__label">Content</div>
+    <!-- <div class="content-editor__label">Content</div> -->
     <div class="content-editor__block-editor">
-      <BlockEditor
-        v-if="selectedDocument.type === 'document'"
-        v-model="page"
-        :readOnly="false"
-        :debug="false"
-        :plugins="plugins"
-        :showAllBlockControls="true"
-        :disableColumns="true"
-      />
+      <BlockEditor v-if="selectedDocument.type === 'document'" v-model="page" :readOnly="false" :debug="false"
+        :plugins="plugins" :showAllBlockControls="true" :disableColumns="true" />
     </div>
 
     <!-- Dummy container that adds whitespace to the editor area for usability. -->
@@ -37,26 +26,27 @@ import MetaData from '../components/MetaData.vue';
 import { PluginMedium } from './../blocks/medium';
 import { PluginMarkdown } from './../blocks/markdown';
 import { ref, computed } from 'vue';
-import { useSelectedStore } from '../stores/selected';
+import { useDocumentStore } from '../stores/documents';
 
 // computed selectedDocument
-const selectedStore = useSelectedStore();
+const $doc = useDocumentStore();
+
 const selectedDocument = computed({
   get() {
-    return selectedStore.$state.selectedDocument;
+    return $doc.$state.selectedDocument;
   },
   set(newValue) {
     console.log('set selected document');
-    selectedStore.$state.selectedDocument = newValue;
+    $doc.$state.selectedDocument = newValue;
   },
 });
 const content = computed({
   get() {
-    return selectedStore.$state.selectedDocument?.content || [];
+    return $doc.$state.selectedDocument?.content || [];
   },
   set(newValue) {
-    if (selectedStore.$state.selectedDocument == null) return;
-    selectedStore.$state.selectedDocument.content = newValue;
+    if ($doc.$state.selectedDocument == null) return;
+    $doc.$state.selectedDocument.content = newValue;
   },
 });
 
@@ -76,7 +66,8 @@ const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown];
   flex-direction: column;
   gap: 0.5rem;
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 105px);
+  overflow-y: scroll;
 
   &__label {
     font-size: 0.9em;

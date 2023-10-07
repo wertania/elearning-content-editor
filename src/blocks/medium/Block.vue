@@ -1,7 +1,7 @@
 <template>
   <div class="plugin-medium">
-    <template v-if="loadedMedium?.url">
-      <img v-if="loadedMedium.type === 'image'" :src="loadedMedium.url" />
+    <template v-if="mediumUrl && loadedMedium">
+      <img v-if="loadedMedium.type === 'image'" :src="mediumUrl" />
 
       <video
         v-else-if="loadedMedium.type === 'video'"
@@ -64,6 +64,7 @@ const emit = defineEmits<{
 
 const mediumId = ref<string>();
 const loadedMedium = ref<Medium>();
+const mediumUrl = ref<null | string>(null);
 const isNotFound = computed(
   () => props.modelValue.data.id && !loadedMedium.value?.url,
 );
@@ -76,6 +77,9 @@ watch(
     if (!mediumId.value) return;
 
     loadedMedium.value = await dataProvider.getMedium(mediumId.value);
+    // get URL
+    if (!loadedMedium.value) return;
+    mediumUrl.value = await dataProvider.getMediumUrl(loadedMedium.value.id);
   },
   { immediate: true },
 );

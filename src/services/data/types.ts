@@ -46,9 +46,9 @@ export interface DataProvider {
     query?: DocumentQuery,
   ): Promise<{ tree: DocumentTreeItem[]; list: DocumentItem[] }>;
   getDataForDocument(id: string): Promise<DocumentItem>;
-  addDocument(document: DocumentItem): Promise<void>;
+  addDocument(document: DocumentItem): Promise<DocumentItem>;
   dropDocument(id: string): Promise<void>;
-  updateDocument(document: DocumentItem): Promise<void>;
+  updateDocument(document: DocumentItem): Promise<DocumentItem>;
 
   getMedium(id: string): Promise<Medium | undefined>;
   addMedium(file: File): Promise<Medium>;

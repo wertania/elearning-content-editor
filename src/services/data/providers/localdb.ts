@@ -6,12 +6,13 @@ import env from '../../env';
 const URL = env.VITE_LOCALDB_HOST || 'http://localhost:8077';
 const DOCUMENTS_URL = URL + '/document/';
 const MEDIA_URL = URL + '/media/';
+const STATIC_URL = URL + '/static/';
 
 export default {
   name: 'localdb',
 
   initialize() {
-    console.log('nothing to initialize');
+    console.log('localdb: nothing to initialize');
   },
 
   async getDocuments(query?: DocumentQuery): Promise<{
@@ -50,7 +51,7 @@ export default {
     return document;
   },
 
-  async addDocument(document: DocumentItem): Promise<void> {
+  async addDocument(document: DocumentItem): Promise<DocumentItem> {
     const res = await fetch(URL + '/document', {
       method: 'POST',
       body: JSON.stringify(document),
@@ -60,7 +61,7 @@ export default {
     });
     const newDocument = await res.json();
     console.log(newDocument);
-    return;
+    return newDocument;
   },
 
   async dropDocument(id: string): Promise<void> {
@@ -73,7 +74,7 @@ export default {
     return;
   },
 
-  async updateDocument(document: DocumentItem): Promise<void> {
+  async updateDocument(document: DocumentItem): Promise<DocumentItem> {
     const res = await fetch(DOCUMENTS_URL + document.id, {
       method: 'PUT',
       body: JSON.stringify(document),
@@ -83,7 +84,7 @@ export default {
     });
     const updatedDocument = await res.json();
     console.log(updatedDocument);
-    return;
+    return updatedDocument;
   },
 
   // ---------
@@ -92,6 +93,11 @@ export default {
 
   async getMedium(id) {
     const res = await fetch(`${MEDIA_URL}${id}`);
+    // check status code
+    if (res.status !== 200) {
+      console.warn(`Medium with ID ${id} could not be found.`);
+      return null;
+    }
     const medium = await res.json();
     return medium;
   },
@@ -100,8 +106,8 @@ export default {
     throw Error(`Not implemented`);
   },
 
-  async getMediumUrl(_mediumId) {
-    throw Error('Not implemented');
+  async getMediumUrl(id) {
+    return `${STATIC_URL}${id}`;
   },
 
   // ---------

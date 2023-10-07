@@ -106,16 +106,20 @@ export default {
     return resources[0];
   },
 
-  async addDocument(document: DocumentItem): Promise<void> {
-    await container.items.create(document);
+  async addDocument(document: DocumentItem): Promise<DocumentItem> {
+    const doc = await container.items.create(document);
+    if (!doc.resource) throw Error('Failed to create document');
+    return doc.resource;    
   },
 
   async dropDocument(id: string): Promise<void> {
     await container.item(id, id).delete();
   },
 
-  async updateDocument(document: DocumentItem): Promise<void> {
-    await container.item(document.id, document.id).replace(document);
+  async updateDocument(document: DocumentItem): Promise<DocumentItem> {
+    const doc = await container.item(document.id, document.id).replace(document);
+    if (!doc.resource) throw Error('Failed to update document');
+    return doc.resource;
   },
 
   // ---------
