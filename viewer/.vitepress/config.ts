@@ -86,6 +86,11 @@ export default defineConfig({
     },
 
     logo: logoPath,
+
+    docFooter: {
+      prev: false, // 'Previous page',
+      next: false, // 'Next page',
+    }
   },
 
   lastUpdated: false,

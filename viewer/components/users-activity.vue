@@ -1,5 +1,5 @@
 <template>
-    [Hidden tracker]: {{ documentId + "" }}
+    <!-- [Hidden tracker]: {{ documentId + "" }} -->
 </template>
 
 <script setup lang="ts">

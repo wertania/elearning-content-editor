@@ -37,19 +37,18 @@ export default async (
       case 'medium': {
         if (!block.data.id) return '';
 
-        // Fetch medium
+        // Fetch medium db entry
         const medium = await vitepressDataProvider.getMedium(block.data.id);
         if (!medium) {
-          console.warn(`Medium with ID ${block.data.id} could not be found.`);
           return '';
         }
 
         // Store the medium in a parameter to access it in the template.
-        const paramName = `medium-${medium.id}`;
-        params[paramName] = medium;
+        // const paramName = `medium-${medium.id}`;
+        // params[paramName] = medium;
 
         // Pass the medium to the Vue component from the params object.
-        return `<Medium :medium="params['${paramName}']" />`;
+        return `<MediaViewer :id="'${medium.id}'" :type="'${medium.type}'" />`;
       }
 
       default: {
