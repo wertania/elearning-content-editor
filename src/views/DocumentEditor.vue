@@ -26,8 +26,9 @@
       <img src="./../assets/logo.png" alt="logo" style="height: 50px;" />
       <span class="ml-2 tx-gradient-logo mr-4">RevDocs</span>
       <SplitButton @click="addDocument('document')" label="Add" icon="fa-solid fa-plus" :model="menuAdd" />
-      <Button icon="fa-solid fa-trash" class="ml-1 bg-purple-300 border-none" @click="deleteSelected"
-        v-show="selectedNode" />
+      <ConfirmPopup />
+      <Button icon="fa-solid fa-trash" class="ml-1 bg-purple-300 border-none" @click="deleteSelected($event)"
+        v-show="$doc.$state.selectedDocument" />
     </template>
     <template #end>
       <Button icon="fa-solid fa-save" class="ml-1 bg-purple-300 border-none" @click="saveDocument"
@@ -60,7 +61,8 @@
             <i class="fa-solid fa-language mt-1 ml-1 mr-2"></i>Assigned translations
           </div>
           <div class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2">
-            <Button icon="fa-solid fa-plus" @click="showAddLanguage = true" :disabled="$doc.$state.missingLanguages.length < 1"></Button>
+            <Button icon="fa-solid fa-plus" @click="showAddLanguage = true"
+              :disabled="$doc.$state.missingLanguages.length < 1"></Button>
             <Dropdown v-model="$doc.$state.selectedLanguage" :options="$doc.$state.availableLanguages" option-label="name"
               option-value="code" class="ml-1 flex-auto" :disabled="$doc.availableLanguages.length < 2"
               @change="switchLanguage" />
@@ -92,8 +94,11 @@ import SplitButton from 'primevue/splitbutton';
 import Dropdown from 'primevue/dropdown';
 import Dialog from 'primevue/dialog';
 import Checkbox from 'primevue/checkbox';
+import ConfirmPopup from 'primevue/confirmpopup';
 import { useGlobalStore } from '../stores/global';
+import { useConfirm } from "primevue/useconfirm";
 
+const confirm = useConfirm(); // confirm dialog
 const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
 
@@ -111,7 +116,6 @@ const menuAdd = [
 
 // tree data
 const selection = ref<Record<string, boolean>>({}); // selected node keys in tree (single selection enabled)
-const selectedNode = ref<DocumentTreeItem>(); // selected node in tree as single object
 
 // add language dialog
 const showAddLanguage = ref(false); // control: dialog for adding a new language
@@ -125,11 +129,13 @@ const draggedOver = ref<DocumentItem | null>(null);
 /**
  * load a document from API.
  */
+const nodeSelected = ref<{ type: string; id: string, parent?: string } | null>(null);
 const loadDocument = async (node: TreeNode) => {
+  const n = node as DocumentTreeItem;
+  nodeSelected.value = { type: n.type, id: n.id, parent: n.parent };
   console.log('loadDocument', node.id);
   $doc.$state.editMode = 'edit';
   await $doc.getDocument(node.id);
-
   if ($doc.$state.missingLanguages.length > 0) {
     languageToAdd.value = $doc.$state.missingLanguages[0].code;
   }
@@ -156,7 +162,7 @@ const addTranslationToDocument = async () => {
  * Add a new document.
  */
 const addDocument = async (type: 'folder' | 'document' = 'document') => {
-  $doc.addEmtpyDocument(type);
+  $doc.addEmtpyDocument(type, nodeSelected.value?.type === 'folder' ? nodeSelected.value?.id : nodeSelected.value?.parent);
 };
 
 /**
@@ -186,9 +192,17 @@ const closeDocument = () => {
 /**
  * Delete the selected document.
  */
-const deleteSelected = async () => {
-  if (!$doc.$state.selectedDocument) return;
-  await $doc.dropNode($doc.$state.selectedDocument.id);
+const deleteSelected = (event: any) => {
+  console.log('deleteSelected', event);
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Are you sure you want to proceed?',
+    icon: 'fa-solid fa-trash',
+    accept: async () => {
+      if (!$doc.$state.selectedDocument) return;
+      await $doc.dropNode($doc.$state.selectedDocument.id);
+    },
+  });
 };
 
 /**

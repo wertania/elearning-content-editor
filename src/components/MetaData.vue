@@ -19,7 +19,7 @@
         <InputText id="header" :value="header" @update:model-value="$emit('update:header', $event)" />
       </div>
 
-      <div class="meta-data__item">
+      <div class="meta-data__item" v-show="type === 'document'">
         <label class="content-editor__label" for="description">Short description</label>
         <InputText id="description" :value="description" @update:model-value="$emit('update:description', $event)" />
       </div>
@@ -54,6 +54,7 @@ const props = defineProps<{
   description: string;
   langCode: string;
   hasOrigin: boolean;
+  type: string;
 }>();
 
 const showDetails = ref<boolean>(false);

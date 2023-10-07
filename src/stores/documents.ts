@@ -12,6 +12,7 @@ import {
 import { UniversalBlock } from "vue-blockful-editor";
 import { getItemFromTree, isDescendant } from "./helper";
 import { error, info } from "./../services/toast";
+import { buildTreeItem } from "./../services/data/helpers";
 
 const DATASOURCE: string = import.meta.env.VITE_DOCUMENT_DATASOURCE ?? "mock";
 
@@ -190,15 +191,16 @@ export const useDocumentStore = defineStore("documents", {
       try {
         const doc = await dataProvider.addDocument(document);
         // update current tree. find parent and add new document to children
+        const treeItem = buildTreeItem(doc, []);
         if (doc.parent) {
           const parent = getItemFromTree(doc.parent, this.$state.documentTree);
           if (parent) {
             parent.children
-              ? parent.children.push(doc)
-              : (parent.children = [doc]);
+              ? parent.children.push(treeItem)
+              : (parent.children = [treeItem]);
           }
         } else {
-          this.$state.documentTree.push(doc);
+          this.$state.documentTree.push(treeItem);
         }
       } catch (e) {
         error(e + "");
@@ -358,7 +360,7 @@ export const useDocumentStore = defineStore("documents", {
     /**
      * add a new empty document. only add to the editor. do not save to backend initially
      */
-    addEmtpyDocument(type: "document" | "folder") {
+    addEmtpyDocument(type: "document" | "folder", parent?: string) {
       const document: DocumentItem = {
         id: "",
         version: 1,
@@ -375,7 +377,7 @@ export const useDocumentStore = defineStore("documents", {
             },
           ]
           : [],
-        parent: this.$state.selectedDocument?.parent ?? undefined,
+        parent: parent ?? undefined,
       };
 
       this.resetSelectedDocument();

@@ -2,7 +2,7 @@
   <div class="content-editor" v-if="selectedDocument">
     <MetaData v-model:header="selectedDocument.header" v-model:description="selectedDocument.description"
       v-model:lang-code="selectedDocument.langCode" v-model:name="selectedDocument.name"
-      :hasOrigin="selectedDocument.originId != null" />
+      :hasOrigin="selectedDocument.originId != null" :type="selectedDocument.type" />
 
     <!-- <div class="content-editor__label">Content</div> -->
     <div class="content-editor__block-editor">

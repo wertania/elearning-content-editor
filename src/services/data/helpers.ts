@@ -13,7 +13,7 @@ const sorter = (a: DocumentTreeItem, b: DocumentTreeItem): number => {
   return a.name.localeCompare(b.name);
 };
 
-const buildTreeItem = (
+export const buildTreeItem = (
   item: DocumentItem,
   documents: DocumentItem[],
 ): DocumentTreeItem => {
