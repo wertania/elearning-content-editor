@@ -1,10 +1,9 @@
-import { type } from "os";
 import { TreeNode } from "primevue/tree";
 import type { UniversalBlock } from "vue-blockful-editor";
 
-export interface DocumentItem {
+export type DocumentItem = {
+  id: string;
   version: number;
-  id: string; // GUID
   type: "document" | "folder";
   parent?: string;
   originId?: string; // id of the original document (e.g. translations)
@@ -14,19 +13,25 @@ export interface DocumentItem {
   description: string; // short description
   langCode: string; // 'de', 'en', 'fr', ...
   content: UniversalBlock[];
-}
+  media: string[]; // list of medium ids
+};
+export type DocumentAddRequest = Omit<DocumentItem, "id" | "version">;
 
 export type MediumType = "video" | "audio" | "image";
-
 export interface Medium {
   id: string;
-  url: string; // blob url
-  name: string;
-  hash: string; // Ein hash über die Datei, um ggf. in Zukunft festzustellen, ob sich ein Upload/Download lohnt.
+  version: number;
   type: MediumType;
   langCode: string;
+  name: string;
+  url: string;
+  hash: string; // Ein hash über die Datei, um ggf. in Zukunft festzustellen, ob sich ein Upload/Download lohnt.
+  filename: string;
   originId?: string; // id of the original document (e.g. translations)
+  providerSpecific?: any; // provider specific data
+  documents: string[]; // list of document ids
 }
+export type MediumAddRequest = Omit<Medium, "id" | "version">;
 
 export interface DocumentTreeItem extends TreeNode, DocumentItem {
   type: "document" | "folder";
@@ -43,6 +48,7 @@ export interface DocumentQuery {
 export interface MediumQuery {
   type?: MediumType;
   documentId?: string;
+  originId?: string;
 }
 
 export interface DataProvider {
@@ -60,9 +66,38 @@ export interface DataProvider {
 
   getMediums(query?: MediumQuery): Promise<Medium[]>;
   getMedium(id: string): Promise<Medium | undefined>;
-  addMedium(file: File, langCode: string, originId?: string): Promise<Medium>;
+  addMedium(
+    file: File,
+    langCode: string,
+    documentId?: string | string[],
+    originId?: string,
+  ): Promise<Medium>;
+  updateMedium(mediumId: string, file: File): Promise<Medium>;
+  dropMedium(mediumId: string): Promise<void>;
+  updateMediumDocumentRelations(mediumId: string, documentIds: string[]): Promise<void>;
   getMediumUrl(mediumId: string): Promise<string>;
 
   dropNodes(ids: string[]): Promise<void>;
   moveNode(id: string, parentId: string | undefined): Promise<void>;
+}
+
+export interface SmartVideoConvertTask {
+  id: string;
+  status: "pending" | "running" | "finished" | "error";
+  text: string;
+}
+
+export interface SmartVideoTranscriptWithTimestamps {
+  text: string;
+  startTime: number;
+}
+
+export interface SmartVideoConvertTransscript {
+  sentences: SmartVideoTranscriptWithTimestamps[];
+}
+
+export interface SmartVideoCreationRequest {
+  id: string;
+  langCode: string;
+  sentences: SmartVideoTranscriptWithTimestamps[];
 }

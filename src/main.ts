@@ -5,6 +5,7 @@ import { createPinia } from "pinia";
 import ToastService from "primevue/toastservice";
 import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
+import Tooltip from 'primevue/tooltip';
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "primevue/resources/themes/saga-blue/theme.css";
@@ -18,5 +19,7 @@ export const app = createApp(App)
   .use(PrimeVue)
   .use(ConfirmationService)
   .use(ToastService);
+
+app.directive('tooltip', Tooltip);
 
 app.mount("#app");

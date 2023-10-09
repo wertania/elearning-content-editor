@@ -1,8 +1,8 @@
 import { buildTree, fileTypeToMediaType } from '../helpers';
-import { DocumentItem } from '../types';
+import { DocumentItem, MediumQuery } from '../types';
 import type { DataProvider, DocumentTreeItem, Medium } from '../types';
-import { mockData as demoData } from '../mock';
-import { mockMedia } from '../mock/media';
+import { mockData as demoData } from './mock';
+import { mockMedia } from './mock/media';
 import { guid } from '../../../../src/services/guid';
 
 export default {
@@ -52,6 +52,10 @@ export default {
 
   async getMedium(id: string): Promise<Medium | undefined> {
     return mockMedia.find((item) => id === item.id);
+  },
+
+  async getMediums(query?: MediumQuery): Promise<Medium | undefined> {
+    return mockMedia;
   },
 
   async addMedium(file: File): Promise<Medium> {

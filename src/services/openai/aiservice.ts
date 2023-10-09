@@ -2,8 +2,14 @@ import OpenAI from "openai";
 
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_KEY;
 
+/**
+ * AI service for text translations
+ * getTranslation(text, sourceLanguage, targetLanguage)
+ */
 export default {
-  _openai: OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY, dangerouslyAllowBrowser: true }) : null,
+  _openai: OPENAI_API_KEY
+    ? new OpenAI({ apiKey: OPENAI_API_KEY, dangerouslyAllowBrowser: true })
+    : null,
   aiServicesAvailable: OPENAI_API_KEY ? true : false,
 
   async getTranslation(

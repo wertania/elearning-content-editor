@@ -21,22 +21,22 @@
     </template>
   </Dialog>
 
-  <Toolbar class="bg-purple-50">
+  <AppToolbar class="bg-purple-50">
     <template #start>
-      <img src="./../assets/logo.png" alt="logo" style="height: 50px;" />
-      <span class="ml-2 tx-gradient-logo mr-4">RevDocs</span>
       <SplitButton @click="addDocument('document')" label="Add" icon="fa-solid fa-plus" :model="menuAdd" />
       <ConfirmPopup />
       <Button icon="fa-solid fa-trash" class="ml-1 bg-purple-300 border-none" @click="deleteSelected($event)"
         v-show="$doc.$state.selectedDocument" />
     </template>
     <template #end>
+      <Button icon="fa-solid fa-photo-film" class="ml-1 bg-purple-300 border-none" @click="openMediaBrowser"
+        v-show="$doc.$state.selectedDocument" />
       <Button icon="fa-solid fa-save" class="ml-1 bg-purple-300 border-none" @click="saveDocument"
         v-show="$doc.$state.selectedDocument" />
       <Button icon="fa-solid fa-times" class="ml-1 bg-purple-300 border-none" @click="closeDocument"
         v-show="$doc.$state.selectedDocument" />
     </template>
-  </Toolbar>
+  </AppToolbar>
 
   <div class="document-editor__main">
     <div class="document-editor__sidebar flex flex-column card-container">
@@ -89,7 +89,7 @@ import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';
 import { DocumentItem, DocumentTreeItem } from '../services/data/types';
 import ContentEditor from '../components/ContentEditor.vue';
-import Toolbar from 'primevue/toolbar';
+import AppToolbar from '../components/AppToolbar.vue';
 import SplitButton from 'primevue/splitbutton';
 import Dropdown from 'primevue/dropdown';
 import Dialog from 'primevue/dialog';
@@ -97,10 +97,12 @@ import Checkbox from 'primevue/checkbox';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useGlobalStore } from '../stores/global';
 import { useConfirm } from "primevue/useconfirm";
+import { useRouter } from 'vue-router';
 
 const confirm = useConfirm(); // confirm dialog
 const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
+const router = useRouter(); // router
 
 // "add" split-button
 const menuAdd = [
@@ -203,6 +205,15 @@ const deleteSelected = (event: any) => {
       await $doc.dropNode($doc.$state.selectedDocument.id);
     },
   });
+};
+
+/**
+ * Open the media browser for the current document.
+ */
+const openMediaBrowser = () => {
+  // router.push({ name: 'media', params: { documentId: $doc.$state.selectedDocument?.id } });
+  // open in new tab
+  window.open(`/#/media/${$doc.$state.selectedDocument?.id}`, '_blank');
 };
 
 /**
@@ -312,14 +323,5 @@ onMounted(async () => {
 
 .node-dragover {
   background-color: var(--surface-100);
-}
-
-span.tx-gradient-logo {
-  font-size: 24px;
-  font-weight: 700;
-  background: -webkit-linear-gradient(#f9f9f9, #780f72);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  direction: rtl;
 }
 </style>

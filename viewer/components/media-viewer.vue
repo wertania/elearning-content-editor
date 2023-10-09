@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { vitepressDataProvider } from '../services/vitepressDataService';
 
 const props = defineProps<{
@@ -24,10 +24,17 @@ const mediumUrl = ref<string>();
 
 const loadMediumUrl = async () => {
   console.log('Loading medium URL...' + props.id + ' ' + props.type);
+  if (isLoading.value) {
+    console.log('Already loading...');
+  }
   isLoading.value = true;
   mediumUrl.value = await vitepressDataProvider.getMediumUrl(props.id);
   isLoading.value = false;
 };
+
+watch(() => props.id, async () => {
+  await loadMediumUrl();
+});
 
 onMounted(async () => {
   // Load the medium's URL.

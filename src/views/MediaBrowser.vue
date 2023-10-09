@@ -1,22 +1,39 @@
 <template>
-  <Toolbar class="bg-purple-50">
+  <AppToolbar class="bg-purple-50">
     <template #start>
-      <img src="./../assets/logo.png" alt="logo" style="height: 50px;" />
-      <span class="ml-2 tx-gradient-logo mr-4">RevDocs</span>
-      <SplitButton @click="addDocument()" label="Add" icon="fa-solid fa-plus" :model="menuAdd" />
-      <ConfirmPopup />
-      <Button icon="fa-solid fa-trash" class="ml-1 bg-purple-300 border-none" @click="deleteSelected($event)"
-        v-show="selection" />
+      <SplitButton @click="uploadDialogControl = { show: true, mode: 'main' }" label="Add" icon="fa-solid fa-plus"
+        :model="menuAdd" />
     </template>
     <template #end>
-      <!-- <Button icon="fa-solid fa-save" class="ml-1 bg-purple-300 border-none" @click="saveDocument" v-show="true" /> -->
-      <!-- <Button icon="fa-solid fa-times" class="ml-1 bg-purple-300 border-none" @click="closeDocument"
-        v-show="true" /> -->
+      <ConfirmPopup />
+      <Button v-tooltip="'Re-Upload media'" icon="fa-solid fa-repeat" class="ml-1 bg-purple-300 border-none"
+        @click="uploadDialogControl = { show: true, mode: 'replace' }"
+        v-show="selection && Object.keys(selection).length > 0" />
+      <Button v-tooltip="'Delete media'" icon="fa-solid fa-trash" class="ml-1 bg-purple-300 border-none"
+        @click="deleteSelected($event)" v-show="selection && Object.keys(selection).length > 0" />
+      <div class="border-">
+        <Button icon="fa-solid fa-times" class="ml-1 bg-purple-300 border-none" @click="closeDocument" v-if="documentId"
+          v-tooltip="'Show all media and close ' + documentId" />
+      </div>
     </template>
-  </Toolbar>
+  </AppToolbar>
 
-  <div class="document-editor__main">
+  <!-- Dialog to upload new media -->
+  <Dialog v-model:visible="uploadDialogControl.show" modal header="Add image/video" :style="{ width: '40vw' }">
+    <template #default>
+      <div class="p-1">
+        <div v-if="uploadDialogControl.mode === 'sub'">
+          <label>Select a language</label>
+          <Dropdown :options="missingLanguages" option-label="name" option-value="code" placeholder="Select a language"
+            class="w-full mt-2" v-model="languageToAdd" :disabled="$global.$state.requestPending" />
+        </div>
+        <FileUpload class="mt-4" mode="basic" accept="video/*, image/*" :maxFileSize="1000000" customUpload
+          @uploader="upload($event)" />
+      </div>
+    </template>
+  </Dialog>
 
+  <div>
     <div v-if="$global.$state.isLoading || $global.$state.requestPending"
       class="flex justify-content-center flex-wrap mt-5">
       <ProgressSpinner />
@@ -34,10 +51,10 @@
       <div class="col-6">
         <div v-if="itemSelected">
           <div class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2">
-            <Button icon="fa-solid fa-plus" @click="showAddLanguage = true" :disabled="false"></Button>
-            <Dropdown v-model="languageToAdd" option-label="name" option-value="code"
-              :options="[{ name: 'Dummy', code: 'de' }]" class="ml-1 flex-auto" :disabled="false"
-              @change="switchLanguage" />
+            <Button icon="fa-solid fa-plus" @click="uploadDialogControl = { show: true, mode: 'sub' }"
+              :disabled="missingLanguages.length < 1"></Button>
+            <Dropdown v-model="selectedLanugage" option-label="name" option-value="code" :options="subLanguages"
+              class="ml-1 flex-auto" :disabled="false" @change="switchLanguage" />
           </div>
           <MediaViewer :id="itemSelected.id" :type="itemSelected.type" />
         </div>
@@ -50,7 +67,7 @@
 import { onMounted, ref } from 'vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import Button from 'primevue/button';
-import Toolbar from 'primevue/toolbar';
+import AppToolbar from '../components/AppToolbar.vue';
 import SplitButton from 'primevue/splitbutton';
 import Dropdown from 'primevue/dropdown';
 import ConfirmPopup from 'primevue/confirmpopup';
@@ -61,75 +78,120 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { Medium } from './../services/data/types';
 import MediaViewer from './../../viewer/components/media-viewer.vue';
-import { error } from './../services/toast';
 import { useRoute } from 'vue-router';
+import Dialog from 'primevue/dialog';
+import FileUpload from 'primevue/fileupload';
+import { dataProvider } from './../services/data';
+import { error, info } from './../services/toast';
+import { LanguageItem, mapLangCodesToLanguageItems, getMissingLanguagesItems, baseLanguage } from './../services/language/languageService'
 
 const $media = useMediaStore(); // media store
 const confirm = useConfirm(); // confirm dialog
 const $global = useGlobalStore(); // global store
+const route = useRoute();
 
-const route = useRoute()
-const documentId = route.params.documentId !== '' && !Array.isArray(route.params.documentId) ? route.params.documentId : null;
-
+const documentId = ref<string | null>(route.params.documentId !== '' && !Array.isArray(route.params.documentId) ? route.params.documentId : null);
+const uploadDialogControl = ref({ show: false, mode: <'main' | 'sub' | 'replace'>'main' }); // control: dialog for uploading a new file
+const selection = ref<any>(null);
+const languageToAdd = ref(baseLanguage); // dropdown: sub-language to add
 
 // "add" split-button
 const menuAdd = [
   {
     label: 'Add smart video',
-    command: () => addDocument(),
+    command: () => window.open('/#/smart-video-converter', '_blank'),
   },
   {
-    label: 'Upload video',
-    command: () => addDocument(),
-  },
-  {
-    label: 'Upload image',
-    command: () => addDocument(),
+    label: 'Upload mage/video',
+    command: () => uploadDialogControl.value = { show: true, mode: 'main' },
   },
 ];
-
-// needed for datagrid selection
-const selection = ref<any>(null);
-
-// add language dialog
-const showAddLanguage = ref(false); // control: dialog for adding a new language
-const languageToAdd = ref('en'); // dropdown: language to add
 
 /**
  * select item
  */
 const itemSelected = ref<Medium | null>(null);
+const subItems = ref<Medium[]>([]);
+const baseItem = ref<Medium | null>(null);
+const subLanguages = ref<LanguageItem[]>([]);
+const missingLanguages = ref<LanguageItem[]>([]);
+const selectedLanugage = ref(baseLanguage);
+
 const selectItem = async (event: any) => {
   itemSelected.value = event.data;
+  if (!itemSelected.value?.id) return;
+
+  // check for items with originId = documentId
+  subItems.value = await dataProvider.getMediums({ originId: itemSelected.value.id });
+  baseItem.value = itemSelected.value;
+
+  // set to base language
+  selectedLanugage.value = baseLanguage;
+
+  // get all languages from subItems
+  const langCodes = subItems.value.map((item) => item.langCode);
+  // get missing languages
+  missingLanguages.value = getMissingLanguagesItems(langCodes);
+  if (missingLanguages.value.length > 0) {
+    languageToAdd.value = missingLanguages.value[0].code;
+  }
+  subLanguages.value = mapLangCodesToLanguageItems([...langCodes, baseLanguage]);
 };
 
 /**
  * change the language
  */
-const switchLanguage = async (data: any) => {
-  console.log('switchLanguage', data);
+const switchLanguage = async () => {
+  // check if selectedLanguage is baseLanguage
+  if (selectedLanugage.value === baseLanguage) {
+    itemSelected.value = baseItem.value;
+    return;
+  }
+  // get element with langCode
+  const item = subItems.value.find((item) => item.langCode === selectedLanugage.value);
+  if (item) {
+    itemSelected.value = item;
+  }
 };
 
 /**
- * add a new language
+ * Upload a new file
  */
-const addTranslationToMedia = async () => {
-  console.log('addTranslationToMedia');
-};
+const upload = async (event: any) => {
+  $global.$state.requestPending = true;
+  try {
+    const file = event.files[0];
 
-/**
- * Add a new document.
- */
-const addDocument = async () => {
-  console.log('addDocument');
-};
-
-/**
- * Save the current document depending on the mode.
- */
-const saveDocument = async () => {
-  console.log('saveDocument');
-};
+    // depending on mode, use selected language from dialog, selected language from sub-menu or base language    
+    if (uploadDialogControl.value.mode === 'main') {
+      const media = await dataProvider.addMedium(file, languageToAdd.value);
+      console.log('uploaded file', media);
+      info('New File uploaded successfully');
+    }
+    // upload new sub-language for media
+    else if (uploadDialogControl.value.mode === 'sub' && baseItem.value?.id) {
+      const media = await dataProvider.addMedium(file, languageToAdd.value, undefined, baseItem.value.id);
+      console.log('uploaded file', media);
+      info('New language depending File uploaded successfully');
+      // remove langCode from missingLanguages
+      missingLanguages.value = missingLanguages.value.filter((item) => item.code !== languageToAdd.value);
+      // add langCode to subLanguages
+      subLanguages.value.push(mapLangCodesToLanguageItems([languageToAdd.value])[0]);
+    }
+    // replace media
+    else if (uploadDialogControl.value.mode === 'replace' && itemSelected.value?.id) {
+      const media = await dataProvider.updateMedium(itemSelected.value.id, file);
+      console.log('updated file', media);
+      info('File updated successfully');
+    }
+    
+    uploadDialogControl.value = { show: false, mode: 'main' };
+    await init();
+  } catch (e) {
+    error(e + "");
+  }
+  $global.$state.requestPending = false;
+}
 
 /**
  * Delete the selected document.
@@ -140,27 +202,36 @@ const deleteSelected = (event: any) => {
     message: 'Are you sure you want to proceed?',
     icon: 'fa-solid fa-trash',
     accept: async () => {
-      error('Disabled function');
+      if (itemSelected.value?.id == null) return;
+      await dataProvider.dropMedium(itemSelected.value.id)
+        .catch((e) => {
+          error(e + "");
+        });
+      await init();
       console.log('deleteSelected', selection.value);
     },
   });
 };
 
+/**
+ * Close the current document.
+ */
+const closeDocument = async () => {
+  documentId.value = null;
+  selection.value = {};
+  itemSelected.value = null;
+};
+
+const init = async () => {
+  $global.$state.isLoading = true;
+  await $media.initialize(documentId.value);
+  $global.$state.isLoading = false;
+  selection.value = {};
+  itemSelected.value = null;
+};
+
 // App Start
 onMounted(async () => {
-  $global.$state.isLoading = true;
-  await $media.initialize(documentId);
-  $global.$state.isLoading = false;
+  await init();
 });
 </script>
-
-<style lang="scss">
-span.tx-gradient-logo {
-  font-size: 24px;
-  font-weight: 700;
-  background: -webkit-linear-gradient(#f9f9f9, #780f72);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  direction: rtl;
-}
-</style>

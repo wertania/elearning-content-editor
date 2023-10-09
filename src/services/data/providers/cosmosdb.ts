@@ -1,31 +1,31 @@
-import { InteractiveBrowserCredential } from '@azure/identity';
-import { DocumentItem } from '../types';
+import { InteractiveBrowserCredential } from "@azure/identity";
+import { DocumentItem } from "../types";
 import type {
   DataProvider,
+  DocumentQuery,
   DocumentTreeItem,
   Medium,
-  DocumentQuery,
   MediumQuery,
-} from '../types';
-import { Container, CosmosClient } from '@azure/cosmos';
-import { buildTree, fileTypeToMediaType } from '../helpers';
-import env from '../../../services/env';
-import { blobService } from '../../../../src/services/blob';
-import { guid } from '../../../../src/services/guid';
+} from "../types";
+import { Container, CosmosClient } from "@azure/cosmos";
+import { buildTree, fileTypeToMediaType } from "../helpers";
+import env from "../../../services/env";
+import { blobService } from "../../../../src/services/blob";
+import { guid } from "../../../../src/services/guid";
 
 let cosmosClient: CosmosClient;
 let container: Container;
 let mediaContainer: Container;
 
-const AUTHENTICATION_TYPE = env.VITE_AZURE_AUTHENTICATION_TYPE || 'ad';
+const AUTHENTICATION_TYPE = env.VITE_AZURE_AUTHENTICATION_TYPE || "ad";
 
 export default {
-  name: 'cosmosdb',
+  name: "cosmosdb",
 
   initialize() {
     console.log(`Authentication to CosmosDB via '${AUTHENTICATION_TYPE}'...`);
 
-    if (AUTHENTICATION_TYPE === 'ad') {
+    if (AUTHENTICATION_TYPE === "ad") {
       const endpoint = import.meta.env.VITE_AZURE_COSMOSDB_ENDPOINT;
 
       cosmosClient = new CosmosClient({
@@ -35,7 +35,7 @@ export default {
           tenantId: import.meta.env.VITE_AZURE_COSMOSDB_TENANT_ID,
         }),
       });
-    } else if (AUTHENTICATION_TYPE === 'connection-string') {
+    } else if (AUTHENTICATION_TYPE === "connection-string") {
       cosmosClient = new CosmosClient(
         env.VITE_AZURE_COSMOSDB_CONNECTION_STRING,
       );
@@ -59,23 +59,25 @@ export default {
     list: DocumentItem[];
   }> {
     // can be improved...
-    let sql = 'SELECT * FROM document'; // Modify this query as needed
+    let sql = "SELECT * FROM document"; // Modify this query as needed
     // filter by langCode if set
     if (query?.langCodes) {
-      sql += ` WHERE document.langCode = '${query.langCodes.join(
-        `' OR document.langCode = '`,
-      )}'`;
+      sql += ` WHERE document.langCode = '${
+        query.langCodes.join(
+          `' OR document.langCode = '`,
+        )
+      }'`;
     }
     // filter by hasOrigin if set
     if (query?.hasOrigin) {
       sql += ` ${
-        Object.keys(query).length > 1 ? 'AND' : 'WHERE'
+        Object.keys(query).length > 1 ? "AND" : "WHERE"
       } document.originId != null`;
     }
     // filter by originId if set
     if (query?.originId) {
       sql += ` ${
-        Object.keys(query).length > 1 ? 'AND' : 'WHERE'
+        Object.keys(query).length > 1 ? "AND" : "WHERE"
       } document.originId = '${query.originId}'`;
     }
     // "noContent" not implemented yet
@@ -95,8 +97,8 @@ export default {
   async getDataForDocument(id: string): Promise<DocumentItem> {
     const { resources } = await container.items
       .query({
-        query: 'SELECT * FROM document d WHERE d.id = @id',
-        parameters: [{ name: '@id', value: id }],
+        query: "SELECT * FROM document d WHERE d.id = @id",
+        parameters: [{ name: "@id", value: id }],
       })
       .fetchAll();
 
@@ -109,8 +111,8 @@ export default {
 
   async addDocument(document: DocumentItem): Promise<DocumentItem> {
     const doc = await container.items.create(document);
-    if (!doc.resource) throw Error('Failed to create document');
-    return doc.resource;    
+    if (!doc.resource) throw Error("Failed to create document");
+    return doc.resource;
   },
 
   async dropDocument(id: string): Promise<void> {
@@ -118,8 +120,10 @@ export default {
   },
 
   async updateDocument(document: DocumentItem): Promise<DocumentItem> {
-    const doc = await container.item(document.id, document.id).replace(document);
-    if (!doc.resource) throw Error('Failed to update document');
+    const doc = await container.item(document.id, document.id).replace(
+      document,
+    );
+    if (!doc.resource) throw Error("Failed to update document");
     return doc.resource;
   },
 
@@ -133,24 +137,58 @@ export default {
   },
 
   async getMediums(query?: MediumQuery): Promise<Medium[]> {
-    const response = await mediaContainer.items.readAll<Medium>().fetchAll();
-    return response.resources;
+    if (!query) {
+      const response = await mediaContainer.items.readAll<Medium>().fetchAll();
+      return response.resources;
+    } else {
+      let sql = "SELECT * FROM media";
+      let first = true;
+      if (query.type) {
+        sql += ` ${first ? "WHERE" : "AND"} media.type = '${query.type}'`;
+        first = false;
+      }
+      if (query.documentId) {
+        first = false;
+      }
+      if (query.originId) {
+        sql += ` ${
+          first ? "WHERE" : "AND"
+        } media.originId = '${query.originId}'`;
+        first = false;
+      }
+      const { resources } = await mediaContainer.items
+        .query(sql)
+        .fetchAll();
+      return resources;
+    }
   },
 
-  async addMedium(file: File, langCode: string, originId?: string): Promise<Medium> {
+  async addMedium(
+    file: File,
+    langCode: string,
+    sourceDocumentId?: string | string[],
+    originId?: string,
+  ): Promise<Medium> {
     // Upload to the blob storage.
     const { url } = await blobService.upload(file.name, file);
 
     // Create medium object.
     const medium: Medium = {
       id: guid(),
+      version: 1,
       // TODO
-      hash: '',
+      hash: "",
       name: file.name,
+      filename: file.name,
       type: fileTypeToMediaType(file),
       url,
       langCode,
       originId,
+      documents: sourceDocumentId
+        ? (Array.isArray(sourceDocumentId)
+          ? sourceDocumentId
+          : [sourceDocumentId])
+        : [],
     };
 
     // Create CosmosDB entry.
@@ -163,6 +201,18 @@ export default {
     return res.resource;
   },
 
+  async updateMedium(id: string, file: File): Promise<Medium> {
+    const medium = await this.getMedium(id);
+    if (!medium) {
+      throw Error(`The medium with ID "${id}" could not be found.`);
+    }
+    // replace file in blob storage
+    const { url } = await blobService.upload(medium.filename, file);
+    // update medium
+    medium.url = url;
+    return medium;    
+  },
+
   async getMediumUrl(mediumId) {
     const medium = await this.getMedium(mediumId);
     if (!medium) {
@@ -170,6 +220,10 @@ export default {
     }
 
     return await blobService.generateSasUrl(medium.url);
+  },
+
+  async dropMedium(mediumId: string): Promise<void> {
+    await mediaContainer.item(mediumId, mediumId).delete();
   },
 
   // ---------
@@ -187,8 +241,8 @@ export default {
   async moveNode(id: string, parentId: string): Promise<void> {
     const { resources } = await container.items
       .query({
-        query: 'SELECT * FROM document d WHERE d.id = @id',
-        parameters: [{ name: '@id', value: id }],
+        query: "SELECT * FROM document d WHERE d.id = @id",
+        parameters: [{ name: "@id", value: id }],
       })
       .fetchAll();
 

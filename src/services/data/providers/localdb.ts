@@ -98,7 +98,17 @@ export default {
 
   async getMediums(query?: MediumQuery): Promise<any> {
     console.log("getMediums", query);
-    const res = await fetch(MEDIA_URL);
+    let url = MEDIA_URL + "query" + "?";
+    if (query?.documentId) {
+      url += `documentId=${query.documentId}&`;
+    }
+    if (query?.originId) {
+      url += `originId=${query.originId}&`;
+    }
+    if (query?.type) {
+      url += `type=${query.type}&`;
+    }
+    const res = await fetch(url);
     const media = await res.json();
     return media;
   },
@@ -114,21 +124,84 @@ export default {
     return medium;
   },
 
-  async addMedium(file: File, langCode: string, originId?: string) {
+  async addMedium(
+    file: File,
+    langCode: string,
+    documentId?: string | string[],
+    originId?: string,
+  ) {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("langCode", langCode);
+    if (documentId) {
+      if (Array.isArray(documentId)) {
+        formData.append("documentId", documentId.join(","));
+      } else {
+        formData.append("documentId", documentId);
+      }
+    }
     if (originId) formData.append("originId", originId);
     const res = await fetch(MEDIA_URL, {
       method: "POST",
       body: formData,
     });
+    if (res.status !== 200) {
+      console.warn(`Medium ${file.name} could not be uploaded.`);
+      throw Error(`Medium ${file.name} could not be uploaded.`);
+    }
     const medium = await res.json();
     return medium;
   },
 
+  async updateMedium(
+    id: string,
+    file: File,
+  ) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await fetch(MEDIA_URL + "replace/" + id, {
+      method: "PUT",
+      body: formData,
+    });
+    if (res.status !== 200) {
+      console.warn(`Medium ${file.name} could not be uploaded.`);
+      throw Error(`Medium ${file.name} could not be uploaded.`);
+    }
+    const medium = await res.json();
+    return medium;
+  },
+
+  async updateMediumDocumentRelations(
+    documentId: string,
+    mediumIds: string[],
+  ): Promise<void> {
+    for (const media of mediumIds) {
+      const res = await fetch(
+        MEDIA_URL + "references/" + media + `?documentId=${documentId}`,
+        {
+          method: "PUT",
+        },
+      );
+      if (res.status !== 200) {
+        throw Error(
+          `Medium ${media} could not be added to document ${documentId}.`,
+        );
+      }
+    }
+  },
+
   async getMediumUrl(id) {
     return `${STATIC_URL}${id}`;
+  },
+
+  async dropMedium(mediumId: string): Promise<void> {
+    const res = await fetch(MEDIA_URL + mediumId, {
+      method: "DELETE",
+    });
+    if (res.status !== 200) {
+      throw Error(`Medium ${mediumId} could not be deleted.`);
+    }
   },
 
   // ---------

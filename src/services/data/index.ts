@@ -6,7 +6,7 @@ import env from '../env';
 
 // Register your providers here.
 const providerOptions: DataProvider[] = [
-  MockProvider,
+  // MockProvider,
   CosmosDbProvider,
   LocaldbProvider,
 ];

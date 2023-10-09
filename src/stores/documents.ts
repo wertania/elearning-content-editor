@@ -155,7 +155,17 @@ export const useDocumentStore = defineStore("documents", {
      */
     async updateDocument(document: DocumentItem): Promise<void> {
       try {
+        // get all mediumIds from content
+        const mediumIds: string[] = [];
+        document.content.forEach((block) => {
+          if (block.type === "medium" && block.data.id) {
+            mediumIds.push(block.data.id);
+          }
+        });
+        document.media = mediumIds;
         const doc = await dataProvider.updateDocument(document);
+        await dataProvider.updateMediumDocumentRelations(doc.id, mediumIds);
+
         // update current tree
         let item = getItemFromTree(document.id, this.$state.documentTree);
         if (item) {
@@ -189,6 +199,14 @@ export const useDocumentStore = defineStore("documents", {
      */
     async addDocument(document: DocumentItem): Promise<void> {
       try {
+        // get all mediumIds from content
+        const mediumIds: string[] = [];
+        document.content.forEach((block) => {
+          if (block.type === "medium" && block.data.id) {
+            mediumIds.push(block.data.id);
+          }
+        });
+        document.media = mediumIds;
         const doc = await dataProvider.addDocument(document);
         // update current tree. find parent and add new document to children
         const treeItem = buildTreeItem(doc, []);
@@ -346,6 +364,7 @@ export const useDocumentStore = defineStore("documents", {
         content,
         parent: this.$state.selectedDocument?.parent ?? undefined,
         originId: translate ? this.$state.selectedDocument?.id : undefined,
+        media: this.$state.selectedDocument?.media ?? [],
       };
 
       // create document in backend
@@ -378,6 +397,7 @@ export const useDocumentStore = defineStore("documents", {
           ]
           : [],
         parent: parent ?? undefined,
+        media: [],
       };
 
       this.resetSelectedDocument();
