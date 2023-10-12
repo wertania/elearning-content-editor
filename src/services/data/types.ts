@@ -56,7 +56,10 @@ export interface DataProvider {
 
   cache?: any; // provider specific cache
 
-  initialize?(): void;
+  initialize(): void;
+  checkLogin(): Promise<boolean>;
+  login(data?: any): Promise<boolean>;
+  logout(): Promise<void>;
 
   getDocuments(
     query?: DocumentQuery,

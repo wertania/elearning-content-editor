@@ -1,12 +1,12 @@
-import { DocumentItem } from "../types";
+import { DocumentItem } from "../../types";
 import type {
   DataProvider,
   DocumentQuery,
   DocumentTreeItem,
   MediumQuery,
-} from "../types";
-import { buildTree } from "../helpers";
-import env from "../../env";
+} from "../../types";
+import { buildTree } from "../../helpers";
+import env from "../../../env";
 
 const URL = env.VITE_LOCALDB_HOST || "http://localhost:8077";
 const DOCUMENTS_URL = URL + "/document/";
@@ -16,8 +16,20 @@ const STATIC_URL = URL + "/static/";
 export default {
   name: "localdb",
 
-  initialize() {
+  async initialize() {
     console.log("localdb: nothing to initialize");
+  },
+
+  async checkLogin(): Promise<boolean> {
+    return true;
+  },
+
+  async login(data: any): Promise<boolean> {
+    return true;
+  },
+
+  async logout(): Promise<void> {
+    return;
   },
 
   async getDocuments(query?: DocumentQuery): Promise<{

@@ -1,4 +1,4 @@
-import { DocumentItem } from "../types";
+import { DocumentItem } from "../../types";
 import type {
   DataProvider,
   DocumentQuery,
@@ -6,17 +6,13 @@ import type {
   Medium,
   MediumQuery,
   MediumType,
-} from "../types";
-import { buildTree } from "../helpers";
-import env from "../../env";
+} from "../../types";
+import { buildTree } from "../../helpers";
+import env from "../../../env";
 import PocketBase from "pocketbase";
+import { log } from "console";
 
 const URL: string = env.VITE_POCKETBASE_URL || "http://127.0.0.1:8090";
-
-const authDEMO = {
-  username: "b.enders@hochhuth.de",
-  password: "some-seed-pwd",
-};
 
 export default {
   name: "pocketbase",
@@ -26,16 +22,28 @@ export default {
     login: null,
   },
 
-  async initialize() {
-    this.cache.pb = new PocketBase(URL);
-
+  async login(data: any): Promise<boolean> {
     // authenticate on auth collection record
     const userData = await this.cache.pb.collection("users").authWithPassword(
-      authDEMO.username,
-      authDEMO.password,
+      data.username,
+      data.password,
     );
-    console.log("authentification", userData);
-    this.cache.login = userData;
+    console.log(userData);
+    return true;
+  },
+
+  async checkLogin(): Promise<boolean> {
+    const login = this.cache.pb.collection("users").getList(1, 1);
+    console.log(login);
+    return true;
+  },
+
+  async logout(): Promise<void> {
+    this.cache.pb.authStore.clear();
+  },
+
+  async initialize() {
+    this.cache.pb = new PocketBase(URL);
   },
 
   async getDocuments(query?: DocumentQuery): Promise<{

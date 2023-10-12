@@ -17,7 +17,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
  * Diese Daten sollen den originalen Daten entsprechen, die in einer DB lagern.
  * Die Daten liegen flach in der DB und können über id und parent id verknüpft werden
  */
-export const mockData: DocumentItem[] = [
+export const demoData: DocumentItem[] = [
   {
     version: 1,
     id: "1",

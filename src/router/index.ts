@@ -3,8 +3,8 @@ import * as VueRouter from "vue-router";
 const routes = [
   {
     path: "/",
-    component: () => import("../views/Home.vue"),
-    name: "home",
+    component: () => import("../views/Login.vue"),
+    name: "login",
   },
   {
     path: "/edit/",

@@ -1,19 +1,18 @@
 import { InteractiveBrowserCredential } from "@azure/identity";
-import { DocumentItem } from "../types";
+import { DocumentItem } from "../../types";
 import type {
   DataProvider,
   DocumentQuery,
   DocumentTreeItem,
   Medium,
   MediumQuery,
-} from "../types";
+} from "../../types";
 import { Container, CosmosClient } from "@azure/cosmos";
-import { buildTree, fileTypeToMediaType } from "../helpers";
-import env from "../../../services/env";
-import { blobService } from "../../../../src/services/blob";
-import { guid } from "../../../../src/services/guid";
+import { buildTree, fileTypeToMediaType } from "../../helpers";
+import env from "../../../env";
+import { blobService } from "../../../blob";
+import { guid } from "../../../guid";
 
-let cosmosClient: CosmosClient;
 let container: Container;
 let mediaContainer: Container;
 
@@ -22,13 +21,30 @@ const AUTHENTICATION_TYPE = env.VITE_AZURE_AUTHENTICATION_TYPE || "ad";
 export default {
   name: "cosmosdb",
 
+  cache: {
+    cosmosClient: <undefined | CosmosClient> undefined,
+  },
+
+  async checkLogin(): Promise<boolean> {
+    if (this.cache.cosmosClient != null) return true;
+    else return false;
+  },
+
+  async login(data: any): Promise<boolean> {
+    return true;
+  },
+
+  async logout(): Promise<void> {
+    this.cache.cosmosClient = undefined;
+  },
+
   initialize() {
     console.log(`Authentication to CosmosDB via '${AUTHENTICATION_TYPE}'...`);
 
     if (AUTHENTICATION_TYPE === "ad") {
       const endpoint = import.meta.env.VITE_AZURE_COSMOSDB_ENDPOINT;
 
-      cosmosClient = new CosmosClient({
+      this.cache.cosmosClient = new CosmosClient({
         endpoint,
         aadCredentials: new InteractiveBrowserCredential({
           clientId: import.meta.env.VITE_AZURE_COSMOSDB_CLIENT_ID,
@@ -36,7 +52,7 @@ export default {
         }),
       });
     } else if (AUTHENTICATION_TYPE === "connection-string") {
-      cosmosClient = new CosmosClient(
+      this.cache.cosmosClient = new CosmosClient(
         env.VITE_AZURE_COSMOSDB_CONNECTION_STRING,
       );
     } else {
@@ -45,11 +61,11 @@ export default {
 
     const databaseName = env.VITE_AZURE_COSMOSDB_DATABASE;
 
-    container = cosmosClient
+    container = this.cache.cosmosClient
       .database(databaseName)
       .container(env.VITE_AZURE_COSMOSDB_CONTAINER);
 
-    mediaContainer = cosmosClient
+    mediaContainer = this.cache.cosmosClient
       .database(databaseName)
       .container(env.VITE_AZURE_COSMOSDB_CONTAINER_MEDIA);
   },
@@ -210,7 +226,7 @@ export default {
     const { url } = await blobService.upload(medium.filename, file);
     // update medium
     medium.url = url;
-    return medium;    
+    return medium;
   },
 
   async getMediumUrl(mediumId) {

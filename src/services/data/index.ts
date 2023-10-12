@@ -1,13 +1,13 @@
-// import MockProvider from './providers/mock';
-import CosmosDbProvider from "./providers/cosmosdb";
-import LocaldbProvider from "./providers/localdb";
-import PocketBaseProvider from "./providers/pocketbase";
+import MockProvider from "./providers/mock/mock";
+import CosmosDbProvider from "./providers/cosmosdb/cosmosdb";
+import LocaldbProvider from "./providers/localdb/localdb";
+import PocketBaseProvider from "./providers/pocketbase/pocketbase";
 import type { DataProvider } from "./types";
 import env from "../env";
 
 // Register your providers here.
 const providerOptions: DataProvider[] = [
-  // MockProvider,
+  MockProvider,
   CosmosDbProvider,
   LocaldbProvider,
   PocketBaseProvider,
@@ -20,9 +20,6 @@ export const dataProvider = (() => {
 
   for (const p of providerOptions) {
     if (p.name === providerName) {
-      // Initialize the provider and return it.
-      p.initialize?.();
-
       return p;
     }
   }
