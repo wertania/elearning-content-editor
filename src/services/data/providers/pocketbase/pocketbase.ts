@@ -10,7 +10,6 @@ import type {
 import { buildTree } from "../../helpers";
 import env from "../../../env";
 import PocketBase from "pocketbase";
-import { log } from "console";
 
 const URL: string = env.VITE_POCKETBASE_URL || "http://127.0.0.1:8090";
 

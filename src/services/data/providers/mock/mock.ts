@@ -1,5 +1,5 @@
 import { buildTree, fileTypeToMediaType } from "../../helpers";
-import { DocumentItem, MediumQuery } from "../../types";
+import { DocumentItem } from "../../types";
 import type { DataProvider, DocumentTreeItem, Medium } from "../../types";
 import { demoData } from "./data";
 import { mockMedia } from "./media";
@@ -16,7 +16,7 @@ export default {
     return true;
   },
 
-  async login(data: any): Promise<boolean> {
+  async login(): Promise<boolean> {
     return true;
   },
 
@@ -72,7 +72,7 @@ export default {
     return mockMedia.find((item) => id === item.id);
   },
 
-  async getMediums(query?: MediumQuery): Promise<Medium[]> {
+  async getMediums(): Promise<Medium[]> {
     return mockMedia;
   },
 
@@ -100,6 +100,7 @@ export default {
   },
 
   async updateMedium(mediumId: string, file: File): Promise<Medium> {
+    console.log(file);
     const m = mockMedia.find((item) => mediumId === item.id);
     if (!m) {
       throw Error(`Medium ${mediumId} not found`);

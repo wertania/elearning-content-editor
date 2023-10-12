@@ -30,7 +30,7 @@ export default {
     else return false;
   },
 
-  async login(data: any): Promise<boolean> {
+  async login(): Promise<boolean> {
     return true;
   },
 

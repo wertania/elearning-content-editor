@@ -97,12 +97,10 @@ import Checkbox from 'primevue/checkbox';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useGlobalStore } from '../stores/global';
 import { useConfirm } from "primevue/useconfirm";
-import { useRouter } from 'vue-router';
 
 const confirm = useConfirm(); // confirm dialog
 const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
-const router = useRouter(); // router
 
 // "add" split-button
 const menuAdd = [

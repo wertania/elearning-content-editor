@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { dataProvider } from "../services/data";
 import { Medium } from "../services/data/types";
-import { error, info } from "../services/toast";
+import { error } from "../services/toast";
 
 interface DocumentState {
   media: Medium[];

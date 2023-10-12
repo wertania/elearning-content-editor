@@ -1,6 +1,6 @@
-import * as msal from '@azure/msal-browser';
-import pkg from '../../package.json';
-import { router } from '../router';
+import * as msal from "@azure/msal-browser";
+import pkg from "../../package.json";
+import { router } from "../router";
 
 const TENANT_ID = import.meta.env.VITE_AZURE_COSMOSDB_TENANT_ID;
 const CLIENT_ID = import.meta.env.VITE_AZURE_COSMOSDB_CLIENT_ID;
@@ -18,11 +18,11 @@ const loginRequest: msal.SilentRequest = {
 export const msalInstance = new msal.PublicClientApplication({
   auth: {
     clientId: CLIENT_ID,
-    authority: 'https://login.microsoftonline.com/' + TENANT_ID,
+    authority: "https://login.microsoftonline.com/" + TENANT_ID,
     // redirectUri: "http://localhost:8080/redirect",
   },
   cache: {
-    cacheLocation: 'sessionStorage', // This configures where your cache will be stored
+    cacheLocation: "sessionStorage", // This configures where your cache will be stored
     storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
   },
   system: {
@@ -60,10 +60,10 @@ export const msalInstance = new msal.PublicClientApplication({
   },
 });
 
-await msalInstance.initialize();
+msalInstance.initialize();
 
-export async function signIn(method: 'popup' | 'redirect' = 'popup') {
-  if (method === 'popup') {
+export async function signIn(method: "popup" | "redirect" = "popup") {
+  if (method === "popup") {
     return msalInstance
       .loginPopup({
         scopes: loginRequest.scopes,
@@ -76,11 +76,11 @@ export async function signIn(method: 'popup' | 'redirect' = 'popup') {
         console.log(error);
 
         // Route back to home.
-        router.replace({ name: 'home' });
+        router.replace({ name: "home" });
 
         return false;
       });
-  } else if (method === 'redirect') {
+  } else if (method === "redirect") {
     return msalInstance.loginRedirect(loginRequest);
   }
 }

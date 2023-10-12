@@ -224,7 +224,7 @@ const closeDocument = async () => {
 
 const init = async () => {
   $global.$state.isLoading = true;
-  await $media.initialize(documentId.value);
+  await $media.initialize();
   $global.$state.isLoading = false;
   selection.value = {};
   itemSelected.value = null;

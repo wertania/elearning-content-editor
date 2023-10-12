@@ -24,7 +24,7 @@ export default {
     return true;
   },
 
-  async login(data: any): Promise<boolean> {
+  async login(): Promise<boolean> {
     return true;
   },
 
