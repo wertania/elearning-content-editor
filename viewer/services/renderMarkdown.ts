@@ -1,6 +1,6 @@
-import { UniversalBlock } from 'vue-blockful-editor';
-import { vitepressDataProvider } from './vitepressDataService';
-import { DocumentItem } from 'src/services/data/types';
+import { UniversalBlock } from "vue-blockful-editor";
+import { vitepressDataProvider } from "./vitepressDataService";
+import { DocumentItem } from "src/services/data/types";
 
 type Params = Record<string, any>;
 
@@ -22,38 +22,44 @@ export default async (
 
   const promises = blocks.map(async (block) => {
     switch (block.type) {
-      case 'paragraph': {
+      case "paragraph": {
         return block.data.text;
       }
 
-      case 'header': {
-        return '#'.repeat(block.data.level) + ' ' + block.data.text;
+      case "header": {
+        return "#".repeat(block.data.level) + " " + block.data.text;
       }
 
-      case 'markdown': {
+      case "markdown": {
         return block.data.code;
       }
 
-      case 'medium': {
-        if (!block.data.id) return '';
+      case "medium": {
+        if (!block.data.id) return "";
 
         // Fetch medium db entry
-        const medium = await vitepressDataProvider.getMedium(block.data.id);
-        if (!medium) {
-          return '';
+        if (block?.data?.id != null && block.data.id !== "") {
+          try {
+            const medium = await vitepressDataProvider.getMedium(block.data.id);
+            if (!medium) return "";
+            // Store the medium in a parameter to access it in the template.
+            // const paramName = `medium-${medium.id}`;
+            // params[paramName] = medium;
+
+            // Pass the medium to the Vue component from the params object.
+            return `<MediaViewer :id="'${medium.id}'" :type="'${medium.type}'" />`;
+          } catch (err) {
+            console.error("Error fetching medium:" + block.data.id);
+            return "";
+          }
+        } else {
+          return "";
         }
-
-        // Store the medium in a parameter to access it in the template.
-        // const paramName = `medium-${medium.id}`;
-        // params[paramName] = medium;
-
-        // Pass the medium to the Vue component from the params object.
-        return `<MediaViewer :id="'${medium.id}'" :type="'${medium.type}'" />`;
       }
 
       default: {
         console.error(`Unknown block type "${(block as any).type}".`);
-        return '';
+        return "";
       }
     }
   });
@@ -63,7 +69,7 @@ export default async (
   // The content of the `.md` virtual file with embedded Vue components.
   // The `UsersActivity` component is always rendered at the top.
   let content = `<UsersActivity :documentId="'${doc.id}'" />\n`;
-  content += renderedBlocks.join('\n\n');
-  
+  content += renderedBlocks.join("\n\n");
+
   return { content, params };
 };

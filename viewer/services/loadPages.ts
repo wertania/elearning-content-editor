@@ -1,8 +1,8 @@
-import type { DocumentItem, DocumentTreeItem } from 'src/services/data/types';
-import { vitepressDataProvider } from './vitepressDataService';
-import { writeFileSync } from 'fs';
+import type { DocumentItem, DocumentTreeItem } from "src/services/data/types";
+import { vitepressDataProvider } from "./vitepressDataService";
+import { writeFileSync } from "fs";
 
-const baseLang = process.env.VITE_BASE_LANGUAGE || 'en';
+const baseLang = process.env.VITE_BASE_LANGUAGE || "en";
 
 /**
  * Converts a string to a part of a URL.
@@ -10,12 +10,12 @@ const baseLang = process.env.VITE_BASE_LANGUAGE || 'en';
  */
 const toUrl = (text: string) =>
   text
-    .split('')
+    .split("")
     .filter((s) => /[\da-zA-Z0-9\s]/.test(s))
-    .join('')
+    .join("")
     .split(/\s+/g)
     .map((s) => s.toLowerCase())
-    .join('-');
+    .join("-");
 
 export interface Page {
   name: string;
@@ -27,12 +27,24 @@ export interface Page {
 
 // internal simple cache
 let pagesCache: { list: Page[]; tree: Page[]; availableLanguages: string[] };
+let isLoading = false;
 
 export const loadPages = async () => {
+  // initialize
+  while (isLoading) {
+    console.log("waiting for pagesCache");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  isLoading = true;
+  await vitepressDataProvider.initialize?.();
+  console.log("vitepressDataProvider initialized");
+
   // check cache first!
   if (pagesCache) return pagesCache;
 
   // get tree and list for base language. this will build the main tree also
+  console.log("getDocuments for baseLang", baseLang);
   const base = await vitepressDataProvider.getDocuments({
     langCodes: [baseLang],
   });
@@ -46,13 +58,16 @@ export const loadPages = async () => {
   const allLangCodes = allWithOrigin.list.map((item) => item.langCode);
   // create list without baseLang inside (only to be sure to have no duplicates later).
   // each language must be unique
-  const additionalLanguages = allLangCodes.filter((lang) => lang !== baseLang).filter((lang, index, self) => self.indexOf(lang) === index);
+
+  const additionalLanguages = allLangCodes.filter((lang) => lang !== baseLang)
+    .filter((lang, index, self) => self.indexOf(lang) === index);
 
   let dictWithOriginAndLangCode: { [id: string]: DocumentItem } = {};
   // form list to dictionary with id as key
+
   dictWithOriginAndLangCode = allWithOrigin.list.reduce(
     (acc, item) => {
-      acc[item.originId + '_' + item.langCode] = item;
+      acc[item.originId + "_" + item.langCode] = item;
       return acc;
     },
     {} as { [id: string]: DocumentItem },
@@ -62,14 +77,15 @@ export const loadPages = async () => {
   // define some internal helpers to map the tree to an navigation tree
   const getPath = (item: DocumentItem): string => {
     const parent = item.parent && base.list.find((i) => i.id === item.parent);
-    const myPathPart = '/' + toUrl(item.name);
+    const myPathPart = "/" + toUrl(item.name);
 
     if (parent) {
-      return getPath(parent) + myPathPart;
+      return myPathPart; //return getPath(parent) + myPathPart;??? HACK
     } else {
       return myPathPart;
     }
   };
+
   const mapItem = (item: DocumentItem, langCode?: string): Page => ({
     doc: item,
     name: item.name,
@@ -92,23 +108,24 @@ export const loadPages = async () => {
     children?: Page[],
   ): Page => {
     return {
-      name: 'Language: ' + langCode.toUpperCase(),
+      name: "Language: " + langCode.toUpperCase(),
       path: `${langCode}/main`,
       doc: {
         // some empty dummy document
         version: 1,
-        id: 'dummy_' + langCode,
-        type: 'document',
+        id: "dummy_" + langCode,
+        type: "document",
         name: langCode,
-        header: '',
-        description: '',
+        header: "",
+        description: "",
         langCode: langCode,
         content: [
           {
-            type: 'paragraph',
-            data: { text: '' },
+            type: "paragraph",
+            data: { text: "" },
           },
         ],
+        media: [],
       },
       children,
       isTopic: true,
@@ -118,6 +135,7 @@ export const loadPages = async () => {
   // main tree
   // create a sub-path for each additional language if some languages are available
   // at least add base language
+
   const fullTree: Page[] = [];
   if (additionalLanguages.length > 0) {
     // console.log('additionalLanguages', additionalLanguages);
@@ -129,7 +147,7 @@ export const loadPages = async () => {
     // --------------------------------
     // helper to switch one Page to Page with different langCode
     const replaceLangCode = (path: string, langCode: string): string => {
-      return path.replace(baseLang + '/', langCode + '/');
+      return path.replace(baseLang + "/", langCode + "/");
     };
     const mapDocItem = (
       item: DocumentItem,
@@ -143,7 +161,7 @@ export const loadPages = async () => {
     });
     const replaceByTranslated = (item: Page, langCode: string): Page => {
       const itemWithSameOriginId =
-        dictWithOriginAndLangCode[item.doc.id + '_' + langCode] ?? null;
+        dictWithOriginAndLangCode[item.doc.id + "_" + langCode] ?? null;
       if (itemWithSameOriginId) {
         // replace item
         item = mapDocItem(itemWithSameOriginId, langCode, item.path);
@@ -181,12 +199,11 @@ export const loadPages = async () => {
   }
 
   // debug: write to JSON file
-  writeFileSync('./debug.fullTree.json', JSON.stringify(fullTree, null, 2));
+  writeFileSync("./debug.fullTree.json", JSON.stringify(fullTree, null, 2));
   writeFileSync(
-    './debug.baseLangList.json',
+    "./debug.baseLangList.json",
     JSON.stringify(baseLangList, null, 2),
   );
-
   // set cache
   pagesCache = {
     list: baseLangList,
