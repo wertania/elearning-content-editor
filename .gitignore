@@ -40,3 +40,5 @@ debug.navigation.json
 debug.paths.json
 viewer/assets/
 !viewer/assets/placeholder
+.dev/pb_data/**/*
+.dev/pb_public/**/*
