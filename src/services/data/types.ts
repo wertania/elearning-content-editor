@@ -54,6 +54,8 @@ export interface MediumQuery {
 export interface DataProvider {
   name: string;
 
+  cache?: any; // provider specific cache
+
   initialize?(): void;
 
   getDocuments(
@@ -74,7 +76,6 @@ export interface DataProvider {
   ): Promise<Medium>;
   updateMedium(mediumId: string, file: File): Promise<Medium>;
   dropMedium(mediumId: string): Promise<void>;
-  updateMediumDocumentRelations(mediumId: string, documentIds: string[]): Promise<void>;
   getMediumUrl(mediumId: string): Promise<string>;
 
   dropNodes(ids: string[]): Promise<void>;

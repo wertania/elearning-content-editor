@@ -155,16 +155,7 @@ export const useDocumentStore = defineStore("documents", {
      */
     async updateDocument(document: DocumentItem): Promise<void> {
       try {
-        // get all mediumIds from content
-        const mediumIds: string[] = [];
-        document.content.forEach((block) => {
-          if (block.type === "medium" && block.data.id) {
-            mediumIds.push(block.data.id);
-          }
-        });
-        document.media = mediumIds;
         const doc = await dataProvider.updateDocument(document);
-        await dataProvider.updateMediumDocumentRelations(doc.id, mediumIds);
 
         // update current tree
         let item = getItemFromTree(document.id, this.$state.documentTree);

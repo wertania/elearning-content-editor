@@ -172,25 +172,6 @@ export default {
     return medium;
   },
 
-  async updateMediumDocumentRelations(
-    documentId: string,
-    mediumIds: string[],
-  ): Promise<void> {
-    for (const media of mediumIds) {
-      const res = await fetch(
-        MEDIA_URL + "references/" + media + `?documentId=${documentId}`,
-        {
-          method: "PUT",
-        },
-      );
-      if (res.status !== 200) {
-        throw Error(
-          `Medium ${media} could not be added to document ${documentId}.`,
-        );
-      }
-    }
-  },
-
   async getMediumUrl(id) {
     return `${STATIC_URL}${id}`;
   },
