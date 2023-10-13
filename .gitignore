@@ -42,3 +42,4 @@ viewer/assets/
 !viewer/assets/placeholder
 .dev/pb_data/**/*
 .dev/pb_public/**/*
+viewer/[path].paths.ts.*.mjs

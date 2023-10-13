@@ -1,8 +1,9 @@
 import type { DocumentItem, DocumentTreeItem } from "src/services/data/types";
 import { vitepressDataProvider } from "./vitepressDataService";
 import { writeFileSync } from "fs";
+import env from "./../../src/services/env";
 
-const baseLang = process.env.VITE_BASE_LANGUAGE || "en";
+const baseLang = env.ENV_VITE_BASE_LANGUAGE;
 
 /**
  * Converts a string to a part of a URL.
@@ -37,7 +38,8 @@ export const loadPages = async () => {
   }
 
   isLoading = true;
-  await vitepressDataProvider.initialize?.();
+  await vitepressDataProvider.initialize();
+  await vitepressDataProvider.login({ username: env.ENV_VITE_POCKETBASE_VP_USERNAME, password: env.ENV_VITE_POCKETBASE_VP_PASSWORD});
   console.log("vitepressDataProvider initialized");
 
   // check cache first!

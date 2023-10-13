@@ -1,10 +1,10 @@
-import { BlobClient } from '@azure/storage-blob';
-import { InteractiveBrowserCredential } from '@azure/identity';
-import env from '../env';
+import { BlobClient } from "@azure/storage-blob";
+import { InteractiveBrowserCredential } from "@azure/identity";
+import env from "../env";
 
 const credential = new InteractiveBrowserCredential({
-  clientId: env.VITE_AZURE_COSMOSDB_CLIENT_ID,
-  tenantId: env.VITE_AZURE_COSMOSDB_TENANT_ID,
+  clientId: env.ENV_VITE_AZURE_COSMOSDB_CLIENT_ID,
+  tenantId: env.ENV_VITE_AZURE_COSMOSDB_TENANT_ID,
 });
 
 interface BlobCreateOptions {
@@ -19,8 +19,8 @@ interface BlobCreateOptions {
 export const blobService = {
   async upload(blobName: string, data: Blob, options: BlobCreateOptions = {}) {
     // Get the blob client.
-    const base = env.VITE_AZURE_BLOB_STORAGE_URL;
-    const containerName = env.VITE_AZURE_BLOB_STORAGE_CONTAINER_NAME;
+    const base = env.ENV_VITE_AZURE_BLOB_STORAGE_URL;
+    const containerName = env.ENV_VITE_AZURE_BLOB_STORAGE_CONTAINER_NAME;
 
     const blob = new BlobClient(
       `${base}/${containerName}/${blobName}`,
@@ -47,6 +47,6 @@ export const blobService = {
     // TODO: Call an Azure Function that generates the URL.
     // This is good for access control and the browser authentication does not have the permission to generate these URLs.
 
-    throw Error('Not implemented');
+    throw Error("Not implemented");
   },
 };

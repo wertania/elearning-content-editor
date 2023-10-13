@@ -8,7 +8,7 @@ import type {
 import { buildTree } from "../../helpers";
 import env from "../../../env";
 
-const URL = env.VITE_LOCALDB_HOST || "http://localhost:8077";
+const URL = env.ENV_VITE_LOCALDB_HOST || "http://localhost:8077";
 const DOCUMENTS_URL = URL + "/document/";
 const MEDIA_URL = URL + "/media/";
 const STATIC_URL = URL + "/static/";

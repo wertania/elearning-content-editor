@@ -16,7 +16,7 @@ import { guid } from "../../../guid";
 let container: Container;
 let mediaContainer: Container;
 
-const AUTHENTICATION_TYPE = env.VITE_AZURE_AUTHENTICATION_TYPE || "ad";
+const AUTHENTICATION_TYPE = env.ENV_VITE_AZURE_AUTHENTICATION_TYPE || "ad";
 
 export default {
   name: "cosmosdb",
@@ -53,21 +53,21 @@ export default {
       });
     } else if (AUTHENTICATION_TYPE === "connection-string") {
       this.cache.cosmosClient = new CosmosClient(
-        env.VITE_AZURE_COSMOSDB_CONNECTION_STRING,
+        env.ENV_VITE_AZURE_COSMOSDB_CONNECTION_STRING,
       );
     } else {
       throw Error(`Unknown authentication type.`);
     }
 
-    const databaseName = env.VITE_AZURE_COSMOSDB_DATABASE;
+    const databaseName = env.ENV_VITE_AZURE_COSMOSDB_DATABASE;
 
     container = this.cache.cosmosClient
       .database(databaseName)
-      .container(env.VITE_AZURE_COSMOSDB_CONTAINER);
+      .container(env.ENV_VITE_AZURE_COSMOSDB_CONTAINER);
 
     mediaContainer = this.cache.cosmosClient
       .database(databaseName)
-      .container(env.VITE_AZURE_COSMOSDB_CONTAINER_MEDIA);
+      .container(env.ENV_VITE_AZURE_COSMOSDB_CONTAINER_MEDIA);
   },
 
   async getDocuments(query?: DocumentQuery): Promise<{

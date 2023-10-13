@@ -15,7 +15,7 @@ const providerOptions: DataProvider[] = [
 
 // Instantiate a provider.
 export const dataProvider = (() => {
-  const providerName = env.VITE_DOCUMENT_DATASOURCE || "localdb";
+  const providerName = env.ENV_VITE_DOCUMENT_DATASOURCE;
   console.log(`Using data provider '${providerName}'.`);
 
   for (const p of providerOptions) {

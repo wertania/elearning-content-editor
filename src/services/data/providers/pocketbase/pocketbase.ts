@@ -11,7 +11,7 @@ import { buildTree } from "../../helpers";
 import env from "../../../env";
 import PocketBase from "pocketbase";
 
-const URL: string = env.VITE_POCKETBASE_URL || "http://127.0.0.1:8090";
+const URL: string = env.ENV_VITE_POCKETBASE_URL || "http://127.0.0.1:8090";
 
 export default {
   name: "pocketbase",
@@ -23,11 +23,11 @@ export default {
 
   async login(data: any): Promise<boolean> {
     // authenticate on auth collection record
-    const userData = await this.cache.pb.collection("users").authWithPassword(
+    console.log("login", data);
+    await this.cache.pb.collection("users").authWithPassword(
       data.username,
       data.password,
-    );
-    console.log(userData);
+    );    
     return true;
   },
 
