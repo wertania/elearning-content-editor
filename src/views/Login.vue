@@ -2,7 +2,7 @@
   <div class="login">
     <h1 class="txt-gradient">Welcome to RevDocs</h1>
     <div v-if="provider === 'cosmosdb'">
-      <Button @click="/*triggerMicrosoftSignIn()*/" class="login__button" :disabled="loading">
+      <Button @click="triggerMicrosoftSignIn()" class="login__button" :disabled="loading">
         <div class="login__loading-spinner" v-if="loading"></div>
         <span v-else> Bei O365 anmelden </span>
       </Button>
@@ -55,6 +55,9 @@ const loginPocketbase = async () => {
   loading.value = false;
 }
 
+const triggerMicrosoftSignIn = () => {
+  console.log("triggerMicrosoftSignIn");
+}
 // const triggerMicrosoftSignIn = async () => {
 //   try {
 //     loading.value = true;
