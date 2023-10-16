@@ -3,12 +3,23 @@ import * as VueRouter from "vue-router";
 const routes = [
   {
     path: "/",
-    // component: () => import("@/views/Home.vue"),
-    redirect: "/edit/",
+    component: () => import("../views/Login.vue"),
+    name: "login",
   },
   {
-    path: "/edit/:id?",
-    component: () => import("@/views/DocumentEditor.vue"),
+    path: "/edit/",
+    component: () => import("../views/DocumentEditor.vue"),
+    name: "edit",
+  },
+  {
+    path: "/media/:documentId?",
+    component: () => import("../views/MediaBrowser.vue"),
+    name: "media",
+  },
+  {
+    path: "/smart-video-converter/",
+    component: () => import("../views/SmartVideoConverter.vue"),
+    name: "smart-video-converter",
   },
 ];
 

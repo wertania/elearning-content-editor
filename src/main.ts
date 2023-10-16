@@ -1,19 +1,25 @@
 import { createApp } from "vue";
-import "./style.css";
 import App from "./App.vue";
 import { router } from "./router";
 import { createPinia } from "pinia";
+import ToastService from "primevue/toastservice";
 import PrimeVue from "primevue/config";
+import ConfirmationService from "primevue/confirmationservice";
+import Tooltip from 'primevue/tooltip';
 
-import "./../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
-import "./../node_modules/primeflex/primeflex.css";
-import "./../node_modules/primevue/resources/themes/nano/theme.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "primevue/resources/themes/saga-blue/theme.css";
+import "primeflex/primeflex.css";
 
 const pinia = createPinia();
 
-const app = createApp(App)
-  .use(PrimeVue)
+export const app = createApp(App)
   .use(router)
-  .use(pinia);
+  .use(pinia)
+  .use(PrimeVue)
+  .use(ConfirmationService)
+  .use(ToastService);
+
+app.directive('tooltip', Tooltip);
 
 app.mount("#app");

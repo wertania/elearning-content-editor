@@ -1,81 +1,325 @@
 <template>
-    <div class="grid" style="display: flex;">
-        <div class="col-4">
-            <Tree :value="documentStore.documentTree" v-model="selectedDocument" key="key" @node-select=""></Tree>
+  <Dialog v-model:visible="showAddLanguage" modal header="Add language" :style="{ width: '40vw' }">
+    <template #default>
+      <div class="p-1">
+        <label>Select a language</label>
+        <Dropdown :options="$doc.$state.missingLanguages" option-label="name" option-value="code"
+          placeholder="Select a language" class="w-full mt-2" v-model="languageToAdd"
+          :disabled="$global.$state.requestPending" />
+        <div class="flex flex-row flex-wrap h-4 mt-4">
+          <label class="block">Pre-Translate via AI?</label>
+          <Checkbox :binary="true" class="ml-2" v-model="translateViaAI" :disabled="$global.$state.requestPending" />
         </div>
-        <div class="col-8">
-            <Toolbar>
-                <template #start>
-                    <Button label="New" icon="pi pi-plus" class="mr-2" />
-                </template>
+        <div class="flex flex-row flex-wrap h-4 mt-5">
+          <Button icon="fa-solid fa-check" @click="addTranslationToDocument()" label="Add translation"
+            :disabled="$global.$state.requestPending">
+          </Button>
+          <Button icon="fa-solid fa-close" label="Cancel" class="ml-1" @click="showAddLanguage = false"
+            :disabled="$global.$state.requestPending"></Button>
+        </div>
+      </div>
+    </template>
+  </Dialog>
 
-                <template #end>
-                    <Button label="Save" icon="pi pi-plus" class="mr-2" severity="success" />
-                </template>
-            </Toolbar>
-            <BlockEditor v-model="demo" :readOnly="false" :debug="false" :plugins="plugins" :showAllBlockControls="true" />
+  <AppToolbar class="bg-purple-50">
+    <template #start>
+      <SplitButton @click="addDocument('document')" label="Add" icon="fa-solid fa-plus" :model="menuAdd" />
+      <ConfirmPopup />
+      <Button icon="fa-solid fa-trash" class="ml-1 bg-purple-300 border-none" @click="deleteSelected($event)"
+        v-show="$doc.$state.selectedDocument" />
+    </template>
+    <template #end>
+      <Button icon="fa-solid fa-photo-film" class="ml-1 bg-purple-300 border-none" @click="openMediaBrowser"
+        v-show="$doc.$state.selectedDocument" />
+      <Button icon="fa-solid fa-save" class="ml-1 bg-purple-300 border-none" @click="saveDocument"
+        v-show="$doc.$state.selectedDocument" />
+      <Button icon="fa-solid fa-times" class="ml-1 bg-purple-300 border-none" @click="closeDocument"
+        v-show="$doc.$state.selectedDocument" />
+    </template>
+  </AppToolbar>
+
+  <div class="document-editor__main">
+    <div class="document-editor__sidebar flex flex-column card-container">
+      <div class="document-editor__tree-container document-tree" @dragover="handleDragOverContainer"
+        @drop="handleContainerDrop">
+        <Tree class="document-editor__tree" selectionMode="single" v-model:selectionKeys="selection"
+          :value="$doc.documentTree" @node-select="loadDocument" :disabled="true">
+          <template #default="slotProps">
+            <div class="document-editor__tree-draggable" :class="{
+              'node-dragover': slotProps.node.id === draggedOver?.id,
+            }" :draggable="true" @dragover="handleDragOver(slotProps.node)"
+              @dragstart="handleDragStart($event, slotProps.node)" @drop="handleDragDrop($event, slotProps.node)"
+              @dragend="handleDragEnd">
+              <span>{{ slotProps.node.name }}</span>
+            </div>
+          </template>
+        </Tree>
+      </div>
+      <div class="document-editor__settings-container flex-end" v-show="$doc.$state.selectedDocument != null">
+        <div class="document-editor__settings-content flex flex-column card-container">
+          <div class="flex m-1 h-2rem p-2">
+            <i class="fa-solid fa-language mt-1 ml-1 mr-2"></i>Assigned translations
+          </div>
+          <div class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2">
+            <Button icon="fa-solid fa-plus" @click="showAddLanguage = true"
+              :disabled="$doc.$state.missingLanguages.length < 1"></Button>
+            <Dropdown v-model="$doc.$state.selectedLanguage" :options="$doc.$state.availableLanguages" option-label="name"
+              option-value="code" class="ml-1 flex-auto" :disabled="$doc.availableLanguages.length < 2"
+              @change="switchLanguage" />
+          </div>
         </div>
+      </div>
     </div>
+
+    <div v-if="$global.$state.isLoading || $global.$state.requestPending"
+      class="flex justify-content-center flex-wrap mt-5">
+      <ProgressSpinner />
+    </div>
+    <ContentEditor v-else-if="$doc.$state.selectedDocument" :key="$doc.$state.selectedDocument.id" />
+    <div v-else class="g-center-content">Select a document node.</div>
+
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, Ref } from 'vue';
-import { BlockEditor, PluginHeader, PluginParagraph, BlockPage } from 'vue-blockful-editor';
+import { onMounted, ref } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
+import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
-import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
+import { DocumentItem, DocumentTreeItem } from '../services/data/types';
+import ContentEditor from '../components/ContentEditor.vue';
+import AppToolbar from '../components/AppToolbar.vue';
+import SplitButton from 'primevue/splitbutton';
+import Dropdown from 'primevue/dropdown';
+import Dialog from 'primevue/dialog';
+import Checkbox from 'primevue/checkbox';
+import ConfirmPopup from 'primevue/confirmpopup';
+import { useGlobalStore } from '../stores/global';
+import { useConfirm } from "primevue/useconfirm";
 
-const selectedDocument = ref(null);
+const confirm = useConfirm(); // confirm dialog
+const $doc = useDocumentStore(); // main store
+const $global = useGlobalStore(); // global store
 
-const selectNode = (node: TreeNode) => {
-    console.log(node);
-}
-
-const documentStore = useDocumentStore();
-
-const plugins = [
-    PluginParagraph,
-    PluginHeader,
+// "add" split-button
+const menuAdd = [
+  {
+    label: 'Add document',
+    command: () => addDocument('document'),
+  },
+  {
+    label: 'Add folder',
+    command: () => addDocument('folder'),
+  },
 ];
 
-const demo: Ref<BlockPage> = ref({
-    blocks: [
-        {
-            type: "header",
-            data: {
-                text: "Hello World!",
-                level: 1,
-            },
-        },
-    ],
+// tree data
+const selection = ref<Record<string, boolean>>({}); // selected node keys in tree (single selection enabled)
+
+// add language dialog
+const showAddLanguage = ref(false); // control: dialog for adding a new language
+const translateViaAI = ref(true); // checkbox: translate via AI
+const languageToAdd = ref('en'); // dropdown: language to add
+
+// drag and drop states
+const draggedNode = ref<DocumentItem | null>(null);
+const draggedOver = ref<DocumentItem | null>(null);
+
+/**
+ * load a document from API.
+ */
+const nodeSelected = ref<{ type: string; id: string, parent?: string } | null>(null);
+const loadDocument = async (node: TreeNode) => {
+  const n = node as DocumentTreeItem;
+  nodeSelected.value = { type: n.type, id: n.id, parent: n.parent };
+  console.log('loadDocument', node.id);
+  $doc.$state.editMode = 'edit';
+  await $doc.getDocument(node.id);
+  if ($doc.$state.missingLanguages.length > 0) {
+    languageToAdd.value = $doc.$state.missingLanguages[0].code;
+  }
+};
+
+/**
+ * change the language
+ */
+const switchLanguage = async (data: any) => {
+  await $doc.switchLanguage(data.value);
+};
+
+/**
+ * add a new language
+ */
+const addTranslationToDocument = async () => {
+  $global.$state.requestPending = true;
+  await $doc.addTranslation(true, languageToAdd.value);
+  showAddLanguage.value = false;
+  $global.$state.requestPending = false;
+};
+
+/**
+ * Add a new document.
+ */
+const addDocument = async (type: 'folder' | 'document' = 'document') => {
+  $doc.addEmtpyDocument(type, nodeSelected.value?.type === 'folder' ? nodeSelected.value?.id : nodeSelected.value?.parent);
+};
+
+/**
+ * Save the current document depending on the mode.
+ */
+const saveDocument = async () => {
+  if (!$doc.$state.selectedDocument) return;
+  // first save
+  if ($doc.$state.editMode === 'new') {
+    await $doc.addDocument($doc.$state.selectedDocument);
+    $doc.$state.editMode = 'edit';
+  }
+  // save openend document
+  else {
+    await $doc.updateDocument($doc.$state.selectedDocument);
+  }
+};
+
+/**
+ * only clear the selected document.
+ */
+const closeDocument = () => {
+  if (!$doc.$state.selectedDocument) return;
+  $doc.resetSelectedDocument();
+};
+
+/**
+ * Delete the selected document.
+ */
+const deleteSelected = (event: any) => {
+  console.log('deleteSelected', event);
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Are you sure you want to proceed?',
+    icon: 'fa-solid fa-trash',
+    accept: async () => {
+      if (!$doc.$state.selectedDocument) return;
+      await $doc.dropNode($doc.$state.selectedDocument.id);
+    },
+  });
+};
+
+/**
+ * Open the media browser for the current document.
+ */
+const openMediaBrowser = () => {
+  // router.push({ name: 'media', params: { documentId: $doc.$state.selectedDocument?.id } });
+  // open in new tab
+  window.open(`/#/media/${$doc.$state.selectedDocument?.id}`, '_blank');
+};
+
+/**
+ * Drag n drop support 
+ */
+const handleDragStart = (event: DragEvent, parent: DocumentItem) => {
+  if (!event.dataTransfer) return;
+  draggedNode.value = parent;
+};
+const handleDragDrop = (event: DragEvent, parent: DocumentItem) => {
+  event.preventDefault();
+
+  if (parent.type !== 'folder') return;
+  if (!event.dataTransfer) return;
+  if (!draggedNode.value) return;
+
+  $doc.moveNode(draggedNode.value, parent);
+};
+const handleContainerDrop = (event: DragEvent) => {
+  if (event.target !== event.currentTarget) return;
+  if (!event.dataTransfer) return;
+  if (!draggedNode.value) return;
+
+  $doc.moveNode(draggedNode.value, undefined);
+};
+const handleDragOver = (node: DocumentItem) => {
+  draggedOver.value = node;
+};
+const handleDragOverContainer = (event: DragEvent) => {
+  if (draggedOver.value?.type === 'document') return;
+
+  if (event.target === event.currentTarget) {
+    draggedOver.value = null;
+  }
+
+  event.preventDefault();
+};
+const handleDragEnd = () => {
+  draggedOver.value = null;
+};
+
+// App Start
+onMounted(async () => {
+  // get the document store and initialize it
+  $global.$state.isLoading = true;
+  await $doc.initialize();
+  $global.$state.isLoading = false;
 });
 </script>
 
-<style scoped>
-@import 'vue-blockful-editor/style.css';
+<style lang="scss">
+.document-editor {
 
-h1 {
-    font-size: 2em;
+  &__main,
+  .content-editor {
+    overflow: auto;
+  }
+
+  &__main {
+    display: grid;
+    grid-template-columns: minmax(300px, 1fr) 3fr;
+    gap: 1rem;
+    height: 100%;
+    padding-top: 5px;
+  }
+
+  &__sidebar {
+    display: flex;
+    height: calc(100vh - 105px);
+    overflow: auto;
+    padding-top: 1.25rem;
+    border: 1px solid #dee2e6;
+  }
+
+  &__tree-container {
+    height: calc(90vh);
+  }
+
+  &__settings-container {
+    // height: calc(20vh);
+  }
+
+  &__settings-content {
+    margin: 5px;
+    border: 1px solid #dee2e6;
+    background-color: rgb(240, 240, 240);
+  }
+
+  &__load-button {
+    code {
+      display: inline;
+      background-color: var(--surface-500);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.4rem;
+    }
+  }
+
+  &__tree-draggable {
+    padding: 0.5rem;
+  }
 }
 
-h2 {
-    font-size: 1.5em;
+.p-tree {
+  border: none;
+  padding: 0;
 }
 
-h3 {
-    font-size: 1.17em;
-}
-
-h4 {
-    font-size: 1em;
-}
-
-h5 {
-    font-size: 0.83em;
-}
-
-h6 {
-    font-size: 0.67em;
+.node-dragover {
+  background-color: var(--surface-100);
 }
 </style>

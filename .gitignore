@@ -22,3 +22,24 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+viewer/.vitepress/dist
+viewer/.vitepress/cache
+
+.env
+.env.vitepress
+.hochhuth/
+
+# Blob storage
+__blobstorage__/
+__azurite_*
+
+debug.baseLangList.json
+debug.fullTree.json
+debug.navigation.json
+debug.paths.json
+viewer/assets/
+!viewer/assets/placeholder
+.dev/pb_data/**/*
+.dev/pb_public/**/*
+viewer/[path].paths.ts.*.mjs

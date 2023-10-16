@@ -1,20 +1,28 @@
-import MockProvider from "./provider/mock";
-// some more providers...
+import MockProvider from "./providers/mock/mock";
+import CosmosDbProvider from "./providers/cosmosdb/cosmosdb";
+import LocaldbProvider from "./providers/localdb/localdb";
+import PocketBaseProvider from "./providers/pocketbase/pocketbase";
+import type { DataProvider } from "./types";
+import env from "../env";
 
-// this must be improved later!
-export class DataProvider {
-  provider: string;
+// Register your providers here.
+const providerOptions: DataProvider[] = [
+  MockProvider,
+  CosmosDbProvider,
+  LocaldbProvider,
+  PocketBaseProvider,
+];
 
-  constructor(type: string) {
-    this.provider = type;
-  }
+// Instantiate a provider.
+export const dataProvider = (() => {
+  const providerName = env.ENV_VITE_DOCUMENT_DATASOURCE;
+  console.log(`Using data provider '${providerName}'.`);
 
-  getDocumentTree() {
-    switch (this.provider) {
-      case "mock":
-        return MockProvider.getDocumentTree();
-      default:
-        throw new Error(`Provider ${this.provider} not found`);
+  for (const p of providerOptions) {
+    if (p.name === providerName) {
+      return p;
     }
   }
-}
+
+  throw Error(`Cannot find unregistered data provider '${providerName}'.`);
+})();
