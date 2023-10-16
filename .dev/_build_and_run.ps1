@@ -1,4 +1,3 @@
-cd..
 npm run build
 
 cd .dev
