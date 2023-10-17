@@ -21,28 +21,40 @@ export default {
     login: null,
   },
 
-  async login(data: any): Promise<boolean> {
-    // authenticate on auth collection record
-    console.log("login", data);
-    await this.cache.pb.collection("users").authWithPassword(
-      data.username,
-      data.password,
-    );    
-    return true;
+  async initialize() {
+    this.cache.pb = new PocketBase(URL);
+  },
+
+  async login(data: { username: string; password: string }): Promise<boolean> {
+    try {
+      await this.cache.pb.collection("users").authWithPassword(
+        data.username,
+        data.password,
+      );
+      return this.checkLogin();
+    } catch (err) {
+      throw Error(`Login failed. ${err}`);
+      // return false;
+    }
   },
 
   async checkLogin(): Promise<boolean> {
-    const login = this.cache.pb.collection("users").getList(1, 1);
-    console.log(login);
-    return true;
+    console.log("checking login");
+    try {
+      // console.log("token: ", this.pb.authStore.token);
+      const res = await this.cache.pb.collection("users").getList(1, 1, {
+        expand: "company",
+      });
+      if (res.items.length < 1) return false;
+      return true;
+    } catch (error) {
+      console.log("error: ", error);
+      return false;
+    }
   },
 
   async logout(): Promise<void> {
     this.cache.pb.authStore.clear();
-  },
-
-  async initialize() {
-    this.cache.pb = new PocketBase(URL);
   },
 
   async getDocuments(query?: DocumentQuery): Promise<{

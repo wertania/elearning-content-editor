@@ -7,23 +7,28 @@
 import Toast from 'primevue/toast';
 import './styles/globals.scss';
 import { dataProvider } from './services/data/index';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
+const route = useRoute();
 
-const start = async () => {
+const initApp = async () => {
+  // initialize data provider
   await dataProvider.initialize();
-
-  console.log('check login');
-  const l = await dataProvider.checkLogin();
-  console.log('login', l);
-  if (!l) {
-    router.push({ name: 'login' });
+  // check if already logged in
+  const login = await dataProvider.checkLogin();
+  if (login) {
+    console.log('logged in');
+    if (route.name === 'login') {
+      // redirect if on login page
+      router.push({ name: 'edit' });
+    }
   } else {
-    router.push({ name: 'edit' });
+    console.log('not logged in. redirect to login');
+    router.push({ name: 'login' });
   }
 };
-start();
+initApp();
 </script>
 
 <style lang="scss">
