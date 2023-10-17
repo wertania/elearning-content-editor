@@ -15,7 +15,7 @@ const loginRequest: msal.SilentRequest = {
   forceRefresh: false, // Set this to "true" to skip a cached token and go to the server to get a new token
 };
 
-let _msalInstance = {
+let _msalInstance: any = {
   initialize() {
     console.log("skip msalInstance.initialize");
   },
@@ -88,7 +88,7 @@ export async function signIn(method: "popup" | "redirect" = "popup") {
       .then(() => {
         return true;
       })
-      .catch(function (error) {
+      .catch(function (error: any) {
         console.log(error);
 
         // Route back to home.
