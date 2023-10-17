@@ -41,7 +41,7 @@ if (availableLanguages.length > 1) {
     "/": availableLanguages.map((langCode) => {
       return {
         text: languageNames[langCode] ?? langCode.toUpperCase(),
-        link: langCode + "/main",
+        link: langCode + "/index",
       };
     }),
   };

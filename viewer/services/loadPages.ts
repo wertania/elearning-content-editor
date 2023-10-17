@@ -3,6 +3,10 @@ import { vitepressDataProvider } from "./vitepressDataService";
 import { writeFileSync } from "fs";
 import env from "./../../src/services/env";
 
+export const languageLookup: { code: string; name: string }[] = await import(
+  "./../../globals/languageCodes.json"
+);
+
 const baseLang = env.ENV_VITE_BASE_LANGUAGE;
 
 /**
@@ -39,7 +43,10 @@ export const loadPages = async () => {
 
   isLoading = true;
   await vitepressDataProvider.initialize();
-  await vitepressDataProvider.login({ username: env.ENV_VITE_POCKETBASE_VP_USERNAME, password: env.ENV_VITE_POCKETBASE_VP_PASSWORD});
+  await vitepressDataProvider.login({
+    username: env.ENV_VITE_POCKETBASE_VP_USERNAME,
+    password: env.ENV_VITE_POCKETBASE_VP_PASSWORD,
+  });
   console.log("vitepressDataProvider initialized");
 
   // check cache first!
@@ -110,8 +117,9 @@ export const loadPages = async () => {
     children?: Page[],
   ): Page => {
     return {
-      name: "Language: " + langCode.toUpperCase(),
-      path: `${langCode}/main`,
+      name: "Language: " +
+        (languageLookup.find((i) => i.code === langCode)?.name ?? langCode),
+      path: `${langCode}/index`,
       doc: {
         // some empty dummy document
         version: 1,
