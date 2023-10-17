@@ -20,9 +20,11 @@ let _msalInstance: any = {
     console.log("skip msalInstance.initialize");
   },
   async loginPopup(data: any) {
+    data;
     console.log("skip msalInstance.loginPopup");
   },
   async loginRedirect(data: any) {
+    data;
     console.log("skip msalInstance.loginRedirect");
   },
 };
