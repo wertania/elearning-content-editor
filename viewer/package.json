@@ -1,0 +1,31 @@
+{
+  "name": "elearning-static-content-viewer",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview",
+    "start": "npx http-server -P http://127.0.0.1:${PORT} ./dist"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.0.0",
+    "@azure/identity": "^3.3.0",
+    "@azure/msal-browser": "^3.1.0",
+    "@azure/storage-blob": "^12.16.0",
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/free-regular-svg-icons": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
+    "@fortawesome/vue-fontawesome": "^3.0.3",
+    "dotenv": "^16.3.1",
+    "ink-mde": "^0.28.0",
+    "pocketbase": "^0.18.2",
+    "@types/node": "^20.6.5",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "vitepress": "^1.0.0-rc.20"
+  },
+  "devDependencies": {}
+}

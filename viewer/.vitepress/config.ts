@@ -1,6 +1,6 @@
 import { defineConfig } from "vitepress";
 import type { Page } from "../services/loadPages";
-import env from "../../src/services/env";
+import env from "./../../editor/src/services/env";
 import { writeFileSync } from "fs";
 import { join } from "path";
 

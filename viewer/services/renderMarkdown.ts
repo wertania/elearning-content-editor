@@ -1,6 +1,6 @@
 import { UniversalBlock } from "vue-blockful-editor";
 import { vitepressDataProvider } from "./vitepressDataService";
-import { DocumentItem } from "src/services/data/types";
+import { DocumentItem } from "./../../editor/src/services/data/types";
 
 type Params = Record<string, any>;
 

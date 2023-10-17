@@ -1,3 +1,3 @@
-import { dataProvider } from '../../src/services/data';
+import { dataProvider } from "../../editor/src/services/data";
 
 export const vitepressDataProvider = dataProvider;

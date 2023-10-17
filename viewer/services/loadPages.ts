@@ -1,7 +1,10 @@
-import type { DocumentItem, DocumentTreeItem } from "src/services/data/types";
+import type {
+  DocumentItem,
+  DocumentTreeItem,
+} from "./../../editor/src/services/data/types";
 import { vitepressDataProvider } from "./vitepressDataService";
 import { writeFileSync } from "fs";
-import env from "./../../src/services/env";
+import env from "./../../editor/src/services/env";
 
 export const languageLookup: { code: string; name: string }[] = await import(
   "./../../globals/languageCodes.json"
