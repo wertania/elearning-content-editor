@@ -21,28 +21,40 @@ export default {
     login: null,
   },
 
-  async login(data: any): Promise<boolean> {
-    // authenticate on auth collection record
-    console.log("login", data);
-    await this.cache.pb.collection("users").authWithPassword(
-      data.username,
-      data.password,
-    );    
-    return true;
+  async initialize() {
+    this.cache.pb = new PocketBase(URL);
+  },
+
+  async login(data: { username: string; password: string }): Promise<boolean> {
+    try {
+      await this.cache.pb.collection("users").authWithPassword(
+        data.username,
+        data.password,
+      );
+      return this.checkLogin();
+    } catch (err) {
+      throw Error(`Login failed. ${err}`);
+      // return false;
+    }
   },
 
   async checkLogin(): Promise<boolean> {
-    const login = this.cache.pb.collection("users").getList(1, 1);
-    console.log(login);
-    return true;
+    console.log("checking login");
+    try {
+      // console.log("token: ", this.pb.authStore.token);
+      const res = await this.cache.pb.collection("users").getList(1, 1, {
+        expand: "company",
+      });
+      if (res.items.length < 1) return false;
+      return true;
+    } catch (error) {
+      console.log("error: ", error);
+      return false;
+    }
   },
 
   async logout(): Promise<void> {
     this.cache.pb.authStore.clear();
-  },
-
-  async initialize() {
-    this.cache.pb = new PocketBase(URL);
   },
 
   async getDocuments(query?: DocumentQuery): Promise<{
@@ -157,6 +169,7 @@ export default {
   },
 
   async getMedium(id) {
+    console.log("getMedium from pocketbase", id);
     const result = await this.cache.pb.collection("media").getOne(id);
     if (result.status && result.status !== 200) {
       throw Error(`Medium ${id} could not be fetched. ${result.message}`);
@@ -217,8 +230,20 @@ export default {
     const result = await this.cache.pb.collection("media").update(id, {
       file,
     });
-    console.log(id, file);
-    return { ...result.content, id: result.id };
+    const url = await this.cache.pb.files.getUrl(result, result.file);
+    console.log("new url: ", url);
+    // get actual db entry
+    const medium = await this.getMedium(id);
+    if (!medium) {
+      throw Error(`Medium ${id} could not be fetched after uploading file.`);
+    }
+    medium.url = url;
+    // update db
+    const updatedMedium = await this.cache.pb.collection("media").update(
+      id,
+      { content: medium },
+    );
+    return updatedMedium;
   },
 
   async getMediumUrl(id) {

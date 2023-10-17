@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-// import { signIn } from './../services/auth';
+import { signIn } from './../services/auth';
 import Button from 'primevue/button';
 import { useGlobalStore } from './../stores/global';
 import { ref } from 'vue';
@@ -55,23 +55,20 @@ const loginPocketbase = async () => {
   loading.value = false;
 }
 
-const triggerMicrosoftSignIn = () => {
-  console.log("triggerMicrosoftSignIn");
-}
-// const triggerMicrosoftSignIn = async () => {
-//   try {
-//     loading.value = true;
-//     const loginSuccess = await signIn('popup');
-//     if (loginSuccess) {
-//       await store.loginRedirect();
-//     }
-//     loading.value = false;
-//   } catch (error) {
-//     console.error(error);
-//   } finally {
-//     loading.value = false;
-//   }
-// };
+const triggerMicrosoftSignIn = async () => {
+  try {
+    loading.value = true;
+    const loginSuccess = await signIn('popup');
+    if (loginSuccess) {
+      await store.loginRedirect();
+    }
+    loading.value = false;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <style lang="scss">

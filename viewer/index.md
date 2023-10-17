@@ -10,5 +10,5 @@ hero:
   actions:
     - theme: brand
       text: Start learning
-      link: /markdown-examples
+      link: /welcome
 ---
