@@ -17,18 +17,26 @@ import { vitepressDataProvider } from '../services/vitepressDataService';
 const props = defineProps<{
   id: string;
   type: string;
+  url?: string;
 }>();
 
 const isLoading = ref(true);
 const mediumUrl = ref<string>();
 
 const loadMediumUrl = async () => {
+  if (props.url != null && props.url !== '') {
+    mediumUrl.value = props.url;
+    isLoading.value = false;
+    return;
+  }
+  // else try to load the medium's URL from the data service.
   console.log('Loading medium URL...' + props.id + ' ' + props.type);
   if (isLoading.value) {
     console.log('Already loading...');
   }
   isLoading.value = true;
   mediumUrl.value = await vitepressDataProvider.getMediumUrl(props.id);
+  console.log('Loaded medium URL: ' + mediumUrl.value);
   isLoading.value = false;
 };
 
