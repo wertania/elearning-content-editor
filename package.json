@@ -1,0 +1,16 @@
+{
+  "name": "elearning-platform",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start-editor": "npx http-server -P http://127.0.0.1:8070 ./editor/dist",
+    "build-editor": "npm --prefix .\\editor\\ run build",
+    "dev-editor": "npm --prefix .\\editor\\ run dev",
+    "start-vp": "npx http-server -P http://127.0.0.1:8070 ./viewer./vitepress/dist",
+    "build-vp": "npm --prefix .\\.viewer\\ run build",
+    "dev-vp": "npm --prefix .\\.viewer\\ run vitepress"
+  },
+  "author": "BE",
+  "license": "ISC"
+}
