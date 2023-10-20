@@ -77,11 +77,15 @@ export const useDocumentStore = defineStore("documents", {
     /**
      * Get a document from the backend and set it as selected document
      */
-    async getDocument(id: string): Promise<void> {
+    async getDocument(
+      id: string,
+      preferedLanguageCode?: string,
+    ): Promise<void> {
       try {
+        // rest first
+        this.$state.selectedDocument = null;
+        // get new document
         const document = await dataProvider.getDataForDocument(id);
-        // set selected document
-        this.$state.selectedDocument = document;
         this.$state.baseDocument = document;
         this.$state.selectedLanguage = document.langCode;
         this.$state.availableLanguages = [getLanguageItem(document.langCode)];
@@ -94,6 +98,21 @@ export const useDocumentStore = defineStore("documents", {
           this.$state.subDocuments = null;
         }
         this.refreshLanguagesCache();
+
+        // set prefered language if available
+        if (preferedLanguageCode) {
+          console.log("preferedLanguageCode", preferedLanguageCode);
+          const translation = this.$state.subDocuments?.find((item) =>
+            item.langCode === preferedLanguageCode
+          );
+          if (translation) {
+            this.$state.selectedDocument = translation;
+            this.$state.selectedLanguage = translation.langCode;
+          }
+        } else {
+          // set selected document
+          this.$state.selectedDocument = document;
+        }
       } catch (e) {
         error(e + "");
       }

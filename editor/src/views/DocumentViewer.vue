@@ -21,7 +21,7 @@
     <template #end>
       <li>
         <div class="flex align-content-center">
-          <Dropdown small :options="$doc.languages" option-label="name" option-value="code" v-model="selectedLanguage" />
+          <Dropdown small :options="$doc.languages" option-label="name" option-value="code" v-model="preferedLanguage" />
           <i class="fa-solid fa-language text-4xl ml-2 mt-1"></i>
         </div>
       </li>
@@ -48,15 +48,15 @@
         class="flex justify-content-center flex-wrap mt-5">
         <ProgressSpinner />
       </div>
-      <BlockEditor v-else :read-only="true" v-if="$doc.selectedDocument?.type === 'document'" v-model="page"
-        :debug="false" :plugins="plugins" />
+      <BlockEditor v-else-if="$doc.selectedDocument != null" :read-only="true"
+        v-if="$doc.selectedDocument.type === 'document'" v-model="page" :debug="false" :plugins="plugins" />
     </template>
 
   </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, ComputedRef } from 'vue';
+import { onMounted, ref, computed, ComputedRef, watch } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
@@ -79,7 +79,17 @@ const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
 
 // selected language
-const selectedLanguage = ref<string>($doc.baseLanguage);
+// check if browser language is supported
+const browserLanguageSupported = $doc.languages.find((l) => l.code === navigator.language.split('-')[0]);
+const preferedLanguage = ref<string>(browserLanguageSupported?.code ?? $doc.baseLanguage);
+watch(preferedLanguage, () => {
+  if (!$doc.selectedDocument) return;
+  // const orgId = $doc.selectedDocument.id;
+  // reset view
+  // $doc.selectedDocument = null;
+  // load document in new language
+  $doc.getDocument($doc.selectedDocument.id, preferedLanguage.value)
+});
 
 const page: ComputedRef<BlockPage> = computed(() => {
   return {
@@ -100,15 +110,7 @@ const loadDocument = async (node: TreeNode) => {
   const n = node as DocumentTreeItem;
   nodeSelected.value = { type: n.type, id: n.id, parent: n.parent };
   console.log('loadDocument', node.id);
-  $doc.$state.editMode = 'edit';
-  await $doc.getDocument(node.id);
-};
-
-/**
- * change the language
- */
-const switchLanguage = async (data: any) => {
-  await $doc.switchLanguage(data.value);
+  await $doc.getDocument(node.id, preferedLanguage.value);
 };
 
 // App Start
@@ -119,7 +121,7 @@ onMounted(async () => {
   // check if a document is selected
   if (!$doc.selectedDocument && $doc.documentsFlat.length > 0) {
     console.log('select first document');
-    $doc.getDocument($doc.documentTree[0].id);
+    $doc.getDocument($doc.documentTree[0].id, preferedLanguage.value);
   }
   $global.$state.isLoading = false;
 });
