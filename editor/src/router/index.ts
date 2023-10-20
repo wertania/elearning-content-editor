@@ -21,6 +21,11 @@ const routes = [
     component: () => import("../views/SmartVideoConverter.vue"),
     name: "smart-video-converter",
   },
+  {
+    path: "/demo/",
+    component: () => import("../views/DemoView.vue"),
+    name: "demo",
+  },
 ];
 
 export const router = VueRouter.createRouter({

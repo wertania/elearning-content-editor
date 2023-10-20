@@ -8,8 +8,10 @@ import ConfirmationService from "primevue/confirmationservice";
 import Tooltip from 'primevue/tooltip';
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import "primevue/resources/themes/saga-blue/theme.css";
 import "primeflex/primeflex.css";
+// the theme comes form the index.html file for the dark/light toggle!
+// import "primevue/resources/themes/mdc-light-indigo/theme.css";
+// import "primevue/resources/themes/mdc-dark-indigo/theme.css";
 
 const pinia = createPinia();
 
