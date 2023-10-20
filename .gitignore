@@ -16,3 +16,4 @@ viewer/.vitepress/cache
 .hochhuth/
 aisearch/**/*.pyc
 aisearch/_debug_*.json
+aisearch/importer/test
