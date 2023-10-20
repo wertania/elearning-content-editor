@@ -29,7 +29,7 @@
                 <ul v-if="!mobile" class="list-none desktop-submenu-list">
                     <slot name="end"></slot>
                     <li>
-                        <div class="flex justify-content-end align-content-center mt-2 ml-4 mr-3">
+                        <div class="flex justify-content-end align-content-center mt-2 ml-4 mr-1">
                             <InputSwitch v-model="darkMode" class="mr-2" />
                             <i v-if="mode === 'dark'" class="fa-solid fa-moon text-xl"></i>
                             <i v-if="mode === 'light'" class="fa-solid fa-sun text-xl"></i>
@@ -38,11 +38,12 @@
                 </ul>
 
                 <!-- Mobile Menu -->
-                <div v-if="mobile" class="w-3rem cursor-pointer" @click="showEndMenu = !showEndMenu">
+                <div v-if="mobile" class="cursor-pointer" @click="showEndMenu = !showEndMenu">
                     <i class="fa-solid fa-bars text-3xl"></i>
                 </div>
                 <div v-if="mobile && showEndMenu"
                     class="absolute right-0 surface-10 border-round-xl rounded-md shadow-lg z-10 w-full p-3 shadow-3"
+                    :class="{ 'bg-white': mode === 'light', 'surface-100': mode !== 'light' }"
                     style="top: 5rem;">
                     <ul class="m-0 list-none mobile-submenu-list">
                         <li>
@@ -65,7 +66,7 @@
         <div v-if="showSidebar" class="col-3" style="height: calc(100vh - 6rem);">
             <slot name="sidebar" />
         </div>
-        <div :class="{ 'col-9': showSidebar, 'col-12': !showSidebar }">
+        <div :class="{ 'col-9': showSidebar, 'col-12': !showSidebar, 'p-3': !showSidebar }">
             <slot name="content" />
         </div>
     </div>
