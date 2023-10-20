@@ -78,7 +78,7 @@ import { usePrimeVue } from 'primevue/config';
 import InputSwitch from 'primevue/inputswitch';
 
 const props = defineProps({
-    hideSidebase: {
+    hideSidebar: {
         type: Boolean,
         default: false
     },
@@ -94,7 +94,7 @@ const mobile = computed(() => {
 // sidemenu
 const showSidebar = computed(() => {
     if (mobile.value) return false;
-    if (props.hideSidebase) return false;
+    if (props.hideSidebar) return false;
     return true;
 });
 

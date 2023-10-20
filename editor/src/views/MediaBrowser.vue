@@ -1,23 +1,4 @@
 <template>
-  <AppToolbar class="bg-purple-50">
-    <template #start>
-      <SplitButton @click="uploadDialogControl = { show: true, mode: 'main' }" label="Add" icon="fa-solid fa-plus"
-        :model="menuAdd" />
-    </template>
-    <template #end>
-      <ConfirmPopup />
-      <Button v-tooltip="'Re-Upload media'" icon="fa-solid fa-repeat" class="ml-1 bg-purple-300 border-none"
-        @click="uploadDialogControl = { show: true, mode: 'replace' }"
-        v-show="selection && Object.keys(selection).length > 0" />
-      <Button v-tooltip="'Delete media'" icon="fa-solid fa-trash" class="ml-1 bg-purple-300 border-none"
-        @click="deleteSelected($event)" v-show="selection && Object.keys(selection).length > 0" />
-      <div class="border-">
-        <Button icon="fa-solid fa-times" class="ml-1 bg-purple-300 border-none" @click="closeDocument" v-if="documentId"
-          v-tooltip="'Show all media and close ' + documentId" />
-      </div>
-    </template>
-  </AppToolbar>
-
   <!-- Dialog to upload new media -->
   <Dialog v-model:visible="uploadDialogControl.show" modal header="Add image/video" :style="{ width: '40vw' }">
     <template #default>
@@ -33,41 +14,80 @@
     </template>
   </Dialog>
 
-  <div>
-    <div v-if="$global.$state.isLoading || $global.$state.requestPending"
-      class="flex justify-content-center flex-wrap mt-5">
-      <ProgressSpinner />
-    </div>
-    <div v-else class="grid w-full mt-1" style="height: calc(100vh - 105px);">
-      <div class="col-6">
-        <DataTable :value="$media.media" @row-select="selectItem($event)" selection-mode="single"
-          v-model:selection="selection">
-          <Column field="id" header="ID"></Column>
-          <Column field="type" header="Type"></Column>
-          <!-- <Column field="url" header="URL"></Column>
+  <AppLayout :hide-sidebar="true">
+    <template #logo>
+      <img src="./../assets/logo.png" class="w-full">
+    </template>
+
+    <template #appname>
+      <GradientFont direction="rtl" start-color="#eaa3ff" end-color="#5e085a" style="font-weight: 800; font-size: 25px;">
+        RevDocs
+      </GradientFont>
+    </template>
+
+    <template #start>
+      <SplitButton @click="uploadDialogControl = { show: true, mode: 'main' }" label="Add" icon="fa-solid fa-plus"
+        :model="menuAdd" />
+    </template>
+
+    <template #end>
+      <li>
+        <ConfirmPopup />
+        <Button v-tooltip="'Re-Upload media'" icon="fa-solid fa-repeat" class="bg-purple-300 border-none"
+          @click="uploadDialogControl = { show: true, mode: 'replace' }"
+          v-show="selection && Object.keys(selection).length > 0" />
+      </li>
+      <li>
+        <Button v-tooltip="'Delete media'" icon="fa-solid fa-trash" class="bg-purple-300 border-none"
+          @click="deleteSelected($event)" v-show="selection && Object.keys(selection).length > 0" />
+      </li>
+      <li>
+        <div class="border-">
+          <Button icon="fa-solid fa-times" class="ml-1 bg-purple-300 border-none" @click="closeDocument" v-if="documentId"
+            v-tooltip="'Show all media and close ' + documentId" />
+        </div>
+      </li>
+    </template>
+
+    <template #content>
+
+      <div>
+        <div v-if="$global.$state.isLoading || $global.$state.requestPending"
+          class="flex justify-content-center flex-wrap mt-5">
+          <ProgressSpinner />
+        </div>
+        <div v-else class="grid w-full mt-1" style="height: calc(100vh - 105px);">
+          <div class="col-6">
+            <DataTable :value="$media.media" @row-select="selectItem($event)" selection-mode="single"
+              v-model:selection="selection">
+              <Column field="id" header="ID"></Column>
+              <Column field="type" header="Type"></Column>
+              <!-- <Column field="url" header="URL"></Column>
         <Column field="name" header="Name"></Column> -->
-        </DataTable>
-      </div>
-      <div class="col-6">
-        <div v-if="itemSelected">
-          <div class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2">
-            <Button icon="fa-solid fa-plus" @click="uploadDialogControl = { show: true, mode: 'sub' }"
-              :disabled="missingLanguages.length < 1"></Button>
-            <Dropdown v-model="selectedLanugage" option-label="name" option-value="code" :options="subLanguages"
-              class="ml-1 flex-auto" :disabled="false" @change="switchLanguage" />
+            </DataTable>
           </div>
-          <MediaViewer :id="itemSelected.id" :type="itemSelected.type" />
+          <div class="col-6">
+            <div v-if="itemSelected">
+              <div class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2">
+                <Button icon="fa-solid fa-plus" @click="uploadDialogControl = { show: true, mode: 'sub' }"
+                  :disabled="missingLanguages.length < 1"></Button>
+                <Dropdown v-model="selectedLanugage" option-label="name" option-value="code" :options="subLanguages"
+                  class="ml-1 flex-auto" :disabled="false" @change="switchLanguage" />
+              </div>
+              <MediaViewer :id="itemSelected.id" :type="itemSelected.type" />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+    </template>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import Button from 'primevue/button';
-import AppToolbar from '../components/AppToolbar.vue';
+import AppLayout from './../components/AppLayout.vue';
 import SplitButton from 'primevue/splitbutton';
 import Dropdown from 'primevue/dropdown';
 import ConfirmPopup from 'primevue/confirmpopup';
@@ -184,7 +204,7 @@ const upload = async (event: any) => {
       console.log('updated file', media);
       info('File updated successfully');
     }
-    
+
     uploadDialogControl.value = { show: false, mode: 'main' };
     await init();
   } catch (e) {
