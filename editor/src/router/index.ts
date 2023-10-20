@@ -12,6 +12,11 @@ const routes = [
     name: "edit",
   },
   {
+    path: "/view/:documentId?",
+    component: () => import("../views/DocumentViewer.vue"),
+    name: "view",
+  },
+  {
     path: "/media/:documentId?",
     component: () => import("../views/MediaBrowser.vue"),
     name: "media",

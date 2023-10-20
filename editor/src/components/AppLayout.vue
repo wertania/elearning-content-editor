@@ -1,4 +1,5 @@
 <template>
+    <!-- Toolbar -->
     <div class="card" :class="{ 'lightmode': mode === 'light', 'darkmode': mode !== 'light' }">
         <div class="flex overflow-hidden w-full h-6rem"
             :class="{ 'lightmode': mode === 'light', 'darkmode': mode !== 'light' }">
@@ -28,7 +29,7 @@
                 <ul v-if="!mobile" class="list-none desktop-submenu-list">
                     <slot name="end"></slot>
                     <li>
-                        <div class="flex justify-content-end align-content-center">
+                        <div class="flex justify-content-end align-content-center mt-2 ml-4 mr-3">
                             <InputSwitch v-model="darkMode" class="mr-2" />
                             <i v-if="mode === 'dark'" class="fa-solid fa-moon text-xl"></i>
                             <i v-if="mode === 'light'" class="fa-solid fa-sun text-xl"></i>
@@ -59,9 +60,14 @@
             </div>
         </div>
     </div>
+    <!-- sidebar and Content -->
     <div class="grid w-full" :class="{ 'lightmode': mode === 'light', 'darkmode': mode !== 'light' }">
-        <slot v-if="!mobile && showSidebar" name="sidebar" class="col-3" />
-        <slot name="content" :class="{ 'col-12': mobile || showSidebar, 'col-9': !mobile && showSidebar }" />
+        <div v-if="showSidebar" class="col-3" style="height: calc(100vh - 6rem);">
+            <slot name="sidebar" />
+        </div>
+        <div :class="{ 'col-9': showSidebar, 'col-12': !showSidebar }">
+            <slot name="content" />
+        </div>
     </div>
 </template>
 
@@ -85,7 +91,11 @@ const mobile = computed(() => {
 });
 
 // sidemenu
-const showSidebar = ref(props.hideSidebase ? false : true);
+const showSidebar = computed(() => {
+    if (mobile.value) return false;
+    if (props.hideSidebase) return false;
+    return true;
+});
 
 const showEndMenu = ref(false);
 const darkMode: Ref<boolean> = ref(false);
@@ -112,9 +122,26 @@ watch(() => darkMode.value, (newVal: boolean) => {
         emits('update:mode', 'dark');
     }
 });
+
+const fontSize = ref(15);
+const increaseFontSize = (cnt = 1) => {
+    if (fontSize.value >= 24) return;
+    fontSize.value += cnt;
+    document.getElementsByTagName('html')[0].style.fontSize = fontSize.value + 'px';
+}
+const decreaseFontSize = (cnt = 1) => {
+    if (fontSize.value <= 8) return;
+    fontSize.value -= cnt;
+    document.getElementsByTagName('html')[0].style.fontSize = fontSize.value + 'px';
+}
 </script>
 
 <style>
+html {
+    /* initial value */
+    font-size: 15px;
+}
+
 body {
     margin: 0px !important;
 }
@@ -123,14 +150,12 @@ body {
     background-color: #afafaf;
 }
 
-div .darkmode,
-.darkmode div {
+div .darkmode {
     background-color: #252525;
     color: rgb(210, 210, 210);
 }
 
-div .lightmode,
-.lightmode div {
+div .lightmode {
     background-color: white;
     color: rgb(87 87 87);
 }

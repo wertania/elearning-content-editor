@@ -21,64 +21,90 @@
     </template>
   </Dialog>
 
-  <AppToolbar class="bg-purple-50">
-    <template #start>
-      <SplitButton @click="addDocument('document')" label="Add" icon="fa-solid fa-plus" :model="menuAdd" />
-      <ConfirmPopup />
-      <Button icon="fa-solid fa-trash" class="ml-1 bg-purple-300 border-none" @click="deleteSelected($event)"
-        v-show="$doc.$state.selectedDocument" />
+  <AppLayout>
+    <template #logo>
+      <img src="./../assets/logo.png" class="w-full">
     </template>
-    <template #end>
-      <Button icon="fa-solid fa-photo-film" class="ml-1 bg-purple-300 border-none" @click="openMediaBrowser"
-        v-show="$doc.$state.selectedDocument" />
-      <Button icon="fa-solid fa-save" class="ml-1 bg-purple-300 border-none" @click="saveDocument"
-        v-show="$doc.$state.selectedDocument" />
-      <Button icon="fa-solid fa-times" class="ml-1 bg-purple-300 border-none" @click="closeDocument"
-        v-show="$doc.$state.selectedDocument" />
-    </template>
-  </AppToolbar>
 
-  <div class="document-editor__main">
-    <div class="document-editor__sidebar flex flex-column card-container">
-      <div class="document-editor__tree-container document-tree" @dragover="handleDragOverContainer"
-        @drop="handleContainerDrop">
-        <Tree class="document-editor__tree" selectionMode="single" v-model:selectionKeys="selection"
-          :value="$doc.documentTree" @node-select="loadDocument" :disabled="true">
-          <template #default="slotProps">
-            <div class="document-editor__tree-draggable" :class="{
-              'node-dragover': slotProps.node.id === draggedOver?.id,
-            }" :draggable="true" @dragover="handleDragOver(slotProps.node)"
-              @dragstart="handleDragStart($event, slotProps.node)" @drop="handleDragDrop($event, slotProps.node)"
-              @dragend="handleDragEnd">
-              <span>{{ slotProps.node.name }}</span>
+    <template #appname>
+      <GradientFont direction="rtl" start-color="#eaa3ff" end-color="#5e085a" style="font-weight: 800; font-size: 25px;">
+        RevDocs
+      </GradientFont>
+    </template>
+
+    <template #start>
+      <SplitButton class="ml-5" size="small" @click="addDocument('document')" label="Add" icon="fa-solid fa-plus" :model="menuAdd" />
+      <ConfirmPopup />
+      <Button size="small" icon="fa-solid fa-trash" class="ml-1 bg-purple-600 border-none" @click="deleteSelected($event)"
+        v-show="$doc.$state.selectedDocument" />
+      <!-- <span class="p-input-icon-left ml-3">
+        <i class="fa-solid fa-search" />
+        <InputText placeholder="Search" class="w-12rem surface-100 border-round-lg border-none h-3rem font-medium"
+          size="small" />
+      </span> -->
+    </template>
+
+    <template #end>
+      <li>
+        <Button icon="fa-solid fa-photo-film" size="small" class="bg-purple-600 border-none" @click="openMediaBrowser"
+          v-show="$doc.$state.selectedDocument" />
+      </li>
+      <li>
+        <Button icon="fa-solid fa-save" size="small" class="bg-purple-600 border-none" @click="saveDocument"
+          v-show="$doc.$state.selectedDocument" />
+      </li>
+      <li>
+        <Button icon="fa-solid fa-times" size="small" class="bg-purple-600 border-none" @click="closeDocument"
+          v-show="$doc.$state.selectedDocument" />
+      </li>
+    </template>
+
+    <template #sidebar>
+      <div class="flex flex-column">
+        <!-- Tree -->
+        <div style="height: calc(100vh - 6rem - 100px);" class="document-tree" @dragover="handleDragOverContainer"
+          @drop="handleContainerDrop">
+          <Tree class="document-editor__tree" selectionMode="single" v-model:selectionKeys="selection"
+            :value="$doc.documentTree" @node-select="loadDocument" :disabled="true">
+            <template #default="slotProps">
+              <div class="document-editor__tree-draggable" :class="{
+                'node-dragover': slotProps.node.id === draggedOver?.id,
+              }" :draggable="true" @dragover="handleDragOver(slotProps.node)"
+                @dragstart="handleDragStart($event, slotProps.node)" @drop="handleDragDrop($event, slotProps.node)"
+                @dragend="handleDragEnd">
+                <span>{{ slotProps.node.name }}</span>
+              </div>
+            </template>
+          </Tree>
+        </div>
+        <!-- Settings -->
+        <div class="border-round-md shadow-3" v-show="$doc.$state.selectedDocument != null">
+          <div class="flex flex-column card-container">
+            <div class="flex m-1 h-2rem p-2">
+              <i class="fa-solid fa-language mt-1 ml-1 mr-2"></i>Assigned translations
             </div>
-          </template>
-        </Tree>
-      </div>
-      <div class="document-editor__settings-container flex-end" v-show="$doc.$state.selectedDocument != null">
-        <div class="document-editor__settings-content flex flex-column card-container">
-          <div class="flex m-1 h-2rem p-2">
-            <i class="fa-solid fa-language mt-1 ml-1 mr-2"></i>Assigned translations
-          </div>
-          <div class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2">
-            <Button icon="fa-solid fa-plus" @click="showAddLanguage = true"
-              :disabled="$doc.$state.missingLanguages.length < 1"></Button>
-            <Dropdown v-model="$doc.$state.selectedLanguage" :options="$doc.$state.availableLanguages" option-label="name"
-              option-value="code" class="ml-1 flex-auto" :disabled="$doc.availableLanguages.length < 2"
-              @change="switchLanguage" />
+            <div class="flex flex-row flex-wrap m-2">
+              <Button small icon="fa-solid fa-plus" @click="showAddLanguage = true"
+                :disabled="$doc.$state.missingLanguages.length < 1" class="bg-purple-600"></Button>
+              <Dropdown small v-model="$doc.$state.selectedLanguage" :options="$doc.$state.availableLanguages"
+                option-label="name" option-value="code" class="ml-1 flex-auto"
+                :disabled="$doc.availableLanguages.length < 2" @change="switchLanguage" />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </template>
 
-    <div v-if="$global.$state.isLoading || $global.$state.requestPending"
-      class="flex justify-content-center flex-wrap mt-5">
-      <ProgressSpinner />
-    </div>
-    <ContentEditor v-else-if="$doc.$state.selectedDocument" :key="$doc.$state.selectedDocument.id" />
-    <div v-else class="g-center-content">Select a document node.</div>
+    <template #content>
+      <div v-if="$global.$state.isLoading || $global.$state.requestPending"
+        class="flex justify-content-center flex-wrap mt-5">
+        <ProgressSpinner />
+      </div>
+      <ContentEditor v-else-if="$doc.$state.selectedDocument" :key="$doc.$state.selectedDocument.id" />
+      <div v-else class="g-center-content">Select a document node.</div>
+    </template>
 
-  </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -89,7 +115,7 @@ import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';
 import { DocumentItem, DocumentTreeItem } from '../services/data/types';
 import ContentEditor from '../components/ContentEditor.vue';
-import AppToolbar from '../components/AppToolbar.vue';
+// import AppToolbar from '../components/AppToolbar.vue';
 import SplitButton from 'primevue/splitbutton';
 import Dropdown from 'primevue/dropdown';
 import Dialog from 'primevue/dialog';
@@ -97,6 +123,8 @@ import Checkbox from 'primevue/checkbox';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useGlobalStore } from '../stores/global';
 import { useConfirm } from "primevue/useconfirm";
+import AppLayout from './../components/AppLayout.vue';
+import GradientFont from './../components/GradientFont.vue';
 
 const confirm = useConfirm(); // confirm dialog
 const $doc = useDocumentStore(); // main store
@@ -263,55 +291,17 @@ onMounted(async () => {
 </script>
 
 <style lang="scss">
-.document-editor {
+.p-splitbutton button {
+  background-color: #852196;
+}
 
-  &__main,
-  .content-editor {
-    overflow: auto;
-  }
+.p-tree .p-tree-container .p-treenode {
+  margin: 0;
+  padding: 0;
+}
 
-  &__main {
-    display: grid;
-    grid-template-columns: minmax(300px, 1fr) 3fr;
-    gap: 1rem;
-    height: 100%;
-    padding-top: 5px;
-  }
-
-  &__sidebar {
-    display: flex;
-    height: calc(100vh - 105px);
-    overflow: auto;
-    padding-top: 1.25rem;
-    border: 1px solid #dee2e6;
-  }
-
-  &__tree-container {
-    height: calc(90vh);
-  }
-
-  &__settings-container {
-    // height: calc(20vh);
-  }
-
-  &__settings-content {
-    margin: 5px;
-    border: 1px solid #dee2e6;
-    background-color: rgb(240, 240, 240);
-  }
-
-  &__load-button {
-    code {
-      display: inline;
-      background-color: var(--surface-500);
-      padding: 0.2rem 0.4rem;
-      border-radius: 0.4rem;
-    }
-  }
-
-  &__tree-draggable {
-    padding: 0.5rem;
-  }
+.p-tree .p-tree-container .p-treenode .p-treenode-content {
+  padding: 0rem;
 }
 
 .p-tree {
@@ -321,5 +311,13 @@ onMounted(async () => {
 
 .node-dragover {
   background-color: var(--surface-100);
+}
+
+.p-dropdown .p-inputtext {
+  padding: 10px;
+}
+
+.p-button.p-button-icon-only {
+  width: auto !important;
 }
 </style>

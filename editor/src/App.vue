@@ -44,4 +44,18 @@ initApp();
     }
   }
 }
+
+:root {
+  --primary-color: #781a6d !important;
+  --primary-50: #dfd6e1 !important;
+  --primary-100: rgb(235, 184, 220) !important;
+  --primary-200: rgb(203, 133, 182) !important;
+  --primary-300: rgb(190, 111, 167) !important;
+  --primary-400: rgb(181, 105, 158) !important;
+  --primary-500: rgb(153, 88, 134) !important;
+  --primary-600: rgb(135, 81, 119) !important;
+  --primary-700: rgb(113, 69, 100) !important;
+  --primary-800: rgb(81, 53, 73) !important;
+  --primary-900: rgb(60, 31, 52) !important;
+}
 </style>
