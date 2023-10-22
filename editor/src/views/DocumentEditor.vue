@@ -102,7 +102,7 @@
         <ProgressSpinner />
       </div>
       <ContentEditor v-else-if="$doc.$state.selectedDocument" :key="$doc.$state.selectedDocument.id" />
-      <div v-else class="g-center-content">Select a document node.</div>
+      <div v-else class="text-center text-xl mt-5">Nothing to show. Please select a document node.</div>
     </template>
 
   </AppLayout>
@@ -222,6 +222,7 @@ const saveDocument = async () => {
 const closeDocument = () => {
   if (!$doc.$state.selectedDocument) return;
   $doc.resetSelectedDocument();
+  selection.value = {};
 };
 
 /**
