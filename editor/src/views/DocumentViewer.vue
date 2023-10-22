@@ -1,4 +1,56 @@
 <template>
+  <!-- AI Answer Dialog -->
+  <Dialog v-model:visible="showAnswerDialog" modal header="Let´s answer your question..." :style="{ width: '70vw' }">
+    <template #default>
+      <div class="p-1">
+        Hi! I´m your RevDocs AI documentation assistant. Type in your question and I´ll try to find the answer for you.
+      </div>
+      <div id="search-bar">
+        <div class="p-inputgroup w-full">
+          <InputText placeholder="Your question in natural language"
+            class="w-full surface-100 border-round-lg border-none h-3rem font-medium" size="small" v-model="questionText"
+            @keydown.enter="aiSearch()" :disabled="loading" />
+          <Button icon="fa-solid fa-search" class="border-none border-round-lg ml-1" @click="aiSearch()"
+            :disabled="questionText.length < 10 || loading" />
+        </div>
+      </div>
+      <div v-if="answerText.length > 0">
+        <p>
+          {{ answerText }}
+        </p>
+        <div class="flex align-items-center">
+          <span class="mr-2">Sources:</span>
+          <Chip v-for="doc in answerDependingDocuments" :key="doc.name" :label="doc.name" class="mr-2"
+            @click="info(doc.source)" />
+        </div>
+      </div>
+      <div>
+        <Button label="Close" class="mt-4" @click="showAnswerDialog = false; resetSearch();" />
+      </div>
+    </template>
+  </Dialog>
+
+  <!-- Standard Search Results -->
+  <Dialog v-model:visible="showSearchResults" modal header="Search" :style="{ width: '40vw' }">
+    <template #default>
+      <div id="search-bar">
+        <div class="p-inputgroup w-full">
+          <InputText placeholder="Search" class="w-full surface-100 border-round-lg border-none h-3rem font-medium"
+            size="small" v-model="searchText" :autofocus="true" @keydown.enter="search()" :disabled="loading" />
+          <Button icon="fa-solid fa-search" class="border-none border-round-lg ml-1" @click="search()"
+            :disabled="loading" />
+        </div>
+      </div>
+      <div v-if="searchResults.length > 0" class="flex flex-column">
+        <Chip v-for="doc in searchResults" :key="doc.id" :label="doc.metadata.name" class="mt-2 cursor-pointer"
+          @click="loadDocument({ id: doc.id, type: 'document' }); resetSearch(); showSearchResults = false;" />
+      </div>
+      <div>
+        <Button label="Close" class="mt-4" @click="showSearchResults = false; resetSearch();" />
+      </div>
+    </template>
+  </Dialog>
+
   <AppLayout>
     <template #logo>
       <img src="./../assets/logo.png" class="w-full cursor-pointer" @click="router.push({ name: 'home' })">
@@ -14,8 +66,9 @@
       <span class="p-input-icon-left ml-3">
         <i class="fa-solid fa-search" />
         <InputText placeholder="Search" class="w-12rem surface-100 border-round-lg border-none h-3rem font-medium"
-          size="small" />
+          size="small" v-model="searchText" />
       </span>
+      <i class="fa-solid fa-wand-magic-sparkles text-xl ml-2 mt-1 cursor-pointer" @click="showAnswerDialog = true"></i>
     </template>
 
     <template #end>
@@ -62,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, ComputedRef, watch } from 'vue';
+import { onMounted, ref, computed, ComputedRef, watch, Ref } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
@@ -80,11 +133,35 @@ import { PluginMedium } from './../blocks/medium';
 import { PluginMarkdown } from './../blocks/markdown';
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import Chip from 'primevue/chip';
 import { useRouter } from 'vue-router';
+import { error, info } from './../services/toast';
+import { post } from "./../services/http";
+import { AiSearchResult, DocumentMeta, DocumentSearchResult } from "./../types/global";
 
 const router = useRouter();
 const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
+const loading = ref(false);
+
+// ai search
+const showAnswerDialog = ref(false);
+const questionText = ref('');
+const answerText = ref('');
+const answerDependingDocuments: Ref<DocumentMeta[]> = ref([]);
+// search dialog
+const searchText = ref('');
+const showSearchResults = ref(false);
+const searchResults: Ref<DocumentSearchResult[]> = ref([]);
+
+watch(searchText, () => {
+  if (searchText.value.length > 0) {
+    showSearchResults.value = true;
+  }
+});
+// const searchMode: Ref<'simple' | 'ai'> = ref('search');
 
 // selected language
 // check if browser language is supported
@@ -108,6 +185,49 @@ const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown];
 
 // tree data
 const selection = ref<Record<string, boolean>>({}); // selected node keys in tree (single selection enabled)
+
+/**
+ * search
+ */
+const search = async () => {
+  loading.value = true;
+  try {
+    const res: DocumentSearchResult[] = await post(`${$global.aiSearchUrl}/search`, { text: searchText.value, count: 5 });
+    searchResults.value = res;
+  } catch (e) {
+    error(e + "");
+  }
+  loading.value = false;
+}
+
+/**
+ * AI Search
+ */
+const aiSearch = async () => {
+  // reset old values
+  resetSearch();
+  // fetch new answer
+  loading.value = true;
+  try {
+    const res: AiSearchResult = await post(`${$global.aiSearchUrl}/question`, { text: questionText.value, count: 5 });
+    answerText.value = res.answer;
+    answerDependingDocuments.value = res.documents;
+  } catch (e) {
+    error(e + "");
+  }
+  loading.value = false;
+}
+
+/**
+ * reset search
+ */
+const resetSearch = () => {
+  searchText.value = '';
+  searchResults.value = [];
+  questionText.value = '';
+  answerText.value = '';
+  answerDependingDocuments.value = [];
+}
 
 /**
  * load a document from API.
