@@ -6,6 +6,7 @@ dataprovider_user = os.getenv('DATAPROVIDER_USER')
 dataprovider_password = os.getenv('DATAPROVIDER_PASSWORD')
 dataprovider_url = os.getenv('DATAPROVIDER_URL')
 base_language = os.getenv('BASE_LANGUAGE')
+open_ai_key = os.getenv('OPEN_AI_KEY')
 _debug = os.getenv('DEBUG')
 # parse to bool
 if _debug is not None:
