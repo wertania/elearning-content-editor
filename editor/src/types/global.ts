@@ -16,3 +16,13 @@ export interface AiSearchResult {
   answer: string;
   documents: DocumentMeta[];
 }
+
+export interface SmartVideoSentence {
+  text: string;
+  start_time: number;
+}
+
+export interface SmartVideoInitResult {
+  id: string;
+  sentences: SmartVideoSentence[];
+}
