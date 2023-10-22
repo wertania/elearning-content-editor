@@ -1,22 +1,22 @@
 <template>
   <div class="plugin-medium">
     <template v-if="mediumUrl && loadedMedium">
-      <img v-if="loadedMedium.type === 'image'" :src="mediumUrl" />
+      <img class="mt-3 mb-3" v-if="loadedMedium.type === 'image'" :src="mediumUrl" />
 
-      <video v-else-if="loadedMedium.type === 'video'" :src="loadedMedium.url" />
+      <video class="mt-3 mb-3" v-else-if="loadedMedium.type === 'video'" :src="loadedMedium.url" />
 
-      <audio v-else-if="loadedMedium.type === 'audio'" :src="loadedMedium.url" />
+      <audio class="mt-3 mb-3" v-else-if="loadedMedium.type === 'audio'" :src="loadedMedium.url" />
 
       <Message v-else severity="warn">
         Unknown medium type "{{ loadedMedium.type }}".
       </Message>
     </template>
 
-    <template v-else>
+    <template v-else-if="!readOnly">
       <FileUpload custom-upload :multiple="false" @uploader="uploader" mode="advanced" />
     </template>
 
-    <Message v-if="isNotFound" severity="warn" :closable="false">
+    <Message v-if="isNotFound && !loading" severity="warn" :closable="false">
       The medium with ID {{ props.modelValue.data.id }} could not be found.
     </Message>
   </div>
@@ -62,6 +62,7 @@ const isNotFound = computed(
 );
 
 // Load the medium when the ID changes.
+const loading = ref(true);
 watch(
   () => props.modelValue.data.id,
   async (id) => {
@@ -69,9 +70,11 @@ watch(
     if (!mediumId.value) return;
 
     loadedMedium.value = await dataProvider.getMedium(mediumId.value);
+
     // get URL
     if (!loadedMedium.value) return;
     mediumUrl.value = await dataProvider.getMediumUrl(loadedMedium.value.id);
+    loading.value = false;
   },
   { immediate: true },
 );

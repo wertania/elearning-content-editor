@@ -48,8 +48,14 @@
         class="flex justify-content-center flex-wrap mt-5">
         <ProgressSpinner />
       </div>
-      <BlockEditor v-else-if="$doc.selectedDocument != null" :read-only="true"
-        v-if="$doc.selectedDocument.type === 'document'" v-model="page" :debug="false" :plugins="plugins" />
+      <div v-else-if="$doc.selectedDocument != null && $doc.selectedDocument.type === 'document'">
+        <h1>
+          <GradientFont start-color="purple" end-color="#ff26a4">
+            {{ $doc.selectedDocument?.name }}
+          </GradientFont>
+        </h1>
+        <BlockEditor :read-only="true" v-model="page" :debug="false" :plugins="plugins" />
+      </div>
     </template>
 
   </AppLayout>
