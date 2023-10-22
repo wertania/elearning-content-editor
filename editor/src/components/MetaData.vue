@@ -11,17 +11,17 @@
         <label class="content-editor__label" for="name">
           Name for menu (please write in base language: {{ baseLang }})
         </label>
-        <InputText id="name" :value="name" @update:model-value="$emit('update:name', $event)" />
+        <InputText small id="name" :value="name" @update:model-value="$emit('update:name', $event)" />
       </div>
 
       <div class="meta-data__item">
         <label class="content-editor__label" for="header">Header</label>
-        <InputText id="header" :value="header" @update:model-value="$emit('update:header', $event)" />
+        <InputText small id="header" :value="header" @update:model-value="$emit('update:header', $event)" />
       </div>
 
       <div class="meta-data__item" v-show="type === 'document'">
         <label class="content-editor__label" for="description">Short description</label>
-        <InputText id="description" :value="description" @update:model-value="$emit('update:description', $event)" />
+        <InputText small id="description" :value="description" @update:model-value="$emit('update:description', $event)" />
       </div>
 
       <div class="meta-data__item">
@@ -29,13 +29,13 @@
           Language Code
           {{ hasOrigin ? '' : ' (automatically set to base language)' }}
         </label>
-        <Dropdown id="langCode" :disabled="!hasOrigin" :options="[
+        <Dropdown small id="langCode" :disabled="!hasOrigin" :options="[
           { label: 'German', val: 'de' },
           { label: 'English', val: 'en' },
         ]" option-value="val" option-label="label" v-model="selectedLangCode"
           @update:model-value="$emit('update:langCode', $event)" />
       </div>
-      <Button label="Hide Details" @click="showDetails = false" class="mt-2 mb-2" />
+      <Button small label="Hide Details" @click="showDetails = false" class="mt-2 mb-2" />
     </div>
   </Transition>
 </template>

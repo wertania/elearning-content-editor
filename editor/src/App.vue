@@ -21,7 +21,7 @@ const initApp = async () => {
     console.log('logged in');
     if (route.name === 'login') {
       // redirect if on login page
-      router.push({ name: 'edit' });
+      router.push({ name: 'home' });
     }
   } else {
     console.log('not logged in. redirect to login');
@@ -45,9 +45,13 @@ initApp();
   }
 }
 
+.p-inputtext.p-component :not(.p-input-icon-left) {
+  padding: 10px;
+}
+
 :root {
   --primary-color: #781a6d !important;
-  --primary-50: #dfd6e1 !important;
+  --primary-50: #57355e !important;
   --primary-100: rgb(235, 184, 220) !important;
   --primary-200: rgb(203, 133, 182) !important;
   --primary-300: rgb(190, 111, 167) !important;

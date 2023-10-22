@@ -100,14 +100,18 @@ export const useDocumentStore = defineStore("documents", {
         this.refreshLanguagesCache();
 
         // set prefered language if available
-        if (preferedLanguageCode) {
+        if (preferedLanguageCode && preferedLanguageCode !== baseLanguage) {
           console.log("preferedLanguageCode", preferedLanguageCode);
           const translation = this.$state.subDocuments?.find((item) =>
             item.langCode === preferedLanguageCode
           );
           if (translation) {
+            console.log("translation found", translation);
             this.$state.selectedDocument = translation;
             this.$state.selectedLanguage = translation.langCode;
+          } else {
+            // else fallback to base document
+            this.$state.selectedDocument = document;
           }
         } else {
           // set selected document

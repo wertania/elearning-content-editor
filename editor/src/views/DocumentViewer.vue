@@ -83,12 +83,12 @@ const $global = useGlobalStore(); // global store
 const browserLanguageSupported = $doc.languages.find((l) => l.code === navigator.language.split('-')[0]);
 const preferedLanguage = ref<string>(browserLanguageSupported?.code ?? $doc.baseLanguage);
 watch(preferedLanguage, () => {
-  if (!$doc.selectedDocument) return;
+  if (!$doc.baseDocument) return;
   // const orgId = $doc.selectedDocument.id;
   // reset view
   // $doc.selectedDocument = null;
   // load document in new language
-  $doc.getDocument($doc.selectedDocument.id, preferedLanguage.value)
+  $doc.getDocument($doc.baseDocument.id, preferedLanguage.value)
 });
 
 const page: ComputedRef<BlockPage> = computed(() => {

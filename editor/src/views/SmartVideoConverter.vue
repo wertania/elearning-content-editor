@@ -1,10 +1,31 @@
 <template>
-  
-  <FileUpload mode="basic" accept="video/*" :maxFileSize="1000000" customUpload @uploader="upload($event)" />
+  <AppLayout>
+    <template #logo>
+      <img src="./../assets/logo.png" class="w-full">
+    </template>
+
+    <template #appname>
+      <GradientFont direction="rtl" start-color="#eaa3ff" end-color="#5e085a" style="font-weight: 800; font-size: 25px;">
+        RevDocs
+      </GradientFont>
+    </template>
+
+    <template #start>
+      <FileUpload mode="basic" accept="video/*" :maxFileSize="1000000" customUpload @uploader="upload($event)" />
+    </template>
+
+    <template #end>
+      <li>
+        Use...
+      </li>
+    </template>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import FileUpload from 'primevue/fileupload';
+import AppLayout from './../components/AppLayout.vue';
+import GradientFont from './../components/GradientFont.vue';
 
 const upload = async (event: any) => {
   const file = event.files[0];

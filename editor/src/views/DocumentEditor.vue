@@ -33,7 +33,8 @@
     </template>
 
     <template #start>
-      <SplitButton class="ml-5" size="small" @click="addDocument('document')" label="Add" icon="fa-solid fa-plus" :model="menuAdd" />
+      <SplitButton class="ml-5" size="small" @click="addDocument('document')" label="Add" icon="fa-solid fa-plus"
+        :model="menuAdd" />
       <ConfirmPopup />
       <Button size="small" icon="fa-solid fa-trash" class="ml-1 bg-purple-600 border-none" @click="deleteSelected($event)"
         v-show="$doc.$state.selectedDocument" />
@@ -125,10 +126,12 @@ import { useGlobalStore } from '../stores/global';
 import { useConfirm } from "primevue/useconfirm";
 import AppLayout from './../components/AppLayout.vue';
 import GradientFont from './../components/GradientFont.vue';
+import { useRouter } from 'vue-router';
 
 const confirm = useConfirm(); // confirm dialog
 const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
+const router = useRouter(); // router
 
 // "add" split-button
 const menuAdd = [
@@ -139,6 +142,10 @@ const menuAdd = [
   {
     label: 'Add folder',
     command: () => addDocument('folder'),
+  },
+  {
+    label: 'Add smart video',
+    command: () => router.push({ name: 'smart-video-converter' }),
   },
 ];
 
