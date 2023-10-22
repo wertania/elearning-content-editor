@@ -1,7 +1,7 @@
 <template>
   <AppLayout>
     <template #logo>
-      <img src="./../assets/logo.png" class="w-full">
+      <img src="./../assets/logo.png" class="w-full cursor-pointer" @click="router.push({ name: 'edit' })">
     </template>
 
     <template #appname>
@@ -26,6 +26,9 @@
 import FileUpload from 'primevue/fileupload';
 import AppLayout from './../components/AppLayout.vue';
 import GradientFont from './../components/GradientFont.vue';
+import {useRouter} from 'vue-router';
+
+const router = useRouter();
 
 const upload = async (event: any) => {
   const file = event.files[0];

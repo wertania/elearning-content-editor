@@ -16,7 +16,7 @@
 
   <AppLayout :hide-sidebar="true">
     <template #logo>
-      <img src="./../assets/logo.png" class="w-full">
+      <img src="./../assets/logo.png" class="w-full cursor-pointer" @click="router.push({ name: 'edit' })">
     </template>
 
     <template #appname>
@@ -104,7 +104,9 @@ import FileUpload from 'primevue/fileupload';
 import { dataProvider } from './../services/data';
 import { error, info } from './../services/toast';
 import { LanguageItem, mapLangCodesToLanguageItems, getMissingLanguagesItems, baseLanguage } from './../services/language/languageService'
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const $media = useMediaStore(); // media store
 const confirm = useConfirm(); // confirm dialog
 const $global = useGlobalStore(); // global store

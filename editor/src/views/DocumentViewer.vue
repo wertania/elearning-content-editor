@@ -1,7 +1,7 @@
 <template>
   <AppLayout>
     <template #logo>
-      <img src="./../assets/logo.png" class="w-full">
+      <img src="./../assets/logo.png" class="w-full cursor-pointer" @click="router.push({ name: 'home' })">
     </template>
 
     <template #appname>
@@ -80,7 +80,9 @@ import { PluginMedium } from './../blocks/medium';
 import { PluginMarkdown } from './../blocks/markdown';
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
 

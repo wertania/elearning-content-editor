@@ -23,7 +23,7 @@
 
   <AppLayout>
     <template #logo>
-      <img src="./../assets/logo.png" class="w-full">
+      <img src="./../assets/logo.png" class="w-full cursor-pointer" @click="router.push({ name: 'home' })">
     </template>
 
     <template #appname>
