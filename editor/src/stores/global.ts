@@ -11,6 +11,7 @@ interface GlobalState {
   mode: "light" | "dark";
   aiSearchUrl: string;
   videoConverterUrl: string;
+  jwtToken: string;
 }
 
 export const useGlobalStore = defineStore("global", {
@@ -22,6 +23,8 @@ export const useGlobalStore = defineStore("global", {
 
     aiSearchUrl,
     videoConverterUrl,
+
+    jwtToken: "",
   }),
   actions: {
     async loginRedirect() {

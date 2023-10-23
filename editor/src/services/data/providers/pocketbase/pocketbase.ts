@@ -10,6 +10,7 @@ import type {
 import { buildTree } from "../../helpers";
 import env from "../../../env";
 import PocketBase from "pocketbase";
+import { $global } from "./../../../../main";
 
 const URL: string = env.ENV_VITE_POCKETBASE_URL || "http://127.0.0.1:8090";
 
@@ -46,6 +47,10 @@ export default {
         expand: "company",
       });
       if (res.items.length < 1) return false;
+
+      // set some variables
+      $global.jwtToken = this.cache.pb.authStore.token;
+
       return true;
     } catch (error) {
       console.log("error: ", error);
