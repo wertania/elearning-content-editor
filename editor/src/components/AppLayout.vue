@@ -124,17 +124,17 @@ watch(() => darkMode.value, (newVal: boolean) => {
     }
 });
 
-const fontSize = ref(15);
-const increaseFontSize = (cnt = 1) => {
-    if (fontSize.value >= 24) return;
-    fontSize.value += cnt;
-    document.getElementsByTagName('html')[0].style.fontSize = fontSize.value + 'px';
-}
-const decreaseFontSize = (cnt = 1) => {
-    if (fontSize.value <= 8) return;
-    fontSize.value -= cnt;
-    document.getElementsByTagName('html')[0].style.fontSize = fontSize.value + 'px';
-}
+// const fontSize = ref(15);
+// const increaseFontSize = (cnt = 1) => {
+//     if (fontSize.value >= 24) return;
+//     fontSize.value += cnt;
+//     document.getElementsByTagName('html')[0].style.fontSize = fontSize.value + 'px';
+// }
+// const decreaseFontSize = (cnt = 1) => {
+//     if (fontSize.value <= 8) return;
+//     fontSize.value -= cnt;
+//     document.getElementsByTagName('html')[0].style.fontSize = fontSize.value + 'px';
+// }
 </script>
 
 <style>
