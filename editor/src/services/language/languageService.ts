@@ -4,7 +4,7 @@ export type LanguageItem = { name: string; code: string };
 /**
  * Import settings from ENV and globals
  */
-import allLanguages from "../../../../globals/languageCodes.json";
+import allLanguages from "./languageCodes.json";
 const BASE_LANGUAGE: string = import.meta.env.VITE_BASE_LANGUAGE ?? "en";
 
 const AVAILABLE_CUSTOM_LANGUAGES: LanguageItem[] = JSON.parse(
