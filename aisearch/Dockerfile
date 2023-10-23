@@ -29,7 +29,7 @@ RUN \
 
 # Basisimage
 FROM base AS ai-search-elearning-base
-    
+
 # Kopiere requirements.txt in das Arbeitsverzeichnis
 COPY requirements.txt .
 
