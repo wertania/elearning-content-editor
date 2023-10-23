@@ -97,7 +97,7 @@ import { useMediaStore } from './../stores/media';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { Medium } from './../services/data/types';
-import MediaViewer from './../../../viewer/components/media-viewer.vue';
+import MediaViewer from './../components/MediaViewer.vue';
 import { useRoute } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import FileUpload from 'primevue/fileupload';
