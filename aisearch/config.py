@@ -7,6 +7,7 @@ dataprovider_password = os.getenv('DATAPROVIDER_PASSWORD')
 dataprovider_url = os.getenv('DATAPROVIDER_URL')
 base_language = os.getenv('BASE_LANGUAGE')
 open_ai_key = os.getenv('OPEN_AI_KEY')
+cors = os.getenv('CORS') or '*'
 _debug = os.getenv('DEBUG')
 # parse to bool
 if _debug is not None:

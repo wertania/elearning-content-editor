@@ -192,7 +192,7 @@ const selection = ref<Record<string, boolean>>({}); // selected node keys in tre
 const search = async () => {
   loading.value = true;
   try {
-    const res: DocumentSearchResult[] = await post(`${$global.aiSearchUrl}/search`, { text: searchText.value, count: 5 });
+    const res: DocumentSearchResult[] = await post(`${$global.aiSearchUrl}/search`, { text: searchText.value, count: 5 }, true);
     searchResults.value = res;
   } catch (e) {
     error(e + "");
@@ -209,7 +209,7 @@ const aiSearch = async () => {
   // fetch new answer
   loading.value = true;
   try {
-    const res: AiSearchResult = await post(`${$global.aiSearchUrl}/question`, { text: questionText.value, count: 5 });
+    const res: AiSearchResult = await post(`${$global.aiSearchUrl}/question`, { text: questionText.value, count: 5 }, true);
     answerText.value = res.answer;
     answerDependingDocuments.value = res.documents;
   } catch (e) {

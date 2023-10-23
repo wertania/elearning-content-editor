@@ -6,6 +6,7 @@ import ToastService from "primevue/toastservice";
 import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
 import Tooltip from 'primevue/tooltip';
+import { useGlobalStore } from "./stores/global";
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "primeflex/primeflex.css";
@@ -25,3 +26,5 @@ export const app = createApp(App)
 app.directive('tooltip', Tooltip);
 
 app.mount("#app");
+
+export const $global = useGlobalStore();
