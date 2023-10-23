@@ -43,8 +43,7 @@
                 </div>
                 <div v-if="mobile && showEndMenu"
                     class="absolute right-0 surface-10 border-round-xl rounded-md shadow-lg z-10 w-full p-3 shadow-3"
-                    :class="{ 'bg-white': mode === 'light', 'surface-100': mode !== 'light' }"
-                    style="top: 5rem;">
+                    :class="{ 'bg-white': mode === 'light', 'surface-100': mode !== 'light' }" style="top: 5rem;">
                     <ul class="m-0 list-none mobile-submenu-list">
                         <li>
                             <div class="flex justify-content-end">
@@ -74,8 +73,8 @@
 
 <script setup lang="ts">
 import { ref, Ref, watch, computed } from 'vue';
-import { usePrimeVue } from 'primevue/config';
 import InputSwitch from 'primevue/inputswitch';
+import { usePrimeVue } from "primevue/config";
 
 const props = defineProps({
     hideSidebar: {
@@ -103,14 +102,6 @@ const darkMode: Ref<boolean> = ref(false);
 const mode: Ref<string> = ref('light');
 emits('update:mode', mode.value);
 
-const PrimeVue = usePrimeVue();
-const toggleToDark = () => {
-    PrimeVue.changeTheme('md-light-indigo', 'md-dark-indigo', 'theme-toggle', () => { });
-};
-const toggleToLight = () => {
-    PrimeVue.changeTheme('md-dark-indigo', 'md-light-indigo', 'theme-toggle', () => { });
-};
-
 watch(() => darkMode.value, (newVal: boolean) => {
     console.log('mode changed', newVal);
     if (!newVal) {
@@ -135,6 +126,14 @@ watch(() => darkMode.value, (newVal: boolean) => {
 //     fontSize.value -= cnt;
 //     document.getElementsByTagName('html')[0].style.fontSize = fontSize.value + 'px';
 // }
+
+const PV = usePrimeVue();
+const toggleToDark = () => {
+    PV.changeTheme("md-light-indigo", "md-dark-indigo", "theme-toggle", () => { });
+};
+const toggleToLight = () => {
+    PV.changeTheme("md-dark-indigo", "md-light-indigo", "theme-toggle", () => { });
+};
 </script>
 
 <style>
