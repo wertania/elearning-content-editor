@@ -74,7 +74,6 @@
 <script setup lang="ts">
 import { ref, Ref, watch, computed } from 'vue';
 import InputSwitch from 'primevue/inputswitch';
-import { usePrimeVue } from "primevue/config";
 
 const props = defineProps({
     hideSidebar: {
@@ -127,12 +126,33 @@ watch(() => darkMode.value, (newVal: boolean) => {
 //     document.getElementsByTagName('html')[0].style.fontSize = fontSize.value + 'px';
 // }
 
-const PV = usePrimeVue();
+const theme: Ref<'md-light-indigo' | 'md-dark-indigo'> = ref('md-light-indigo');
+
+const loadStylesheet = (themeName: 'md-light-indigo' | 'md-dark-indigo') => {
+    // Remove the existing theme if it's present
+    const existingTheme = document.getElementById('theme-toggle');
+    if (existingTheme) {
+        existingTheme.remove();
+    }
+    // update theme
+    theme.value = themeName;
+
+    // Create a new link element for the desired theme
+    const link = document.createElement('link');
+    link.id = 'theme-toggle';
+    link.rel = 'stylesheet';
+    // /themes/md-light-indigo.css
+    link.href = `./themes/${themeName}.css`; // adjust the path if needed
+    document.head.appendChild(link);
+};
+
 const toggleToDark = () => {
-    PV.changeTheme("md-light-indigo", "md-dark-indigo", "theme-toggle", () => { });
+    loadStylesheet("md-dark-indigo");
+    // PV.changeTheme("md-light-indigo", "md-dark-indigo", "theme-toggle", () => { });
 };
 const toggleToLight = () => {
-    PV.changeTheme("md-dark-indigo", "md-light-indigo", "theme-toggle", () => { });
+    loadStylesheet("md-light-indigo");
+    // PV.changeTheme("md-dark-indigo", "md-light-indigo", "theme-toggle", () => { });
 };
 </script>
 
