@@ -38,13 +38,13 @@ def ping(user: str = Depends(get_current_user)):
     return {"message": "online"}
 
 # get documents that match the question
-@app.post("/search/")
+@app.post("/search")
 def get_matches(data: UsersQuestion, user: str = Depends(get_current_user)):
     docs = get_documents_for_search(data.text, 5)
     return docs
 
 # get a direct answer to the question
-@app.post("/question/")
+@app.post("/question")
 def ask_question(data: UsersQuestion, user: str = Depends(get_current_user)):
     docs = get_documents_for_search(data.text, 5)
     plain_docs = "\n###\n".join([doc["markdown"] for doc in docs])
