@@ -253,11 +253,11 @@ const openMediaBrowser = () => {
 /**
  * Drag n drop support 
  */
-const handleDragStart = (event: DragEvent, parent: DocumentItem) => {
+const handleDragStart = (event: DragEvent, parent: any /*DocumentItem*/) => {
   if (!event.dataTransfer) return;
   draggedNode.value = parent;
 };
-const handleDragDrop = (event: DragEvent, parent: DocumentItem) => {
+const handleDragDrop = (event: DragEvent, parent: any /*DocumentItem*/) => {
   event.preventDefault();
 
   if (parent.type !== 'folder') return;
@@ -273,7 +273,7 @@ const handleContainerDrop = (event: DragEvent) => {
 
   $doc.moveNode(draggedNode.value, undefined);
 };
-const handleDragOver = (node: DocumentItem) => {
+const handleDragOver = (node: any /*DocumentItem*/) => {
   draggedOver.value = node;
 };
 const handleDragOverContainer = (event: DragEvent) => {
