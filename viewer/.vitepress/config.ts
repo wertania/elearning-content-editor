@@ -1,10 +1,15 @@
 import { defineConfig } from "vitepress";
 import type { Page } from "../services/loadPages";
-import env from "./../../editor/src/services/env";
 import { writeFileSync } from "fs";
 import { join } from "path";
+import {
+  COMPANY_NAME,
+  LOGO_PATH,
+  PAGE_DESCRIPTION,
+  PAGE_TITLE,
+} from "../services/env";
 
-const { loadPages } = await import("../services/loadPages");
+import { loadPages } from "../services/loadPages";
 const { tree, availableLanguages } = await loadPages();
 const languageLookup: { code: string; name: string }[] = await import(
   "./../../globals/languageCodes.json"
@@ -18,8 +23,8 @@ export const languageNames = languageLookup.reduce(
   {} as { [langCode: string]: string },
 );
 
-const companyName = env.ENV_VITE_COMPANY_NAME || "";
-const logoPath = env.ENV_VITE_LOGO_PATH;
+const companyName = COMPANY_NAME || "";
+const logoPath = LOGO_PATH;
 
 const buildNavigation = (subTree?: Page[]) => {
   subTree = subTree || tree;
@@ -58,8 +63,8 @@ writeFileSync("debug.navigation.json", JSON.stringify(navigation, null, 2));
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: env.ENV_VITE_PAGE_TITLE ?? "e-Learning Platform",
-  description: env.ENV_VITE_PAGE_DESCRIPTION ?? "Your learning platform",
+  title: PAGE_TITLE ?? "e-Learning Platform",
+  description: PAGE_DESCRIPTION ?? "Your learning platform",
   // base: "/some-sub/path/",
 
   themeConfig: {

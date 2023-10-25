@@ -1,16 +1,13 @@
-import type {
-  DocumentItem,
-  DocumentTreeItem,
-} from "./../../editor/src/services/data/types";
 import { vitepressDataProvider } from "./vitepressDataService";
 import { writeFileSync } from "fs";
-import env from "./../../editor/src/services/env";
+import { DocumentItem, DocumentTreeItem } from "./types";
+import { BASELANG } from "./env";
 
 export const languageLookup: { code: string; name: string }[] = await import(
   "./../../globals/languageCodes.json"
 );
 
-const baseLang = env.ENV_VITE_BASE_LANGUAGE;
+const baseLang = BASELANG;
 
 /**
  * Converts a string to a part of a URL.
@@ -46,10 +43,7 @@ export const loadPages = async () => {
 
   isLoading = true;
   await vitepressDataProvider.initialize();
-  await vitepressDataProvider.login({
-    username: env.ENV_VITE_POCKETBASE_VP_USERNAME,
-    password: env.ENV_VITE_POCKETBASE_VP_PASSWORD,
-  });
+  await vitepressDataProvider.login();
   console.log("vitepressDataProvider initialized");
 
   // check cache first!
@@ -153,8 +147,8 @@ export const loadPages = async () => {
   if (additionalLanguages.length > 0) {
     // console.log('additionalLanguages', additionalLanguages);
     // add base language first
-    fullTree.push(createLanguagePageDummy(baseLang, baseLangTree));
-    baseLangList.push(createLanguagePageDummy(baseLang));
+    fullTree.push(createLanguagePageDummy(BASELANG, baseLangTree));
+    baseLangList.push(createLanguagePageDummy(BASELANG));
 
     // add additional languages
     // --------------------------------
