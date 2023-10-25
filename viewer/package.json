@@ -7,7 +7,8 @@
     "docs:dev": "vitepress dev",
     "docs:build": "vitepress build",
     "docs:preview": "vitepress preview",
-    "start": "npx http-server -P http://127.0.0.1 -p ${PORT} ./.vitepress/dist"
+    "start": "npx http-server -P http://127.0.0.1 -p ${PORT} ./.vitepress/dist",
+    "build": "vitepress build"
   },
   "dependencies": {
     "@azure/cosmos": "^4.0.0",
