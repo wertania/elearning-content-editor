@@ -30,7 +30,7 @@
                     <slot name="end"></slot>
                     <li>
                         <div class="flex justify-content-end align-content-center mt-2 ml-4 mr-1">
-                            <InputSwitch v-model="darkMode" class="mr-2" />
+                            <InputSwitch v-model="$global.mode" class="mr-2" :true-value="'dark'" :false-value="'light'" />
                             <i v-if="mode === 'dark'" class="fa-solid fa-moon text-xl"></i>
                             <i v-if="mode === 'light'" class="fa-solid fa-sun text-xl"></i>
                         </div>
@@ -49,7 +49,8 @@
                             <div class="flex justify-content-end">
                                 <i v-if="mode === 'dark'" class="fa-solid fa-moon"></i>
                                 <i v-if="mode === 'light'" class="fa-solid fa-sun"></i>
-                                <InputSwitch v-model="darkMode" class="ml-3" />
+                                <InputSwitch v-model="$global.mode" class="ml-3" :true-value="'dark'"
+                                    :false-value="'light'" />
                             </div>
                         </li>
                         <slot name="end">
@@ -74,6 +75,8 @@
 <script setup lang="ts">
 import { ref, Ref, watch, computed } from 'vue';
 import InputSwitch from 'primevue/inputswitch';
+import { useGlobalStore } from './../stores/global';
+const $global = useGlobalStore();
 
 const props = defineProps({
     hideSidebar: {
@@ -97,13 +100,16 @@ const showSidebar = computed(() => {
 });
 
 const showEndMenu = ref(false);
-const darkMode: Ref<boolean> = ref(false);
 const mode: Ref<string> = ref('light');
 emits('update:mode', mode.value);
 
-watch(() => darkMode.value, (newVal: boolean) => {
+const darkMode = computed(() => {
+    return $global.mode;
+});
+
+watch(() => darkMode.value, (newVal) => {
     console.log('mode changed', newVal);
-    if (!newVal) {
+    if (newVal === 'light') {
         toggleToLight();
         mode.value = 'light';
         emits('update:mode', 'light');
@@ -147,13 +153,17 @@ const loadStylesheet = (themeName: 'md-light-indigo' | 'md-dark-indigo') => {
 };
 
 const toggleToDark = () => {
+    $global.saveUserSettings();
     loadStylesheet("md-dark-indigo");
     // PV.changeTheme("md-light-indigo", "md-dark-indigo", "theme-toggle", () => { });
 };
 const toggleToLight = () => {
+    $global.saveUserSettings();
     loadStylesheet("md-light-indigo");
     // PV.changeTheme("md-dark-indigo", "md-light-indigo", "theme-toggle", () => { });
 };
+
+$global.getUserSettings();
 </script>
 
 <style>

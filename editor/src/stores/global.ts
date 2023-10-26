@@ -8,10 +8,12 @@ interface GlobalState {
   isLoading: boolean;
   isLoggenIn: boolean;
   requestPending: boolean;
-  mode: "light" | "dark";
   aiSearchUrl: string;
   videoConverterUrl: string;
   jwtToken: string;
+
+  // user settings
+  mode: "light" | "dark";
 }
 
 export const useGlobalStore = defineStore("global", {
@@ -29,6 +31,19 @@ export const useGlobalStore = defineStore("global", {
   actions: {
     async loginRedirect() {
       await router.push({ path: "/edit" });
+    },
+
+    saveUserSettings() {
+      // store user settings in local storage
+      localStorage.setItem("ece_mode", this.mode);
+    },
+
+    getUserSettings() {
+      // get user settings from local storage
+      const mode = localStorage.getItem("ece_mode");
+      if (mode && (mode === "light" || mode === "dark")) {
+        this.mode = mode;
+      }
     },
   },
 });
