@@ -104,7 +104,7 @@
       <div v-else-if="$doc.selectedDocument != null && $doc.selectedDocument.type === 'document'">
         <h1>
           <GradientFont start-color="purple" end-color="#ff26a4">
-            {{ $doc.selectedDocument?.name }}
+            {{ $doc.selectedDocument?.header }}
           </GradientFont>
         </h1>
         <BlockEditor :read-only="true" v-model="page" :debug="false" :plugins="plugins" />

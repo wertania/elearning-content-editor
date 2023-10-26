@@ -1,6 +1,7 @@
 <template>
   <div class="plugin-markdown">
-    <InkMde v-model="codeProxy" />
+    <InkMde v-if="!readOnly" v-model="codeProxy" />
+    <div v-else v-html="parsedMarkdown" />
   </div>
 </template>
 
@@ -8,8 +9,10 @@
 import { InkMde } from 'ink-mde/vue';
 import { computed } from 'vue';
 import { BlockMarkdown } from './types';
+import { parseMarkdown } from './../../services/markdown/liveparser'
 
 const props = defineProps<{
+  readOnly: boolean;
   modelValue: BlockMarkdown;
 }>();
 
@@ -24,6 +27,18 @@ const codeProxy = computed({
     updated.data.code = value;
     emit('update:modelValue', updated);
   },
+});
+
+/**
+ * rendered plain HTML
+ * used in read-only mode
+ */
+const parsedMarkdown = computed(() => {
+  if (props.readOnly) {
+    return parseMarkdown(props.modelValue.data.code);
+  }
+  // else this is not needed
+  return "";
 });
 </script>
 
