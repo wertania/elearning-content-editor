@@ -15,7 +15,8 @@ import { guid } from "../../../guid";
 let container: Container;
 let mediaContainer: Container;
 
-const AUTHENTICATION_TYPE = import.meta.env.VITE_AZURE_AUTHENTICATION_TYPE || "ad";
+const AUTHENTICATION_TYPE = import.meta.env.VITE_AZURE_AUTHENTICATION_TYPE ||
+  "ad";
 
 export default {
   name: "cosmosdb",

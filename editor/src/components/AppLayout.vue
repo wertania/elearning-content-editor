@@ -85,8 +85,6 @@ const props = defineProps({
     },
 });
 
-const emits = defineEmits(['update:mode']);
-
 // mobile mode depends on window size
 const mobile = computed(() => {
     return window.innerWidth < 768;
