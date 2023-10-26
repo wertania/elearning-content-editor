@@ -4,7 +4,7 @@ import { DocumentItem, DocumentTreeItem } from "./types";
 import { BASELANG } from "./env";
 
 export const languageLookup: { code: string; name: string }[] = await import(
-  "./../../globals/languageCodes.json"
+  "./languageCodes.json"
 );
 
 const baseLang = BASELANG;

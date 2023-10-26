@@ -12,7 +12,7 @@ import {
 import { loadPages } from "../services/loadPages";
 const { tree, availableLanguages } = await loadPages();
 const languageLookup: { code: string; name: string }[] = await import(
-  "./../../globals/languageCodes.json"
+  "./../services/languageCodes.json"
 );
 // create dict with language code as key and language name as value
 export const languageNames = languageLookup.reduce(
