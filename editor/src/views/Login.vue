@@ -1,24 +1,28 @@
 <template>
-  <div class="login">
-    <h1 class="txt-gradient">Welcome to RevDocs</h1>
-    <div v-if="provider === 'cosmosdb'">
-      <Button @click="triggerMicrosoftSignIn()" class="login__button" :disabled="loading">
-        <div class="login__loading-spinner" v-if="loading"></div>
-        <span v-else> Bei O365 anmelden </span>
-      </Button>
-    </div>
-    <div v-else-if="provider === 'pocketbase'">
-      <!--login with username and password -->
-      <div class="p-fluid">
-        <div class="p-field">
-          <label for="username">Username</label>
-          <TextInput id="username" v-model="username" />
+  <div class="bg-svg-logo">
+    <div class="login">
+      <GradientFont start-color="#f15bff" end-color="#780f72">
+        <h1 style="font-size: 3em;"> Welcome to RevDocs</h1>
+      </GradientFont>
+      <div v-if="provider === 'cosmosdb'">
+        <Button @click="triggerMicrosoftSignIn()" class="login__button" :disabled="loading">
+          <div class="login__loading-spinner" v-if="loading"></div>
+          <span v-else> Bei O365 anmelden </span>
+        </Button>
+      </div>
+      <div v-else-if="provider === 'pocketbase'">
+        <!--login with username and password -->
+        <div class="p-fluid">
+          <div class="p-field">
+            <label for="username">Username</label>
+            <TextInput id="username" v-model="username" />
+          </div>
+          <div class="p-field mt-2">
+            <label for="password">Password</label>
+            <TextInput id="password" v-model="password" type="password" />
+          </div>
+          <Button @click="loginPocketbase()" :disabled="loading" class="mt-5" label="Login" />
         </div>
-        <div class="p-field mt-2">
-          <label for="password">Password</label>
-          <TextInput id="password" v-model="password" type="password" />
-        </div>
-        <Button @click="loginPocketbase()" :disabled="loading" class="mt-5" label="Login" />
       </div>
     </div>
   </div>
@@ -32,6 +36,7 @@ import { ref } from 'vue';
 import { dataProvider } from './../services/data/index';
 import TextInput from 'primevue/inputtext';
 import { error } from './../services/toast';
+import GradientFont from './../components/GradientFont.vue';
 const provider = dataProvider.name;
 const store = useGlobalStore();
 
@@ -77,15 +82,27 @@ const triggerMicrosoftSignIn = async () => {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-
-  margin-top: 50px;
+  padding-top: 50px;
 }
 
-h1.txt-gradient {
-  font-size: 40px;
-  font-weight: 700;
-  background: -webkit-linear-gradient(#f9f9f9, #780f72);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.bg-svg-logo {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 100px);
+}
+
+.bg-svg-logo::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('./../assets/logo.svg');
+  background-repeat: no-repeat;
+  background-position: -20% 100%;
+  background-size: 50%;
+  opacity: 0.1;
+  z-index: -1; // Damit es hinter den Kinderelementen liegt
 }
 </style>
