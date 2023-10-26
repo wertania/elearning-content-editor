@@ -79,7 +79,8 @@
           </Tree>
         </div>
         <!-- Settings -->
-        <div class="border-round-md shadow-3" v-show="$doc.$state.selectedDocument != null">
+        <div class="border-round-md shadow-3"
+          v-show="$doc.$state.selectedDocument != null && $doc.$state.selectedDocument.type === 'document'">
           <div class="flex flex-column card-container">
             <div class="flex m-1 h-2rem p-2">
               <i class="fa-solid fa-language mt-1 ml-1 mr-2"></i>Assigned translations
@@ -166,6 +167,7 @@ const draggedOver = ref<DocumentItem | null>(null);
  */
 const nodeSelected = ref<{ type: string; id: string, parent?: string } | null>(null);
 const loadDocument = async (node: TreeNode) => {
+  $global.requestPending = true;
   const n = node as DocumentTreeItem;
   nodeSelected.value = { type: n.type, id: n.id, parent: n.parent };
   console.log('loadDocument', node.id);
@@ -174,6 +176,7 @@ const loadDocument = async (node: TreeNode) => {
   if ($doc.$state.missingLanguages.length > 0) {
     languageToAdd.value = $doc.$state.missingLanguages[0].code;
   }
+  $global.requestPending = false;
 };
 
 /**
