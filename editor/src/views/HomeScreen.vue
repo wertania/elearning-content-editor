@@ -20,17 +20,23 @@
 
                 <GardientBox start="rgb(255 251 189)" end="#ffa8fa" class="cursor-pointer text-center text-white"
                     bg="transparent" @click="router.push({ name: 'view' })">
-                    <h2 style="color: #ca566f"><i class="fa-regular fa-newspaper"></i> Live Docs</h2>
+                    <h2 style="color: #ca566f"><i class="fa-regular fa-newspaper"></i>
+                        Live Docs (live rendered)
+                    </h2>
                 </GardientBox>
 
                 <GardientBox start="rgb(255 251 189)" end="#ffa8fa" class="mt-4 cursor-pointer text-center text-white"
-                    bg="transparent" @click="router.push({ name: 'view' })">
-                    <h2 style="color: #ca566f"><i class="fa-solid fa-eye"></i> Preview</h2>
+                    bg="transparent" @click="openFastViewer()">
+                    <h2 style="color: #ca566f"><i class="fa-solid fa-eye"></i>
+                        FastViewer (static rendered)
+                    </h2>
                 </GardientBox>
 
                 <GardientBox start="rgb(255 251 189)" end="#ffa8fa" class="mt-4 cursor-pointer text-center text-white"
                     bg="transparent" @click="router.push({ name: 'edit' })">
-                    <h2 style="color: #ca566f"><i class="fa-solid fa-pen-nib"></i> Editor</h2>
+                    <h2 style="color: #ca566f"><i class="fa-solid fa-pen-nib"></i>
+                        Document Editor
+                    </h2>
                 </GardientBox>
 
             </div>
@@ -45,4 +51,9 @@ import AppLayout from './../components/AppLayout.vue';
 import GradientFont from './../components/GradientFont.vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
+
+const staticViewerRoute = import.meta.env.VITE_STATIC_RENDERED_PAGE_URL ?? "/";
+const openFastViewer = () => {
+    window.open(staticViewerRoute, '_blank');
+}
 </script>
