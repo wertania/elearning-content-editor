@@ -254,31 +254,3 @@ onMounted(async () => {
   $global.$state.isLoading = false;
 });
 </script>
-
-<style lang="scss">
-.p-tree .p-tree-container .p-treenode {
-  margin: 0;
-  padding: 0;
-}
-
-.p-tree .p-tree-container .p-treenode .p-treenode-content {
-  padding: 0rem;
-}
-
-.p-tree {
-  border: none;
-  padding: 0;
-}
-
-.darkmode .p-tree {
-  background-color: #343434;
-}
-
-.p-dropdown .p-inputtext {
-  padding: 5px;
-}
-
-.p-button.p-button-icon-only {
-  width: auto !important;
-}
-</style>

@@ -300,35 +300,3 @@ onMounted(async () => {
   $global.$state.isLoading = false;
 });
 </script>
-
-<style lang="scss">
-.p-splitbutton button {
-  background-color: #852196;
-}
-
-.p-tree .p-tree-container .p-treenode {
-  margin: 0;
-  padding: 0;
-}
-
-.p-tree .p-tree-container .p-treenode .p-treenode-content {
-  padding: 0rem;
-}
-
-.p-tree {
-  border: none;
-  padding: 0;
-}
-
-.node-dragover {
-  background-color: var(--surface-100);
-}
-
-.p-dropdown .p-inputtext {
-  padding: 10px;
-}
-
-.p-button.p-button-icon-only {
-  width: auto !important;
-}
-</style>

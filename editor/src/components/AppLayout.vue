@@ -149,7 +149,8 @@ const loadStylesheet = (themeName: 'md-light-indigo' | 'md-dark-indigo') => {
     link.rel = 'stylesheet';
     // /themes/md-light-indigo.css
     link.href = `./themes/${themeName}.css`; // adjust the path if needed
-    document.head.appendChild(link);
+    // add to header at first position to not overwrite other styles
+    document.head.insertBefore(link, document.head.firstChild);
 };
 
 const toggleToDark = () => {
