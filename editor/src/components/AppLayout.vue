@@ -1,8 +1,8 @@
 <template>
     <!-- Toolbar -->
-    <div class="card" :class="{ 'lightmode': mode === 'light', 'darkmode': mode !== 'light' }">
+    <div class="card" :class="{ 'lightmode': colorMode === 'light', 'darkmode': colorMode !== 'light' }">
         <div class="flex overflow-hidden w-full h-6rem"
-            :class="{ 'lightmode': mode === 'light', 'darkmode': mode !== 'light' }">
+            :class="{ 'lightmode': colorMode === 'light', 'darkmode': colorMode !== 'light' }">
             <!-- Logo -->
             <div class="flex-none flex align-items-center justify-content-center ml-4 m-1 w-3rem">
                 <slot name="logo"></slot>
@@ -31,8 +31,8 @@
                     <li>
                         <div class="flex justify-content-end align-content-center mt-2 ml-4 mr-1">
                             <InputSwitch v-model="$global.mode" class="mr-2" :true-value="'dark'" :false-value="'light'" />
-                            <i v-if="mode === 'dark'" class="fa-solid fa-moon text-xl"></i>
-                            <i v-if="mode === 'light'" class="fa-solid fa-sun text-xl"></i>
+                            <i v-if="colorMode === 'dark'" class="fa-solid fa-moon text-xl"></i>
+                            <i v-if="colorMode === 'light'" class="fa-solid fa-sun text-xl"></i>
                         </div>
                     </li>
                 </ul>
@@ -43,12 +43,12 @@
                 </div>
                 <div v-if="mobile && showEndMenu"
                     class="absolute right-0 surface-10 border-round-xl rounded-md shadow-lg z-10 w-full p-3 shadow-3"
-                    :class="{ 'bg-white': mode === 'light', 'surface-100': mode !== 'light' }" style="top: 5rem;">
+                    :class="{ 'bg-white': colorMode === 'light', 'surface-100': colorMode !== 'light' }" style="top: 5rem;">
                     <ul class="m-0 list-none mobile-submenu-list">
                         <li>
                             <div class="flex justify-content-end">
-                                <i v-if="mode === 'dark'" class="fa-solid fa-moon"></i>
-                                <i v-if="mode === 'light'" class="fa-solid fa-sun"></i>
+                                <i v-if="colorMode === 'dark'" class="fa-solid fa-moon"></i>
+                                <i v-if="colorMode === 'light'" class="fa-solid fa-sun"></i>
                                 <InputSwitch v-model="$global.mode" class="ml-3" :true-value="'dark'"
                                     :false-value="'light'" />
                             </div>
@@ -62,7 +62,7 @@
         </div>
     </div>
     <!-- sidebar and Content -->
-    <div class="grid w-full" :class="{ 'lightmode': mode === 'light', 'darkmode': mode !== 'light' }">
+    <div class="grid w-full" :class="{ 'lightmode': colorMode === 'light', 'darkmode': colorMode !== 'light' }">
         <div v-if="showSidebar" class="col-3" style="height: calc(100vh - 6rem);">
             <slot name="sidebar" />
         </div>
@@ -100,23 +100,19 @@ const showSidebar = computed(() => {
 });
 
 const showEndMenu = ref(false);
-const mode: Ref<string> = ref('light');
-emits('update:mode', mode.value);
 
-const darkMode = computed(() => {
+const colorMode = computed(() => {
     return $global.mode;
 });
 
-watch(() => darkMode.value, (newVal) => {
+watch(() => colorMode.value, (newVal) => {
     console.log('mode changed', newVal);
     if (newVal === 'light') {
         toggleToLight();
-        mode.value = 'light';
-        emits('update:mode', 'light');
+        $global.mode = 'light';
     } else {
         toggleToDark();
-        mode.value = 'dark';
-        emits('update:mode', 'dark');
+        $global.mode = 'dark';
     }
 });
 
