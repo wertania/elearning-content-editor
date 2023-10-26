@@ -1,3 +1,11 @@
+/**
+ * Some global settings.
+ * - global styling of the app
+ * - global loading states for the progress spinners
+ * - global settings for the ai search and video converter
+ * - cache for the jwt token
+ */
+
 import { defineStore } from "pinia";
 import { router } from "./../router/index";
 

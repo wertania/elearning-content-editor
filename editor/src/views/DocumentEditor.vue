@@ -117,7 +117,6 @@ import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';
 import { DocumentItem, DocumentTreeItem } from '../services/data/types';
 import ContentEditor from '../components/ContentEditor.vue';
-// import AppToolbar from '../components/AppToolbar.vue';
 import SplitButton from 'primevue/splitbutton';
 import Dropdown from 'primevue/dropdown';
 import Dialog from 'primevue/dialog';

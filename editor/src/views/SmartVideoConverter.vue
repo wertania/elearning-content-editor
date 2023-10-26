@@ -76,7 +76,7 @@ import ProgressSpinner from 'primevue/progressspinner';
 import { useRouter } from 'vue-router';
 import { useGlobalStore } from "./../stores/global";
 import { ref, Ref } from 'vue';
-import { SmartVideoInitResult } from "./../types/global";
+import { SmartVideoInitResult } from "./../types/services";
 import { error, info } from "./../services/toast"
 import { post } from './../services/http';
 
@@ -112,14 +112,17 @@ const renderVideo = async () => {
     return;
   }
   loading.value = true;
-
-  const res = await post(`${$global.videoConverterUrl}/createVideo`, {
-    id: smartVideoProcessing.value.id,
-    sentences: smartVideoProcessing.value.sentences,
-  });
-  info(res.message);
+  try {
+    const res = await post(`${$global.videoConverterUrl}/createVideo`, {
+      id: smartVideoProcessing.value.id,
+      sentences: smartVideoProcessing.value.sentences,
+    });
+    info(res.message);
+    resetForm();
+  } catch (e) {
+    error(e + "")
+  }
   loading.value = false;
-  resetForm();
 }
 
 const resetForm = () => {

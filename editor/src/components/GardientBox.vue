@@ -7,6 +7,9 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * A simple component that renders a box with a gradient background.
+ */
 import { computed } from 'vue';
 
 const props = defineProps({

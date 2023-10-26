@@ -139,7 +139,7 @@ import Chip from 'primevue/chip';
 import { useRouter } from 'vue-router';
 import { error, info } from './../services/toast';
 import { post } from "./../services/http";
-import { AiSearchResult, DocumentMeta, DocumentSearchResult } from "./../types/global";
+import { AiSearchResult, DocumentMeta, DocumentSearchResult } from "./../types/services";
 
 const router = useRouter();
 const $doc = useDocumentStore(); // main store

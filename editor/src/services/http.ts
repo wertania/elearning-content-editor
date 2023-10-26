@@ -1,5 +1,9 @@
 import { $global } from "./../main";
 
+/**
+ * a simple wrapper around fetch´s GET
+ * will add the jwt token from dataprovider if sendJwt is true
+ */
 export const get = async (url: string, sendJwt = false) => {
   const r = await fetch(url, {
     method: "GET",
@@ -11,6 +15,10 @@ export const get = async (url: string, sendJwt = false) => {
   return r.json();
 };
 
+/**
+ * a simple wrapper around fetch´s POST
+ * will add the jwt token from dataprovider if sendJwt is true
+ */
 export const post = async (url: string, data: any, sendJwt = false) => {
   const r = await fetch(url, {
     method: "POST",
@@ -23,6 +31,10 @@ export const post = async (url: string, data: any, sendJwt = false) => {
   return r.json();
 };
 
+/**
+ * a simple wrapper around fetch´s PUT
+ * will add the jwt token from dataprovider if sendJwt is true
+ */
 export const put = async (url: string, data: any, sendJwt = false) => {
   const r = await fetch(url, {
     method: "PUT",
@@ -35,6 +47,10 @@ export const put = async (url: string, data: any, sendJwt = false) => {
   return r.json();
 };
 
+/**
+ * a simple wrapper around fetch´s DELETE
+ * will add the jwt token from dataprovider if sendJwt is true
+ */
 export const del = async (url: string, sendJwt = false) => {
   const r = await fetch(url, {
     method: "DELETE",

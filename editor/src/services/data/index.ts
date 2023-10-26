@@ -1,21 +1,16 @@
-import MockProvider from "./providers/mock/mock";
 import CosmosDbProvider from "./providers/cosmosdb/cosmosdb";
-import LocaldbProvider from "./providers/localdb/localdb";
 import PocketBaseProvider from "./providers/pocketbase/pocketbase";
 import type { DataProvider } from "./types";
-import env from "../env";
 
 // Register your providers here.
 const providerOptions: DataProvider[] = [
-  MockProvider,
   CosmosDbProvider,
-  LocaldbProvider,
   PocketBaseProvider,
 ];
 
 // Instantiate a provider.
 export const dataProvider = (() => {
-  const providerName = env.ENV_VITE_DOCUMENT_DATASOURCE;
+  const providerName = import.meta.env.VITE_DOCUMENT_DATASOURCE;
   console.log(`Using data provider '${providerName}'.`);
 
   for (const p of providerOptions) {

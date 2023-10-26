@@ -1,7 +1,7 @@
 <template>
   <div v-if="!showDetails" class="flex card-container">
     <div class="flex-grow-1 flex align-items-center font-bold surface-100 border-round-md mr-2 pl-2">
-      {{ name }}</div>
+      {{ header }}</div>
     <!-- <div class="flex-none flex align-items-center justify-content-center bg-blue-500 font-bold text-white m-2 px-5 py-3 border-round">PrimeFlex</div> -->
     <Button icon="fa-solid fa-pen" @click="showDetails = true" class="flex-none" />
   </div>
@@ -21,7 +21,8 @@
 
       <div class="meta-data__item" v-show="type === 'document'">
         <label class="content-editor__label" for="description">Short description</label>
-        <InputText small id="description" :value="description" @update:model-value="$emit('update:description', $event)" />
+        <InputText small id="description" :value="description"
+          @update:model-value="$emit('update:description', $event)" />
       </div>
 
       <div class="meta-data__item">
@@ -41,6 +42,10 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * A component that allows editing the meta data of a document.
+ * Will be rendered at the top of the content editor.
+ */
 import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import { computed, ref } from 'vue';
@@ -83,11 +88,12 @@ const selectedLangCode = computed<string>({
   }
 }
 
-.v-enter-active, .v-leave-active {
+.v-enter-active,
+.v-leave-active {
   transition: opacity 0.5s ease, height 1s ease;
 }
+
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
-}
-</style>
+}</style>

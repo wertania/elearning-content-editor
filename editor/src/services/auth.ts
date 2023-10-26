@@ -1,10 +1,9 @@
 import * as msal from "@azure/msal-browser";
 import pkg from "../../package.json";
 import { router } from "../router";
-import env from "./../services/env/index";
 
-const TENANT_ID = env.ENV_VITE_AZURE_COSMOSDB_TENANT_ID;
-const CLIENT_ID = env.ENV_VITE_AZURE_COSMOSDB_CLIENT_ID;
+const TENANT_ID = import.meta.env.VITE_AZURE_COSMOSDB_TENANT_ID;
+const CLIENT_ID = import.meta.env.VITE_AZURE_COSMOSDB_CLIENT_ID;
 
 // Add here scopes for id token to be used at MS Identity Platform endpoints.
 const loginRequest: msal.SilentRequest = {

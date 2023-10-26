@@ -8,11 +8,10 @@ import type {
   MediumType,
 } from "../../types";
 import { buildTree } from "../../helpers";
-import env from "../../../env";
 import PocketBase from "pocketbase";
 import { $global } from "./../../../../main";
 
-const URL: string = env.ENV_VITE_POCKETBASE_URL || "http://127.0.0.1:8090";
+const URL: string = import.meta.env.VITE_POCKETBASE_URL || "http://127.0.0.1:8090";
 
 export default {
   name: "pocketbase",

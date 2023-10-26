@@ -9,14 +9,13 @@ import type {
 } from "../../types";
 import { Container, CosmosClient } from "@azure/cosmos";
 import { buildTree, fileTypeToMediaType } from "../../helpers";
-import env from "../../../env";
 import { blobService } from "../../../blob";
 import { guid } from "../../../guid";
 
 let container: Container;
 let mediaContainer: Container;
 
-const AUTHENTICATION_TYPE = env.ENV_VITE_AZURE_AUTHENTICATION_TYPE || "ad";
+const AUTHENTICATION_TYPE = import.meta.env.VITE_AZURE_AUTHENTICATION_TYPE || "ad";
 
 export default {
   name: "cosmosdb",
@@ -53,21 +52,21 @@ export default {
       });
     } else if (AUTHENTICATION_TYPE === "connection-string") {
       this.cache.cosmosClient = new CosmosClient(
-        env.ENV_VITE_AZURE_COSMOSDB_CONNECTION_STRING,
+        import.meta.env.VITE_AZURE_COSMOSDB_CONNECTION_STRING,
       );
     } else {
       throw Error(`Unknown authentication type.`);
     }
 
-    const databaseName = env.ENV_VITE_AZURE_COSMOSDB_DATABASE;
+    const databaseName = import.meta.env.VITE_AZURE_COSMOSDB_DATABASE;
 
     container = this.cache.cosmosClient
       .database(databaseName)
-      .container(env.ENV_VITE_AZURE_COSMOSDB_CONTAINER);
+      .container(import.meta.env.VITE_AZURE_COSMOSDB_CONTAINER);
 
     mediaContainer = this.cache.cosmosClient
       .database(databaseName)
-      .container(env.ENV_VITE_AZURE_COSMOSDB_CONTAINER_MEDIA);
+      .container(import.meta.env.VITE_AZURE_COSMOSDB_CONTAINER_MEDIA);
   },
 
   async getDocuments(query?: DocumentQuery): Promise<{

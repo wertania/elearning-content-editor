@@ -5,6 +5,9 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * A simple component that renders text with a gradient as font-color.
+ */
 import { computed } from 'vue';
 
 const props = defineProps({

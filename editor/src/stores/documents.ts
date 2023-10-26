@@ -1,3 +1,9 @@
+/**
+ * The main Pinia cache between Backend and Users Interaction
+ * Will cache all documents and the tree
+ * Will handle the interaction with the backend
+ */
+
 import { defineStore } from "pinia";
 import { dataProvider } from "../services/data";
 import { DocumentItem, DocumentTreeItem } from "../services/data/types";

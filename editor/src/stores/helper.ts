@@ -1,3 +1,7 @@
+/**
+ * Some helper functions to build the document tree.
+ */
+
 import { DocumentItem, DocumentTreeItem } from "src/services/data/types";
 
 export const isDescendant = (

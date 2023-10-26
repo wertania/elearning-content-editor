@@ -11,6 +11,10 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * A component that renders a medium. (video, audio, image)
+ * The medium's URL is loaded from the data service and then rendered.
+ */
 import { onMounted, ref, watch } from 'vue';
 import { dataProvider } from './../services/data/index';
 

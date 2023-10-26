@@ -16,6 +16,10 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * A component that allows editing the content of a document.
+ * A document is a blockful page. For that reason, the BlockEditor is used.
+ */
 import {
   BlockEditor,
   PluginHeader,

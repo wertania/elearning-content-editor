@@ -8,11 +8,10 @@ import ConfirmationService from "primevue/confirmationservice";
 import Tooltip from "primevue/tooltip";
 import { useGlobalStore } from "./stores/global";
 
+// Icons
 import "@fortawesome/fontawesome-free/css/all.min.css";
+// Utility classes by PrimeVue
 import "primeflex/primeflex.css";
-// the theme comes form the index.html file for the dark/light toggle!
-// import "primevue/resources/themes/mdc-light-indigo/theme.css";
-// import "primevue/resources/themes/mdc-dark-indigo/theme.css";
 
 const pinia = createPinia();
 
@@ -27,4 +26,6 @@ app.directive("tooltip", Tooltip);
 
 app.mount("#app");
 
+// export the global store also here that it can be used in services
+// otherwise there will be errors with Pinia
 export const $global = useGlobalStore();
