@@ -54,12 +54,15 @@ export const loadPages = async () => {
   const base = await vitepressDataProvider.getDocuments({
     langCodes: [baseLang],
   });
+  // output the length of the list
+  console.log("Found " + base.list.length + " documents for baseLang");
 
   // get full list of all non-base-language documents
   // and create a dict with [originId + langCode] as key
   const allWithOrigin = await vitepressDataProvider.getDocuments({
     hasOrigin: true,
   });
+  console.log("Found " + allWithOrigin.list.length + " documents with origin");
   // extract all possible language codes from allWithOrigin list
   const allLangCodes = allWithOrigin.list.map((item) => item.langCode);
   // create list without baseLang inside (only to be sure to have no duplicates later).
@@ -92,12 +95,16 @@ export const loadPages = async () => {
     }
   };
 
-  const mapItem = (item: DocumentItem, langCode?: string): Page => ({
-    doc: item,
-    name: item.name,
-    path: langCode ?? baseLang + getPath(item),
-    isTopic: false,
-  });
+  const mapItem = (item: DocumentItem, langCode?: string): Page => {
+    const p = langCode ?? baseLang + getPath(item);
+    return {
+      doc: item,
+      name: item.name,
+      path: p.substring(0, 1) !== "/" ? "/" + p : p,
+      isTopic: false,
+    };
+  };
+
   const mapTreeItem = (item: DocumentTreeItem): Page => ({
     ...mapItem(item),
     children: item.children && item.children.map(mapTreeItem),
@@ -116,7 +123,7 @@ export const loadPages = async () => {
     return {
       name: "Language: " +
         (languageLookup.find((i) => i.code === langCode)?.name ?? langCode),
-      path: `${langCode}/index`,
+      path: `/${langCode}/index`,
       doc: {
         // some empty dummy document
         version: 1,
@@ -206,10 +213,15 @@ export const loadPages = async () => {
   }
 
   // debug: write to JSON file
+  // "content" is not needed to debug
+  const listToDebug = JSON.parse(JSON.stringify(baseLangList));
+  listToDebug.forEach((item: any) => {
+    delete item.doc.content;
+  });
   writeFileSync("./debug.fullTree.json", JSON.stringify(fullTree, null, 2));
   writeFileSync(
     "./debug.baseLangList.json",
-    JSON.stringify(baseLangList, null, 2),
+    JSON.stringify(listToDebug, null, 2),
   );
   // set cache
   pagesCache = {
@@ -218,5 +230,6 @@ export const loadPages = async () => {
     availableLanguages: [baseLang, ...additionalLanguages],
   };
 
+  isLoading = false;
   return pagesCache;
 };

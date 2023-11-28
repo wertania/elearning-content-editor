@@ -95,6 +95,7 @@ export const vitepressDataProvider = {
       (query?.originId ? "content.originId = '" + query.originId + "'" : "");
     filter = filter.trim();
 
+    console.log("getDocuments from pocketbase", filter);
     const result = await this.cache.pb.collection("documents").getList(1, 500, {
       filter,
     });

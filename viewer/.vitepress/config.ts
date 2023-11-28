@@ -31,7 +31,8 @@ const buildNavigation = (subTree?: Page[]) => {
   return subTree.map((item) => {
     return {
       text: item.name,
-      link: !item.children && "/" + item.path,
+      link: !item.children &&
+        (item.path.substring(0, 1) !== "/" ? "/" + item.path : item.path),
       items: item.children && buildNavigation(item.children),
     };
   });
@@ -46,7 +47,7 @@ if (availableLanguages.length > 1) {
     "/": availableLanguages.map((langCode) => {
       return {
         text: languageNames[langCode] ?? langCode.toUpperCase(),
-        link: langCode + "/index",
+        link: "/" + langCode + "/index",
       };
     }),
   };
