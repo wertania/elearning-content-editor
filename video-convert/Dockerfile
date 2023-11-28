@@ -1,0 +1,28 @@
+# Basisimage
+FROM python:3.9-slim-buster AS vwf_ffmpeg
+
+# Installiere ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg
+
+# Add ffmpeg to PATH environment variable
+ENV PATH="/usr/bin:${PATH}"
+
+FROM vwf_ffmpeg AS vwf_pip
+
+# Kopiere requirements.txt in das Arbeitsverzeichnis
+COPY requirements.txt .
+
+# Installiere Abhängigkeiten
+RUN pip install --no-cache-dir -r requirements.txt
+
+# break cache
+FROM vwf_pip AS vwf_main
+
+# Setze Arbeitsverzeichnis
+WORKDIR /app
+
+# Kopiere alle Dateien in das Arbeitsverzeichnis
+COPY . .
+
+# Führe den Streamlit-Server aus
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
