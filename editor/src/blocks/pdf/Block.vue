@@ -88,6 +88,7 @@ watch(
     aspect-ratio: 1 / 1.414; // DIN A4
 
     iframe {
+      border: none;
       width: 100%;
       height: 100%;
     }
