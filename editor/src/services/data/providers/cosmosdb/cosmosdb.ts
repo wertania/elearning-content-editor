@@ -272,4 +272,20 @@ export default {
 
     await container.item(document.id).replace(document);
   },
+
+  // -------
+  // | PDF |
+  // -------
+
+  async addPDF(file) {
+    throw Error("Not implemented.");
+  },
+
+  async getPDFUrl(id) {
+    throw Error("Not implemented.");
+  },
+
+  async dropPDF(id) {
+    throw Error("Not implemented.");
+  },
 } satisfies DataProvider;
