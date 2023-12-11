@@ -1,6 +1,6 @@
-import renderMarkdown from './services/renderMarkdown';
-import { loadPages } from './services/loadPages';
-import { writeFileSync } from 'fs';
+import renderMarkdown from "./services/renderMarkdown";
+import { loadPages } from "./services/loadPages";
+import { writeFileSync } from "fs";
 
 export default {
   async paths() {
@@ -8,7 +8,7 @@ export default {
 
     const entries = await Promise.all(
       list
-        .filter((item) => item.doc.type === 'document')
+        .filter((item) => item.doc.type === "document")
         .map(async (page) => {
           const { content, params } = await renderMarkdown(page.doc);
 
@@ -16,6 +16,7 @@ export default {
             params: {
               name: page.name,
               path: page.path,
+              documentId: page.doc.id,
               ...params,
             },
             content,
@@ -24,7 +25,7 @@ export default {
     );
 
     // debug:
-    writeFileSync('debug.paths.json', JSON.stringify(entries, null, 2));
+    writeFileSync("debug.paths.json", JSON.stringify(entries, null, 2));
 
     return entries;
   },

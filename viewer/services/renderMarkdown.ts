@@ -9,7 +9,7 @@ type Params = Record<string, any>;
  * into the `.md` file to be used by the template.
  */
 export default async (
-  doc: DocumentItem,
+  doc: DocumentItem
 ): Promise<{ content: string; params: Params }> => {
   /**
    * The params can be collected during the markdown compilation
@@ -32,6 +32,14 @@ export default async (
 
       case "markdown": {
         return block.data.code;
+      }
+
+      case "pdf": {
+        const { name, url } = await vitepressDataProvider.getPDFUrl(
+          block.data.id
+        );
+
+        return `<PdfDownload name="${name}" url="${url}" />`;
       }
 
       case "medium": {
@@ -69,9 +77,8 @@ export default async (
   const renderedBlocks = await Promise.all(promises);
 
   // The content of the `.md` virtual file with embedded Vue components.
-  // The `UsersActivity` component is always rendered at the top.
-  let content = `<UsersActivity :documentId="'${doc.id}'" />\n`;
-  content += renderedBlocks.join("\n\n");
-
-  return { content, params };
+  return {
+    content: renderedBlocks.join("\n\n"),
+    params,
+  };
 };
