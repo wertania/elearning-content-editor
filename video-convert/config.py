@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -21,7 +22,9 @@ if not TTS_MODEL:
     raise Exception("Please set the environment variable TTS_MODEL")
 if (TTS_MODEL == "google" or STT_MODEL == "google") and not GOOGLE_CREDENTIALS_PATH:
     raise Exception("Please set the environment variable GOOGLE_CREDENTIALS_PATH")
-elif (TTS_MODEL == "elevenlabs" or STT_MODEL == "elevenlabs") and not ELEVENLABS_API_KEY:
+elif (
+    TTS_MODEL == "elevenlabs" or STT_MODEL == "elevenlabs"
+) and not ELEVENLABS_API_KEY:
     raise Exception("Please set the environment variable ELEVENLABS_API_KEY")
 elif (TTS_MODEL == "openai" or STT_MODEL == "whisper") and not OPENAI_API_KEY:
     raise Exception("Please set the environment variable OPENAI_API_KEY")
