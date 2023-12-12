@@ -20,6 +20,7 @@ class MockDataProvider(DataProviderBase):
                 lambda task: UnconvertedVideo(
                     task["filename"],
                     task["filename"],
+                    [{"start_time": 0, "text": "This is a demo sentence."}],
                     open("./assets/" + filename, "rb").read(),
                 ),
                 self.videoTasks,
