@@ -16,13 +16,20 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # break cache
-FROM vwf_pip AS vwf_main
+FROM vwf_pip AS vwf_base
 
 # Setze Arbeitsverzeichnis
 WORKDIR /app
 
-# Kopiere alle Dateien in das Arbeitsverzeichnis
-COPY . .
-
 # Führe den Streamlit-Server aus
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+
+FROM vwf_base as dev
+
+# For development, the source code is mounted via a volume.
+VOLUME [ "/app" ]
+
+FROM vwf_base as vwf_main
+
+# Kopiere alle Dateien in das Arbeitsverzeichnis
+COPY . .

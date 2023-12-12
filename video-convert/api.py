@@ -3,7 +3,7 @@ import uuid
 import os
 from config import video_base_path, transscription_base_path, export_video_base_path
 from transcribe_google import speech_to_text
-from tts_google import text_to_speech
+from tts import text_to_speech
 from convert_moviepy import create_video_with_audio
 from logging_output import error, debug
 from cleanup import clean_up

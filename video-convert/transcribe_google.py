@@ -17,15 +17,23 @@ from google.protobuf.json_format import MessageToDict
 from config import GOOGLE_CREDENTIALS_PATH, GOOGLE_BLOB_BUCKET
 from logging_output import info, error, warning, debug
 
-# get google cloud credentials as file
-google_credentials_file = GOOGLE_CREDENTIALS_PATH
 bucket_name = GOOGLE_BLOB_BUCKET
-credentials = service_account.Credentials.from_service_account_file(
-    google_credentials_file
-)
+credentials = None
 
+def authenticate():
+    global credentials
+
+    if credentials is not None:
+        return
+
+    # get google cloud credentials as file
+    credentials = service_account.Credentials.from_service_account_file(
+        GOOGLE_CREDENTIALS_PATH
+    )
 
 def upload_wav_to_gcs(source_file_name: str) -> str:
+    authenticate()
+
     """Uploads a WAV file to the specified Cloud Storage bucket. Needed to convert big files."""
     storage_client = storage.Client(credentials=credentials)
     bucket = storage_client.bucket(bucket_name)
@@ -85,6 +93,8 @@ def get_speech_contexts() -> List[SpeechContext]:
 
 
 def transcribe_gcs(uri: str, contexts: List[SpeechContext]) -> dict:
+    authenticate()
+
     client = speech.SpeechClient(credentials=credentials)
     config = speech.RecognitionConfig(
         # encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
