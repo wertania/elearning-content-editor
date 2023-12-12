@@ -17,11 +17,11 @@ class MockDataProvider(DataProviderBase):
     return list(map(lambda task: UnconvertedVideo(
       task['filename'],
       task['filename'],
-      open("../../assets/test/" + filename, "rb").read()),
+      open("./assets/" + filename, "rb").read()),
       self.videoTasks))
 
   def update_video_status(self, video_id: str, status: VideoStatus):
     ...
 
-  def upload_converted_video(self, converted_video: ConvertedVideo):
+  def upload_converted_video(self, filename: str, data):
     ...

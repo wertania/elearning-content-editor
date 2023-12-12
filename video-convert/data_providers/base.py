@@ -2,11 +2,12 @@ from abc import abstractmethod
 from enum import Enum
 
 class UnconvertedVideo:
-  def __init__(self, url: str, filename: str, data) -> None:
+  def __init__(self, url: str, filename: str, sentences: list, data) -> None:
     self.url = url
     self.filename = filename
     self.file_extension = filename.split(".")[-1]
     self.data = data
+    self.sentences = sentences
 
 class ConvertedVideo:
   def __init__(self, filename: str, data) -> None:
@@ -29,5 +30,5 @@ class DataProviderBase:
     ...
 
   @abstractmethod
-  def upload_converted_video(self, converted_video: ConvertedVideo):
+  def upload_converted_video(self, filename: str, data):
     ...
