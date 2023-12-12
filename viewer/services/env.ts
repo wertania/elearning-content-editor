@@ -1,14 +1,20 @@
 import dotenv from "dotenv";
 
-dotenv.config({
-  override: true,
-});
+const inBrowser = typeof window !== "undefined";
 
-export const POCKETBASE_URL = process.env.POCKETBASE_URL ?? "";
-export const POCKETBASE_USERNAME = process.env.POCKETBASE_USERNAME ?? "";
-export const POCKETBASE_PASSWORD = process.env.POCKETBASE_PASSWORD ?? "";
-export const BASELANG = process.env.BASELANG ?? "en";
-export const LOGO_PATH = process.env.LOGO_PATH ?? "";
-export const COMPANY_NAME = process.env.COMPANY_NAME ?? "";
-export const PAGE_TITLE = process.env.PAGE_TITLE ?? "e-Learning Platform";
-export const PAGE_DESCRIPTION = process.env.PAGE_DESCRIPTION ?? "";
+if (!inBrowser) {
+  dotenv.config({
+    override: true,
+  });
+}
+
+const getEnv = (key: string) => (inBrowser ? "" : process.env[key] ?? "");
+
+export const POCKETBASE_URL = getEnv("POCKETBASE_URL");
+export const POCKETBASE_USERNAME = getEnv("POCKETBASE_USERNAME");
+export const POCKETBASE_PASSWORD = getEnv("POCKETBASE_PASSWORD");
+export const BASELANG = getEnv("BASELANG");
+export const LOGO_PATH = getEnv("LOGO_PATH");
+export const COMPANY_NAME = getEnv("COMPANY_NAME");
+export const PAGE_TITLE = getEnv("PAGE_TITLE");
+export const PAGE_DESCRIPTION = getEnv("PAGE_DESCRIPTION");
