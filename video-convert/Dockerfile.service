@@ -1,0 +1,34 @@
+# Basisimage
+FROM python:3.9-slim-buster AS vwf_ffmpeg
+
+# Installiere ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg
+
+# Add ffmpeg to PATH environment variable
+ENV PATH="/usr/bin:${PATH}"
+
+FROM vwf_ffmpeg AS vwf_pip
+
+# Kopiere requirements.txt in das Arbeitsverzeichnis
+COPY requirements.txt .
+
+# Installiere Abhängigkeiten
+RUN pip install --no-cache-dir -r requirements.txt
+
+# break cache
+FROM vwf_pip AS vwf_base
+
+# Setze Arbeitsverzeichnis
+WORKDIR /app
+
+CMD ["python", "./main.py"]
+
+FROM vwf_base as dev
+
+# For development, the source code is mounted via a volume.
+VOLUME [ "/app" ]
+
+FROM vwf_base as vwf_main
+
+# Kopiere alle Dateien in das Arbeitsverzeichnis
+COPY . .

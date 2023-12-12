@@ -3,21 +3,26 @@ import uuid
 import os
 from config import video_base_path, transscription_base_path
 from transcribe_google import speech_to_text
-from tts_google import text_to_speech
+from tts import text_to_speech
 from convert_moviepy import create_video_with_audio
 from logging_output import error, debug
 from refinement_openai import refine
 import json
+from typing import Optional
 
-def create_video_transcript(video_data, file_extension: str):
+def store_video_file(video_data, file_extension: str):
     # save video to disk
     guid = str(uuid.uuid4())
-
     filename = guid + file_extension
 
     with open(os.path.join(video_base_path, filename), "wb") as f:
         f.write(video_data)
-        
+
+    return (guid, filename)
+
+def create_video_transcript(video_data, file_extension: str):
+    # save video to disk
+    guid, filename = store_video_file(video_data, file_extension)
     debug("Saved video to: " + filename)
 
     # extract audio from video
@@ -39,7 +44,7 @@ def create_video_transcript(video_data, file_extension: str):
         "id": guid
     }
 
-def create_video(id: str, sentences: list):
+def create_video(id: str, sentences: Optional[list]):
     if sentences is None:
         debug("Missing sentences in request. Will use original transcript.")
         # read original transcript from JSON file and parse to object
@@ -47,6 +52,9 @@ def create_video(id: str, sentences: list):
         with open(jf, "r") as f:
             sentences = json.load(f)["sentences"]
         debug("Loaded original transcript from file: " + jf)
+
+    if sentences is None:
+        raise Exception("No sentences found or given for id " + id)
 
     # iterate over all sentences in edited transcript and create audio files for each sentence    
     debug("Create audio slices...")
@@ -76,6 +84,4 @@ def create_video(id: str, sentences: list):
     export_video = create_video_with_audio(raw_video, sentences, id, "mp3")
     debug(f"Video {export_video} fertig gerendert.")
 
-def process_video(video_data, file_extension):
-    transcript = create_video_transcript(video_data, file_extension)
-    create_video(transcript['id'], transcript['sentences'])
+    return export_video

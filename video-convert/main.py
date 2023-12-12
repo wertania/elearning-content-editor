@@ -23,14 +23,16 @@ if __name__ == '__main__':
   # Execute the video converter.
   for video in unconverted_videos:
     # Update the video status to "processing".
-    ...
-    # data_provider.update_video_status(video.filename, VideoStatus.PROCESSING)
+    data_provider.update_video_status(video.filename, VideoStatus.PROCESSING)
 
-    # Convert the video.
-    # converter.process_video(video.data, video.file_extension)
+    # Store the original video file and process it.
+    id, filename = converter.store_video_file(video.data, video.file_extension)
+    new_filename = converter.create_video(id, video.sentences)
 
     # Write the results to the database.
-    ...
+    with open(new_filename, 'rb') as file:
+      data = file.read()
+      data_provider.upload_converted_video(filename, data)
 
     # Update the video status to "processed".
-    ...
+    data_provider.update_video_status(video.filename, VideoStatus.PROCESSED)
