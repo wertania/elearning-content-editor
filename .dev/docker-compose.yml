@@ -11,14 +11,23 @@ services:
     ports:
       - 8080:8080
 
-  video-convert:
+  video-convert-api:
     build:
       context: ../video-convert
+      dockerfile: Dockerfile
       target: dev
     volumes:
       - ../video-convert:/app
     ports:
       - 8000:8000
+
+  video-convert-service:
+    build:
+      context: ../video-convert
+      dockerfile: Dockerfile.service
+      target: dev
+    volumes:
+      - ../video-convert:/app
 
   editor:
     build:
