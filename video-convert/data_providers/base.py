@@ -13,27 +13,23 @@ class UnconvertedVideo:
         self.data = data
         self.sentences = sentences
 
-
-class ConvertedVideo:
-    def __init__(self, filename: str, data) -> None:
-        self.filename = filename
-        self.file_extension = filename.split(".")[-1]
-        self.data = data
+    def __str__(self):
+        return str((self.url, self.filename, self.file_extension, self.sentences))
 
 
-class VideoStatus(Enum):
+class VideoStatus(str, Enum):
     UNPROCESSED = "unprocessed"
     PROCESSING = "processing"
     PROCESSED = "processed"
 
 
-class DataProviderBase:
+class BaseDataProvider:
     @abstractmethod
     def read_unconverted_videos(self) -> list[UnconvertedVideo]:
         ...
 
     @abstractmethod
-    def update_video_status(self, video_id: str, status: VideoStatus):
+    def update_video_status(self, video: UnconvertedVideo, status: VideoStatus):
         ...
 
     @abstractmethod

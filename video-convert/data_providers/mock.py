@@ -1,8 +1,8 @@
-from data_providers.base import DataProviderBase
-from data_providers.base import UnconvertedVideo, VideoStatus, ConvertedVideo
+from data_providers.base import BaseDataProvider
+from data_providers.base import UnconvertedVideo, VideoStatus
 
 
-class MockDataProvider(DataProviderBase):
+class MockDataProvider(BaseDataProvider):
     def __init__(self) -> None:
         self.videoTasks = [
             {
