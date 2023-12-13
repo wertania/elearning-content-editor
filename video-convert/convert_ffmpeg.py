@@ -47,7 +47,15 @@ def remove_audio(video_file: str) -> str:
 
     # Use ffmpeg to remove the audio from the video
     subprocess.run(
-        ["ffmpeg", "-i", source_video_file, "-an", "-vcodec", "copy", new_video_file],
+        [
+            "ffmpeg",
+            "-i",
+            source_video_file,
+            "-an",
+            "-vcodec",
+            "copy",
+            new_video_file,
+        ],
         check=True,
     )
 
