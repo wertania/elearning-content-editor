@@ -31,8 +31,7 @@ if __name__ == "__main__":
 
             # Write the results to the database.
             with open(new_filename, "rb") as file:
-                data = file.read()
-                data_provider.upload_converted_video(filename, data)
+                data_provider.upload_converted_video(filename, file)
 
             # Update the video status to "processed".
             data_provider.update_video_status(video, VideoStatus.PROCESSED)

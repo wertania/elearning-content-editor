@@ -33,5 +33,5 @@ class BaseDataProvider:
         ...
 
     @abstractmethod
-    def upload_converted_video(self, filename: str, data):
+    def upload_converted_video(self, filename: str, file):
         ...

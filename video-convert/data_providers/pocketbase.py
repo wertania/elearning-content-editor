@@ -55,9 +55,9 @@ class PocketBaseDataProvider(BaseDataProvider):
     ):
         self.pb.collection("videoTasks").update(video.task_id, {"status": status})
 
-    def upload_converted_video(self, filename: str, data):
+    def upload_converted_video(self, filename: str, file):
         self.pb.collection("media").create(
             {
-                "file": FileUpload((filename, data)),
+                "file": FileUpload((filename, file)),
             }
         )
