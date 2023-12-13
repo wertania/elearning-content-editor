@@ -45,7 +45,7 @@ class PocketBaseDataProvider(BaseDataProvider):
 
     def read_unconverted_videos(self) -> list[PocketBaseUnconvertedVideo]:
         tasks = self.pb.collection("videoTasks").get_full_list(
-            200, {"status": VideoStatus.UNPROCESSED}
+            200, {"filter": f'status = "{VideoStatus.UNPROCESSED}"'}
         )
 
         return list(map(lambda task: _create_unconverted_video(self.pb, task), tasks))
