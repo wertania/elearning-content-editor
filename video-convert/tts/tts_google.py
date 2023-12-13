@@ -8,7 +8,9 @@ from logging_output import info, error, warning, debug
 def text_to_speech(text: str, filename: str) -> str:
     """Synthesizes speech from the input string of text."""
 
-    credentials = service_account.Credentials.from_service_account_file(GOOGLE_CREDENTIALS_PATH)
+    credentials = service_account.Credentials.from_service_account_file(
+        GOOGLE_CREDENTIALS_PATH
+    )
 
     client = texttospeech.TextToSpeechClient(credentials=credentials)
 
@@ -17,8 +19,7 @@ def text_to_speech(text: str, filename: str) -> str:
 
     # Configure the voice settings
     voice = texttospeech.VoiceSelectionParams(
-        language_code="de-DE",
-        name="de-DE-Wavenet-E"
+        language_code="de-DE", name="de-DE-Wavenet-E"
     )
 
     # Set the audio configuration
@@ -26,15 +27,14 @@ def text_to_speech(text: str, filename: str) -> str:
         audio_encoding=texttospeech.AudioEncoding.MP3,
         effects_profile_id=["small-bluetooth-speaker-class-device"],
         pitch=0,
-        speaking_rate=1
+        speaking_rate=1,
     )
 
     # Perform the text-to-speech request
     response = client.synthesize_speech(
-        input=input_text,
-        voice=voice,
-        audio_config=audio_config
+        input=input_text, voice=voice, audio_config=audio_config
     )
+
     mp3_file = tts_base_path + filename + ".mp3"
 
     # save response to mp3 file
@@ -44,6 +44,7 @@ def text_to_speech(text: str, filename: str) -> str:
 
     return mp3_file
 
-# debug 
+
+# debug
 if __name__ == "__main__":
     text_to_speech("Hallo Welt", "AAA-TEST-AAA")

@@ -11,10 +11,12 @@ from threading import Thread
 
 app = FastAPI()
 
+
 class Worker:
     def __init__(self, thread: Thread, status):
         self.thread = thread
         self.status = status
+
 
 worker_threads: dict[str, Worker] = {}
 
@@ -32,9 +34,11 @@ app.add_middleware(
 
 debug("Starting API...")
 
+
 @app.get("/ping")
 def ping():
-    return { "message": True }
+    return {"message": True}
+
 
 ###
 ### Endpoint to POST a video in a FormData object
@@ -43,7 +47,7 @@ def ping():
 @app.post("/processVideo")
 async def process_video(request: Request):
     form = await request.form()
-    file = form['file']
+    file = form["file"]
     if file is None:
         error("No file in request")
         raise Exception("No file in request")
@@ -61,14 +65,17 @@ async def process_video(request: Request):
         error("No file in request")
         raise Exception("No file in request")
 
+
 ###
 class TranscriptSegment(TypedDict):
     text: str
     start_time: float
 
+
 class CreateVideoRequest(BaseModel):
     id: str
     sentences: List[TranscriptSegment]
+
 
 # Background task to create video
 def create_video_background(req: CreateVideoRequest):
@@ -89,7 +96,9 @@ async def createVideo(req: CreateVideoRequest):
     worker_threads[req.id] = Worker(worker, "running")
 
     # Return a response immediately
-    return {"message": "Video creation process started. It might take a while to complete."}
+    return {
+        "message": "Video creation process started. It might take a while to complete."
+    }
 
 
 @app.get("/status/{id}")
@@ -98,7 +107,12 @@ def get_status(id: str):
     worker = worker_threads.get(id)
     if not worker or not worker.status:
         return {"error": "Task not found"}
-    return {"id": id, "status": worker.status["status"], "message": worker.status["message"]}
+    return {
+        "id": id,
+        "status": worker.status["status"],
+        "message": worker.status["message"],
+    }
+
 
 # only download rendered video file
 @app.get("/video/{id}")
@@ -115,4 +129,8 @@ def get_video(id: str):
 
     # get extension from filename
     fname, fextension = os.path.splitext(filename)
-    return FileResponse(os.path.join(video_base_path, filename), media_type=f"video/{fextension}", filename=filename)
+    return FileResponse(
+        os.path.join(video_base_path, filename),
+        media_type=f"video/{fextension}",
+        filename=filename,
+    )

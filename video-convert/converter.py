@@ -2,13 +2,14 @@ from convert_ffmpeg import extract_audio, remove_audio
 import uuid
 import os
 from config import video_base_path, transscription_base_path
-from transcribe_google import speech_to_text
+from stt import speech_to_text
 from tts import text_to_speech
 from convert_moviepy import create_video_with_audio
 from logging_output import error, debug
 from refinement_openai import refine
 import json
 from typing import Optional
+
 
 def store_video_file(video_data, file_extension: str):
     # save video to disk
@@ -19,6 +20,7 @@ def store_video_file(video_data, file_extension: str):
         f.write(video_data)
 
     return (guid, filename)
+
 
 def create_video_transcript(video_data, file_extension: str):
     # save video to disk
@@ -38,11 +40,13 @@ def create_video_transcript(video_data, file_extension: str):
 
     # convert to json and save to session state
     transcript_obj = optimized_transcript.to_dict()
-    
+
     return {
         "sentences": transcript_obj["sentences"],
-        "id": guid
+        "id": guid,
+        "filename": filename,
     }
+
 
 def create_video(id: str, sentences: Optional[list]):
     if sentences is None:
@@ -56,7 +60,7 @@ def create_video(id: str, sentences: Optional[list]):
     if sentences is None:
         raise Exception("No sentences found or given for id " + id)
 
-    # iterate over all sentences in edited transcript and create audio files for each sentence    
+    # iterate over all sentences in edited transcript and create audio files for each sentence
     debug("Create audio slices...")
     for x, sentence in enumerate(sentences):
         filename = id + "_" + str(x)

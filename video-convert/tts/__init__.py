@@ -8,10 +8,16 @@ text_to_speech: Callable[[str, str], str]
 
 # Conditionally import TTS modules based on the app config.
 if TTS_MODEL == "google":
-  from tts.tts_google import text_to_speech as _text_to_speech
-  text_to_speech = _text_to_speech
+    from tts.tts_google import text_to_speech as _text_to_speech
+
+    text_to_speech = _text_to_speech
 elif TTS_MODEL == "elevenlabs":
-  from tts.tts_elevenlabs import text_to_speech as _text_to_speech
-  text_to_speech = _text_to_speech
+    from tts.tts_elevenlabs import text_to_speech as _text_to_speech
+
+    text_to_speech = _text_to_speech
+elif TTS_MODEL == "openai":
+    from tts.tts_openai import text_to_speech as _text_to_speech
+
+    text_to_speech = _text_to_speech
 else:
-  raise Exception("Invalid TTS_MODEL")
+    raise Exception("Invalid TTS_MODEL")
