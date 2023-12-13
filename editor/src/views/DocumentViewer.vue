@@ -140,6 +140,7 @@ import { useRouter } from 'vue-router';
 import { error, info } from './../services/toast';
 import { post } from "./../services/http";
 import { AiSearchResult, DocumentMeta, DocumentSearchResult } from "./../types/services";
+import { PluginPdf } from '../blocks/pdf';
 
 const router = useRouter();
 const $doc = useDocumentStore(); // main store
@@ -181,7 +182,7 @@ const page: ComputedRef<BlockPage> = computed(() => {
     blocks: $doc.selectedDocument?.content || [],
   };
 });
-const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown];
+const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown, PluginPdf];
 
 // tree data
 const selection = ref<Record<string, boolean>>({}); // selected node keys in tree (single selection enabled)

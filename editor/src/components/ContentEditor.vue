@@ -29,6 +29,7 @@ import {
 import MetaData from '../components/MetaData.vue';
 import { PluginMedium } from './../blocks/medium';
 import { PluginMarkdown } from './../blocks/markdown';
+import { PluginPdf } from './../blocks/pdf';
 import { ref, computed } from 'vue';
 import { useDocumentStore } from '../stores/documents';
 
@@ -59,7 +60,7 @@ const page = ref<BlockPage>({
 });
 
 // block editor plugins
-const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown];
+const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown, PluginPdf];
 </script>
 
 <style lang="scss">

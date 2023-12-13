@@ -20,6 +20,7 @@ from logging_output import info, error, warning, debug
 bucket_name = GOOGLE_BLOB_BUCKET
 credentials = None
 
+
 def authenticate():
     global credentials
 
@@ -31,10 +32,12 @@ def authenticate():
         GOOGLE_CREDENTIALS_PATH
     )
 
+
 def upload_wav_to_gcs(source_file_name: str) -> str:
+    """Uploads a WAV file to the specified Cloud Storage bucket. Needed to convert big files."""
+
     authenticate()
 
-    """Uploads a WAV file to the specified Cloud Storage bucket. Needed to convert big files."""
     storage_client = storage.Client(credentials=credentials)
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(source_file_name)
@@ -76,7 +79,7 @@ def convert_to_transcript(result) -> Transcript:
 def get_speech_contexts() -> List[SpeechContext]:
     phrases = []
     boost = 20
-    # read context from file ".custom_context.json"    
+    # read context from file ".custom_context.json"
     if os.path.exists(".custom_context.json"):
         debug("Found custom context file")
         with open(".custom_context.json", "r", encoding="utf-8") as f:

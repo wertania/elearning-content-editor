@@ -68,19 +68,17 @@ export const loadPages = async () => {
   // create list without baseLang inside (only to be sure to have no duplicates later).
   // each language must be unique
 
-  const additionalLanguages = allLangCodes.filter((lang) => lang !== baseLang)
+  const additionalLanguages = allLangCodes
+    .filter((lang) => lang !== baseLang)
     .filter((lang, index, self) => self.indexOf(lang) === index);
 
   let dictWithOriginAndLangCode: { [id: string]: DocumentItem } = {};
   // form list to dictionary with id as key
 
-  dictWithOriginAndLangCode = allWithOrigin.list.reduce(
-    (acc, item) => {
-      acc[item.originId + "_" + item.langCode] = item;
-      return acc;
-    },
-    {} as { [id: string]: DocumentItem },
-  );
+  dictWithOriginAndLangCode = allWithOrigin.list.reduce((acc, item) => {
+    acc[item.originId + "_" + item.langCode] = item;
+    return acc;
+  }, {} as { [id: string]: DocumentItem });
 
   // --------------------------------
   // define some internal helpers to map the tree to an navigation tree
@@ -100,7 +98,7 @@ export const loadPages = async () => {
     return {
       doc: item,
       name: item.name,
-      path: p.substring(0, 1) !== "/" ? "/" + p : p,
+      path: p,
       isTopic: false,
     };
   };
@@ -121,7 +119,8 @@ export const loadPages = async () => {
     children?: Page[],
   ): Page => {
     return {
-      name: "Language: " +
+      name:
+        "Language: " +
         (languageLookup.find((i) => i.code === langCode)?.name ?? langCode),
       path: `/${langCode}/index`,
       doc: {

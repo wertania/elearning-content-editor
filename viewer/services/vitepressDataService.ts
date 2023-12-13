@@ -24,7 +24,7 @@ const sorter = (a: DocumentTreeItem, b: DocumentTreeItem): number => {
 
 const buildTreeItem = (
   item: DocumentItem,
-  documents: DocumentItem[],
+  documents: DocumentItem[]
 ): DocumentTreeItem => {
   const children = documents
     .filter((childItem) => childItem.parent === item.id)
@@ -57,10 +57,9 @@ export const vitepressDataProvider = {
 
   async login(): Promise<boolean> {
     try {
-      await this.cache.pb.collection("users").authWithPassword(
-        POCKETBASE_USERNAME,
-        POCKETBASE_PASSWORD,
-      );
+      await this.cache.pb
+        .collection("users")
+        .authWithPassword(POCKETBASE_USERNAME, POCKETBASE_PASSWORD);
       return this.checkLogin();
     } catch (err) {
       throw Error(`Login failed. ${err}`);
@@ -91,7 +90,8 @@ export const vitepressDataProvider = {
       query?.langCodes ? "content.langCode ~ '" + query.langCodes + "'" : ""
     } `;
     filter = filter + (query?.hasOrigin ? "content.originId != null " : "");
-    filter = filter +
+    filter =
+      filter +
       (query?.originId ? "content.originId = '" + query.originId + "'" : "");
     filter = filter.trim();
 
@@ -119,5 +119,14 @@ export const vitepressDataProvider = {
       throw Error(`Medium ${id} could not be fetched. ${result.message}`);
     }
     return { ...result.content, id: result.id };
+  },
+
+  async getPDFUrl(id: string): Promise<{ url: string; name: string }> {
+    const item = await this.cache.pb.collection("pdfs").getOne(id);
+
+    return {
+      name: item.file,
+      url: await this.cache.pb.files.getUrl(item, item.file),
+    };
   },
 };

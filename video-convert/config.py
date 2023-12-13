@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -14,8 +15,22 @@ VIDEO_UPLOAD_URL = os.getenv("VIDEO_UPLOAD_URL") or ""
 if LOG_LEVEL is None:
     LOG_LEVEL = "ERROR"
 
-if not OPENAI_API_KEY or not ELEVENLABS_API_KEY or not GOOGLE_CREDENTIALS_PATH or not GOOGLE_BLOB_BUCKET:
-    raise Exception("Please set the environment variables OPENAI_API_KEY, ELEVENLABS_API_KEY and GOOGLE_CREDENTIALS_PATH")
+TTS_MODEL = os.getenv("TTS_MODEL")
+STT_MODEL = os.getenv("STT_MODEL")
+
+if not TTS_MODEL:
+    raise Exception("Please set the environment variable TTS_MODEL")
+if (TTS_MODEL == "google" or STT_MODEL == "google") and not GOOGLE_CREDENTIALS_PATH:
+    raise Exception("Please set the environment variable GOOGLE_CREDENTIALS_PATH")
+elif (
+    TTS_MODEL == "elevenlabs" or STT_MODEL == "elevenlabs"
+) and not ELEVENLABS_API_KEY:
+    raise Exception("Please set the environment variable ELEVENLABS_API_KEY")
+elif (TTS_MODEL == "openai" or STT_MODEL == "whisper") and not OPENAI_API_KEY:
+    raise Exception("Please set the environment variable OPENAI_API_KEY")
+
+if not OPENAI_API_KEY:
+    raise Exception("Please set the environment variable OPENAI_API_KEY")
 
 # Global Variables
 video_base_path = os.path.join(os.getcwd(), "working", "uploads") + "/"
