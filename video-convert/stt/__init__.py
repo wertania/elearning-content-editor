@@ -9,11 +9,11 @@ speech_to_text: Callable[[str], Transcript]
 
 # Conditionally import STT modules based on the app config.
 if STT_MODEL == "google":
-    from stt_google import speech_to_text as _speech_to_text
+    from stt.stt_google import speech_to_text as _speech_to_text
 
     speech_to_text = _speech_to_text
 elif STT_MODEL == "openai":
-    from stt_openai import speech_to_text as _speech_to_text
+    from stt.stt_openai import speech_to_text as _speech_to_text
 
     speech_to_text = _speech_to_text
 else:

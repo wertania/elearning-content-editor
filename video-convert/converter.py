@@ -2,7 +2,7 @@ from convert_ffmpeg import extract_audio, remove_audio
 import uuid
 import os
 from config import video_base_path, transscription_base_path
-from transcribe_google import speech_to_text
+from stt import speech_to_text
 from tts import text_to_speech
 from convert_moviepy import create_video_with_audio
 from logging_output import error, debug
@@ -41,7 +41,11 @@ def create_video_transcript(video_data, file_extension: str):
     # convert to json and save to session state
     transcript_obj = optimized_transcript.to_dict()
 
-    return {"sentences": transcript_obj["sentences"], "id": guid}
+    return {
+        "sentences": transcript_obj["sentences"],
+        "id": guid,
+        "filename": filename,
+    }
 
 
 def create_video(id: str, sentences: Optional[list]):
