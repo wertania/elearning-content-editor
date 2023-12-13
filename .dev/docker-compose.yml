@@ -20,6 +20,7 @@ services:
       - ../video-convert:/app
     ports:
       - 8000:8000
+    cpus: 4
 
   video-convert-service:
     build:
@@ -28,6 +29,7 @@ services:
       target: dev
     volumes:
       - ../video-convert:/app
+    cpus: 4
 
   editor:
     build:

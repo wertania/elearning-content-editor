@@ -8,6 +8,7 @@ from typing_extensions import List, TypedDict
 from pydantic import BaseModel
 from converter import create_video_transcript, create_video
 from threading import Thread
+from starlette.concurrency import run_in_threadpool
 
 app = FastAPI()
 
@@ -59,8 +60,12 @@ async def process_video(request: Request):
     debug("Got video: " + str(filename))
 
     if filename is not None:
-        file_extension = filename.split(".")[-1]
-        return create_video_transcript(contents, file_extension)
+        file_extension = "." + filename.split(".")[-1]
+
+        return await run_in_threadpool(
+            create_video_transcript, contents, file_extension
+        )
+        # return create_video_transcript(contents, file_extension)
     else:
         error("No file in request")
         raise Exception("No file in request")
