@@ -27,8 +27,16 @@ if __name__ == "__main__":
         # Update the video status to "processing".
         data_provider.update_video_status(video.filename, VideoStatus.PROCESSING)
 
-        # Store the original video file and process it.
-        id, filename = converter.store_video_file(video.data, video.file_extension)
+        if not video.sentences or len(video.sentences) == 0:
+            # Create a new video transcript and store the audio data to a file.
+            result = converter.create_video_transcript(video.data, video.file_extension)
+            id = result["id"]
+            video.sentences = result["sentences"]
+            filename = result["filename"]
+        else:
+            # Store the original video file and process it.
+            id, filename = converter.store_video_file(video.data, video.file_extension)
+
         new_filename = converter.create_video(id, video.sentences)
 
         # Write the results to the database.

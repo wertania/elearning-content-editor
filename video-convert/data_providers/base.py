@@ -1,9 +1,12 @@
 from abc import abstractmethod
 from enum import Enum
+from typing import Optional
 
 
 class UnconvertedVideo:
-    def __init__(self, url: str, filename: str, sentences: list, data) -> None:
+    def __init__(
+        self, url: str, filename: str, sentences: Optional[list], data
+    ) -> None:
         self.url = url
         self.filename = filename
         self.file_extension = "." + filename.split(".")[-1]
