@@ -87,6 +87,8 @@ export interface DataProvider {
   addPDF(file: File): Promise<string>;
   getPDFUrl(id: string): Promise<string>;
   dropPDF(id: string): Promise<void>;
+
+  addVideoTask(file: File, sentences: string): Promise<string>;
 }
 
 export interface SmartVideoConvertTask {
