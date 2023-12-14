@@ -50,6 +50,7 @@
             mode="basic"
             accept="video/*"
             customUpload
+            :max-file-size="50000000"
             @uploader="upload($event)"
             :disabled="loading"
           />

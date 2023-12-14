@@ -21,14 +21,18 @@ FROM vwf_pip AS vwf_base
 # Setze Arbeitsverzeichnis
 WORKDIR /app
 
-CMD ["python", "./main.py"]
+# Copy sources
+COPY . .
 
-FROM vwf_base as dev
+CMD python ./main.py
 
-# For development, the source code is mounted via a volume.
+# break cache
+FROM vwf_base AS dev
+
+# The source code is mounted via a volume.
 VOLUME [ "/app" ]
 
-FROM vwf_base as vwf_main
+FROM vwf_base AS production
 
-# Kopiere alle Dateien in das Arbeitsverzeichnis
+# Copy sources
 COPY . .

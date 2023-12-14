@@ -14,22 +14,22 @@ services:
   video-convert-api:
     build:
       context: ../video-convert
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile.api
       target: dev
     volumes:
       - ../video-convert:/app
     ports:
       - 8000:8000
-    cpus: 4
+    cpus: 2
 
   video-convert-service:
     build:
       context: ../video-convert
-      dockerfile: Dockerfile.service
+      dockerfile: docker/Dockerfile.service
       target: dev
     volumes:
       - ../video-convert:/app
-    cpus: 4
+    cpus: 2
 
   editor:
     build:

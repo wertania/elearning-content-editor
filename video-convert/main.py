@@ -2,6 +2,7 @@ from data_providers import data_provider
 from data_providers.base import VideoStatus
 import converter
 import logging_output as logger
+from cleanup import clean_up
 
 if __name__ == "__main__":
     # Fetch videos to convert.
@@ -44,3 +45,6 @@ if __name__ == "__main__":
 
             # Revert the video status to "unprocessed".
             data_provider.update_video_status(video, VideoStatus.UNPROCESSED)
+
+        # Clean up the temporary files.
+        clean_up(id)

@@ -1,7 +1,7 @@
 from moviepy.editor import (
     VideoFileClip,
     AudioFileClip,
-    concatenate_videoclips,
+    CompositeVideoClip,
 )
 from config import raw_video_base_path, export_video_base_path, tts_base_path
 import os
@@ -69,7 +69,10 @@ def create_video_with_audio(
         video_segments.append(video_segment)
 
     # Create a composite video from the video segments
-    final_video = concatenate_videoclips(video_segments)
+    final_video = CompositeVideoClip(video_segments, size=video.size)
+
+    # ? Maybe an alternative. Not sure if it works the same way.
+    # final_video = concatenate_videoclips(video_segments)
 
     # Write the new video file to disk
     output_path = os.path.join(export_video_base_path, video_source_file)

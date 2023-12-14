@@ -19,3 +19,5 @@ aisearch/_debug_*.json
 aisearch/importer/test
 
 .DS_Store
+
+.venv/
