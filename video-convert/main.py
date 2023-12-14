@@ -36,6 +36,9 @@ if __name__ == "__main__":
 
             # Update the video status to "processed".
             data_provider.update_video_status(video, VideoStatus.PROCESSED)
+
+            # Clean up the temporary files.
+            clean_up(id)
         except Exception as e:
             logger.warning(
                 f"Failed to convert video: {video.filename}. Reverting status to 'unprocessed'."
@@ -45,6 +48,3 @@ if __name__ == "__main__":
 
             # Revert the video status to "unprocessed".
             data_provider.update_video_status(video, VideoStatus.UNPROCESSED)
-
-        # Clean up the temporary files.
-        clean_up(id)

@@ -29,7 +29,7 @@ FROM vwf_base as dev
 # For development, the source code is mounted via a volume.
 VOLUME [ "/app" ]
 
-FROM vwf_base as vwf_main
+FROM vwf_base as production
 
 # Kopiere alle Dateien in das Arbeitsverzeichnis
 COPY . .
