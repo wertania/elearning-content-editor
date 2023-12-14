@@ -1,6 +1,7 @@
 from convert_ffmpeg import extract_audio, remove_audio
 import uuid
 import os
+import config
 from config import video_base_path, transscription_base_path
 from stt import speech_to_text
 from tts import text_to_speech
@@ -34,12 +35,14 @@ def create_video_transcript(video_data, file_extension: str):
     debug("Erstelle Transkript...")
     transcript = speech_to_text(audio_file)
 
-    # optimize result by GPT-3.5
-    debug("Optimiere Transkript...")
-    optimized_transcript = refine(transcript, guid)
+    if config.OPTIMIZE_TRANSCRIPT:
+        debug("Optimiere Transkript...")
+        transcript = refine(transcript, guid)
+    else:
+        debug("Skipping transcript optimization because it is disabled.")
 
     # convert to json and save to session state
-    transcript_obj = optimized_transcript.to_dict()
+    transcript_obj = transcript.to_dict()
 
     return {
         "sentences": transcript_obj["sentences"],
