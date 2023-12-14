@@ -28,15 +28,18 @@ You can start the API and the service in combination with all other services. Pl
 If you want to start the service manually, you can do so by running the following commands.
 
 ```sh
+TARGET=production|dev
+IMAGE_NAME=video-convert
+APP_TYPE=service|api
+
 # Build the image.
-docker build -t -f docker/Dockerfile.service
-  # or
-docker build -t -f docker/Dockerfile.api
+docker build --target $TARGET -t $IMAGE_NAME -f docker/Dockerfile.$APP_TYPE
 
 # Run the image.
-docker run \
-  -v ./working/export:/app/working/export \ # Mount a volume to the output directory.
-  video-convert
+docker run $IMAGE_NAME
+
+# Optionally mount a volume to the output directory while running.
+docker run -v ./working/export:/app/working/export $IMAGE_NAME
 ```
 
 ## Configuration

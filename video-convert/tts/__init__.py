@@ -1,4 +1,4 @@
-from config import TTS_MODEL
+from config import TTS_BACKEND
 from typing import Callable
 
 # This is the type of the text_to_speech procedure.
@@ -7,17 +7,17 @@ from typing import Callable
 text_to_speech: Callable[[str, str], str]
 
 # Conditionally import TTS modules based on the app config.
-if TTS_MODEL == "google":
+if TTS_BACKEND == "google":
     from tts.tts_google import text_to_speech as _text_to_speech
 
     text_to_speech = _text_to_speech
-elif TTS_MODEL == "elevenlabs":
+elif TTS_BACKEND == "elevenlabs":
     from tts.tts_elevenlabs import text_to_speech as _text_to_speech
 
     text_to_speech = _text_to_speech
-elif TTS_MODEL == "openai":
+elif TTS_BACKEND == "openai":
     from tts.tts_openai import text_to_speech as _text_to_speech
 
     text_to_speech = _text_to_speech
 else:
-    raise Exception("Invalid TTS_MODEL")
+    raise Exception("Invalid TTS_BACKEND")

@@ -1,4 +1,4 @@
-from config import STT_MODEL
+from config import STT_BACKEND
 from typing import Callable
 from video_types import Transcript
 
@@ -8,13 +8,13 @@ from video_types import Transcript
 speech_to_text: Callable[[str], Transcript]
 
 # Conditionally import STT modules based on the app config.
-if STT_MODEL == "google":
+if STT_BACKEND == "google":
     from stt.stt_google import speech_to_text as _speech_to_text
 
     speech_to_text = _speech_to_text
-elif STT_MODEL == "openai":
+elif STT_BACKEND == "openai":
     from stt.stt_openai import speech_to_text as _speech_to_text
 
     speech_to_text = _speech_to_text
 else:
-    raise Exception("Invalid STT_MODEL")
+    raise Exception("Invalid STT_BACKEND")
