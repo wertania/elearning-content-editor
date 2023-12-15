@@ -1,44 +1,61 @@
 from data_providers import data_provider
-from data_providers.base import VideoStatus
+from data_providers.base import VideoStatus, UnconvertedVideo
 import converter
 import logging_output as logger
 from cleanup import clean_up
+
+
+def process_video(video: UnconvertedVideo):
+    if not video.sentences or len(video.sentences) == 0:
+        # Create a new video transcript and store the audio data to a file.
+        result = converter.create_video_transcript(video.data, video.file_extension)
+        id = result["id"]
+        video.sentences = result["sentences"]
+        filename = result["filename"]
+    else:
+        # Store the original video file and process it.
+        id, filename = converter.store_video_file(video.data, video.file_extension)
+
+    new_filename = converter.create_video(id, video.sentences)
+
+    # Write the results to the database.
+    with open(new_filename, "rb") as file:
+        data_provider.upload_converted_video(filename, file)
+
+    # Update the video status to "processed".
+    data_provider.update_video_status(video, VideoStatus.PROCESSED)
+
+    # Clean up the temporary files.
+    clean_up(id)
+
 
 if __name__ == "__main__":
     # Fetch videos to convert.
     unconverted_videos = data_provider.read_unconverted_videos()
 
-    # Execute the video converter.
+    # Mark all videos as "processing" so other workers do not take them.
+    try:
+        for video in unconverted_videos:
+            data_provider.update_video_status(video, VideoStatus.PROCESSING)
+    except Exception as e:
+        logger.warning(
+            "Failed to update video status to 'processing'. Reverting status to 'unprocessed'."
+        )
+        logger.error("Original error:")
+        logger.error(str(e))
+
+        # Revert the video status to "unprocessed".
+        for video in unconverted_videos:
+            data_provider.update_video_status(video, VideoStatus.UNPROCESSED)
+
+        exit(1)
+
+    # Work on all videos.
     for video in unconverted_videos:
-        # Update the video status to "processing".
-        data_provider.update_video_status(video, VideoStatus.PROCESSING)
+        logger.info(f"Processing video: {video.filename}")
 
         try:
-            if not video.sentences or len(video.sentences) == 0:
-                # Create a new video transcript and store the audio data to a file.
-                result = converter.create_video_transcript(
-                    video.data, video.file_extension
-                )
-                id = result["id"]
-                video.sentences = result["sentences"]
-                filename = result["filename"]
-            else:
-                # Store the original video file and process it.
-                id, filename = converter.store_video_file(
-                    video.data, video.file_extension
-                )
-
-            new_filename = converter.create_video(id, video.sentences)
-
-            # Write the results to the database.
-            with open(new_filename, "rb") as file:
-                data_provider.upload_converted_video(filename, file)
-
-            # Update the video status to "processed".
-            data_provider.update_video_status(video, VideoStatus.PROCESSED)
-
-            # Clean up the temporary files.
-            clean_up(id)
+            process_video(video)
         except Exception as e:
             logger.warning(
                 f"Failed to convert video: {video.filename}. Reverting status to 'unprocessed'."
