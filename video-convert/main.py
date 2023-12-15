@@ -3,6 +3,7 @@ from data_providers.base import VideoStatus, UnconvertedVideo
 import converter
 import logging_output as logger
 from cleanup import clean_up
+from datetime import datetime
 
 
 def process_video(video: UnconvertedVideo):
@@ -38,15 +39,19 @@ if __name__ == "__main__":
         for video in unconverted_videos:
             data_provider.update_video_status(video, VideoStatus.PROCESSING)
     except Exception as e:
+        now = datetime.now()
+        message = f"{now.isoformat()} - {str(e)}"
+
         logger.warning(
             "Failed to update video status to 'processing'. Reverting status to 'unprocessed'."
         )
         logger.error("Original error:")
-        logger.error(str(e))
+        logger.error(message)
 
         # Revert the video status to "unprocessed".
         for video in unconverted_videos:
             data_provider.update_video_status(video, VideoStatus.UNPROCESSED)
+            data_provider.add_errors(video, message)
 
         exit(1)
 
@@ -57,11 +62,17 @@ if __name__ == "__main__":
         try:
             process_video(video)
         except Exception as e:
+            now = datetime.now()
+            message = f"{now.isoformat()} - {str(e)}"
+
             logger.warning(
                 f"Failed to convert video: {video.filename}. Reverting status to 'unprocessed'."
             )
             logger.error("Original error:")
-            logger.error(str(e))
+            logger.error(message)
 
             # Revert the video status to "unprocessed".
             data_provider.update_video_status(video, VideoStatus.UNPROCESSED)
+
+            # Add error message.
+            data_provider.add_errors(video, message)

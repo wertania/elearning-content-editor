@@ -35,3 +35,7 @@ class BaseDataProvider:
     @abstractmethod
     def upload_converted_video(self, filename: str, file):
         ...
+
+    @abstractmethod
+    def add_errors(self, video: UnconvertedVideo, *errors: str):
+        ...
