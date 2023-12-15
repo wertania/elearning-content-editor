@@ -8,10 +8,17 @@ import urllib.request
 
 class PocketBaseUnconvertedVideo(UnconvertedVideo):
     def __init__(
-        self, url: str, filename: str, sentences: Optional[list], data, task_id: str
+        self,
+        url: str,
+        filename: str,
+        sentences: Optional[list],
+        data,
+        task_id: str,
+        errors: Optional[list[str]],
     ) -> None:
         super().__init__(url, filename, sentences, data)
         self.task_id = task_id
+        self.errors = list(errors) if errors else []
 
 
 def _fetch_data(url: str):
@@ -31,6 +38,7 @@ def _create_unconverted_video(pb: PocketBase, task) -> PocketBaseUnconvertedVide
         sentences=sentences,
         data=file_data,
         task_id=task.id,
+        errors=task.errors,
     )
 
 
@@ -60,4 +68,10 @@ class PocketBaseDataProvider(BaseDataProvider):
             {
                 "file": FileUpload((filename, file)),
             }
+        )
+
+    def add_errors(self, video: PocketBaseUnconvertedVideo, *errors: str):
+        self.pb.collection("videoTasks").update(
+            video.task_id,
+            {"errors": video.errors + list(errors)},
         )

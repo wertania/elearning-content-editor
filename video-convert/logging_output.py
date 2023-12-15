@@ -9,6 +9,7 @@ log_file_path = os.path.join(os.getcwd(), "working", "log.txt")
 
 print("LOG_LEVEL: " + str(LOG_LEVEL))
 
+
 # function to generate a ISO8601 timestamp
 def _get_timestamp():
     # get the current time
@@ -18,11 +19,11 @@ def _get_timestamp():
     # return the timestamp
     return timestamp[:-3] + "Z"
 
+
 # function to add a row to a log file and delete the first row if the file is too big
 def _log_fo_file(msg: str, context: str):
-
     row_to_log = f"{_get_timestamp() } - [{context}] " + msg + "\n"
-    
+
     # check if the file exists
     if os.path.exists(log_file_path):
         # get the size of the file
@@ -51,7 +52,7 @@ def _log_fo_file(msg: str, context: str):
 def info(msg: str) -> None:
     if LOG_LEVEL == "ERROR":
         return
-    print("INFO:" + msg)
+    print("INFO: " + msg)
     _log_fo_file(msg, "INFO")
 
 
@@ -59,11 +60,13 @@ def error(msg: str) -> None:
     print("ERROR: " + msg)
     _log_fo_file(msg, "ERROR")
 
+
 def warning(msg: str) -> None:
     if LOG_LEVEL == "ERROR" or LOG_LEVEL == "INFO":
         return
     print("WARN: " + msg)
     _log_fo_file(msg, "WARNING")
+
 
 def debug(msg: str) -> None:
     if LOG_LEVEL == "ERROR" or LOG_LEVEL == "INFO" or LOG_LEVEL == "WARNING":
