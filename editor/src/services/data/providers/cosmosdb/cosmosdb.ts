@@ -288,4 +288,8 @@ export default {
   async dropPDF(id) {
     throw Error("Not implemented.");
   },
+
+  async addVideoTask(file: File, sentences: string): Promise<string> {
+    throw Error("Not implemented.");
+  }
 } satisfies DataProvider;

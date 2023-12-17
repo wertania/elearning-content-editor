@@ -299,4 +299,14 @@ export default {
   async dropPDF(id) {
     await this.cache.pb.collection("pdfs").delete(id);
   },
+
+  async addVideoTask(file: File, sentences: string): Promise<string> {
+    const result = await this.cache.pb.collection("videoTasks").create({
+      status: "unprocessed",
+      file,
+      sentences,
+    });
+
+    return result.id;
+  }
 } satisfies DataProvider;

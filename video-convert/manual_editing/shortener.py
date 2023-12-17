@@ -35,12 +35,6 @@ def cut_video_len(video_file: str, length: int):
     # Speichern Sie das gekürzte Audio
     video.write_videofile(
         video_file_new,
-        # codec="libvpx-vp9",
-        # audio_codec="libvorbis",
-        # ffmpeg_params=["-ac", "1", "-stats"],  # Stereo zu Mono
     )
 
     return video_file_new
-
-# cut_audio_len("audio_35192687-b033-4f1a-873e-971cb1613cb9.wav", 120)
-cut_video_len("./../testdata/Testvideo.webm",20)
