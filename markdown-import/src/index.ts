@@ -87,31 +87,57 @@ export async function importFromDirectory(
   directory: string,
 ) {
   const dir = directory + "/" + mainLanguage;
+  const languages = fs.readdirSync(directory).filter((file) => {
+    return file !== mainLanguage;
+  });
 
-  importFiles(dir);
+  importFiles(dir, mainLanguage, languages);
 }
 
-async function importFiles(dir: string) {
-  const handleFile = async (file: Dirent) => {
-    console.log("import file", file.name)
+async function importFiles(
+  dir: string,
+  mainLanguage: string,
+  languages: string[] = [],
+) {
+  const handleFile = async (file: Dirent, isTranslation: boolean = false) => {
+    console.log("import file", file.name);
 
     const extension = file.name.split(".").pop();
 
     if (extension !== "md") return;
-    const content = await fs.promises.readFile(dir + "/" + file.name, "utf-8");
 
-    const blocks = transformMarkdown(content);
+    // const content = await fs.promises.readFile(dir + "/" + file.name, "utf-8");
+    // const blocks = transformMarkdown(content);
 
     // TODO: save to database
+    const originId = "TODO";
+
+    if (isTranslation) {
+      return;
+    }
+  
+    // check if translation exists in different language
+    console.log("Path: ", dir + "/" + file.name);
+    
+    languages.map((language) => {
+      const path = (dir + "/" + file.name).replace(
+        `/${mainLanguage}/`,
+        `/${language}/`,
+      );
+
+      if (fs.existsSync(path)) {
+        handleFile(file, true);
+      }
+    });
   };
 
   const handleFolder = async (folder: Dirent) => {
-    console.log("import folder", folder.name)
+    console.log("import folder", folder.name);
 
     // TODO: save to database
 
-    importFiles(dir + "/" + folder.name);
-  }
+    importFiles(dir + "/" + folder.name, mainLanguage, languages);
+  };
 
   for await (const file of await fs.promises.opendir(dir)) {
     if (file.isDirectory()) {
