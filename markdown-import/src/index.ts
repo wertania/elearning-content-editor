@@ -1,0 +1,93 @@
+import type { Node, Root } from "mdast";
+import { remark } from "remark";
+import remarkParse from "remark-parse";
+import { visit } from "unist-util-visit";
+import type { UniversalBlock } from "vue-blockful-editor";
+import { toString } from "mdast-util-to-string";
+
+const parser = remark().use(remarkParse);
+
+/**
+ * Parses the markdown and uploads all images it finds, replacing the image URLs.
+ */
+function uploadImages(ast: Root) {
+  visit(ast, "image", (node) => {
+    const url = node.url;
+
+    // TODO: Check if `url` is a local file (check for http/https).
+    const isLocalFile = true;
+
+    if (isLocalFile) {
+      // TODO: If yes, read the file and upload it.
+      // Probably needs a base path as well to locate the image file.
+      // fs.readFileSync(...)
+      // TODO: Replace `url` with the new URL.
+      // node.url = newUrl;
+    }
+  });
+}
+
+function transformMarkdown(md: string): UniversalBlock[] {
+  // Parse the tree.
+  const ast = parser.parse(md);
+
+  // Transform the tree.
+  const blocks: UniversalBlock[] = [];
+
+  for (const node of ast.children) {
+    switch (node.type) {
+      case "heading":
+        {
+          blocks.push({
+            type: "header",
+            data: {
+              level: node.depth,
+              text: toString(node),
+            },
+          });
+        }
+        break;
+
+      case "paragraph":
+        {
+          // TODO: Create markdown block.
+          blocks.push({
+            type: "markdown",
+            data: {
+              code: "", // ...
+            },
+          });
+        }
+        break;
+
+      // TODO: More cases.
+      // case "image":
+    }
+  }
+
+  return blocks
+}
+
+/**
+ * Imports markdown files from a directory.
+ *
+ * The directory structure can look like this:
+ * ```
+ * - en
+ *   - introduction.md
+ *   - image1.png
+ * - de
+ *   - introduction.md
+ *   - image1.png
+ * ```
+ */
+export function importFromDirectory(mainLanguage: string, directory: string) {
+  /**
+   * Workflow
+   *
+   * - Walk main language directory and find markdown files.
+   * - Create all folders.
+   * - Upload all images.
+   * - Parse and transform all markdown files.
+   */
+}
