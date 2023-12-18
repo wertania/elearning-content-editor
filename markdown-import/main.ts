@@ -1,3 +1,3 @@
 import { importFromDirectory } from "./src";
 
-// importFromDirectory()
+importFromDirectory("de", "./testfiles");

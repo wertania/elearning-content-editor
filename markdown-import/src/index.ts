@@ -1,4 +1,5 @@
-import type { Node, Root } from "mdast";
+import fs, { Dirent } from "fs";
+import type { Root } from "mdast";
 import { remark } from "remark";
 import remarkParse from "remark-parse";
 import { visit } from "unist-util-visit";
@@ -65,7 +66,7 @@ function transformMarkdown(md: string): UniversalBlock[] {
     }
   }
 
-  return blocks
+  return blocks;
 }
 
 /**
@@ -81,13 +82,42 @@ function transformMarkdown(md: string): UniversalBlock[] {
  *   - image1.png
  * ```
  */
-export function importFromDirectory(mainLanguage: string, directory: string) {
-  /**
-   * Workflow
-   *
-   * - Walk main language directory and find markdown files.
-   * - Create all folders.
-   * - Upload all images.
-   * - Parse and transform all markdown files.
-   */
+export async function importFromDirectory(
+  mainLanguage: string,
+  directory: string,
+) {
+  const dir = directory + "/" + mainLanguage;
+
+  importFiles(dir);
+}
+
+async function importFiles(dir: string) {
+  const handleFile = async (file: Dirent) => {
+    console.log("import file", file.name)
+
+    const extension = file.name.split(".").pop();
+
+    if (extension !== "md") return;
+    const content = await fs.promises.readFile(dir + "/" + file.name, "utf-8");
+
+    const blocks = transformMarkdown(content);
+
+    // TODO: save to database
+  };
+
+  const handleFolder = async (folder: Dirent) => {
+    console.log("import folder", folder.name)
+
+    // TODO: save to database
+
+    importFiles(dir + "/" + folder.name);
+  }
+
+  for await (const file of await fs.promises.opendir(dir)) {
+    if (file.isDirectory()) {
+      handleFolder(file);
+    } else if (file.isFile()) {
+      handleFile(file);
+    }
+  }
 }
