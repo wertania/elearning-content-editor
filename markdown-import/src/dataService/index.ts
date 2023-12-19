@@ -10,7 +10,7 @@ export interface DataProvider {
   initialize(): void;
 
   uploadMedium(
-    file: File,
+    filePath: string,
     langCode: string,
     documentId?: string | string[],
     originId?: string,

@@ -1,6 +1,8 @@
 import PocketBase from "pocketbase";
 import type { DataProvider } from "./index";
 import type { DocumentItem, Medium, MediumType } from "./types";
+import fs from "fs";
+import path from "path";
 
 const URL: string = process.env.POCKETBASE_URL || "http://127.0.0.1:8090";
 
@@ -23,7 +25,7 @@ export default {
   },
 
   async uploadMedium(
-    file: File,
+    filePath: string,
     langCode: string,
     documentId?: string | string[],
     originId?: string,
@@ -31,13 +33,16 @@ export default {
     try {
       let type: MediumType = "image";
 
-      if (file.name.endsWith(".mp4") || file.name.endsWith(".webm")) {
+      if (filePath.endsWith(".mp4") || filePath.endsWith(".webm")) {
         type = "video";
       }
-      // first upload the file itself
-      const result = await this.cache.pb.collection("media").create({
-        file,
-      });
+
+      const fileName = path.basename(filePath);
+
+      const file = new FormData();
+      file.append("file", new Blob([fs.readFileSync(filePath)]), fileName);
+
+      const result = await this.cache.pb.collection("media").create(file);
 
       const url = await this.cache.pb.files.getUrl(result, result.file);
 
@@ -67,18 +72,22 @@ export default {
 
       return updatedMedium.content;
     } catch (e) {
-      throw Error(`Medium ${file.name} could not be uploaded. ${e}`);
+      throw Error(`Medium ${fileName} could not be uploaded. ${e}`);
     }
   },
 
   async getFileURL(id: string) {
     const result = await this.cache.pb.collection("media").getOne(id);
-    
+
+    console.log(result);
+
     if (result.status && result.status !== 200) {
       throw Error(`Medium ${id} could not be fetched. ${result.message}`);
     }
 
     const url = await this.cache.pb.files.getUrl(result, result.file);
+
+    console.log(url);
 
     return url.startsWith("http") ? url : URL + url;
   },
