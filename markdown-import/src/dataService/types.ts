@@ -1,7 +1,7 @@
 import { UniversalBlock } from "vue-blockful-editor";
 
 export type DocumentItem = {
-  id: string;
+  id?: string;
   version: number;
   type: "document" | "folder";
   parent?: string;

@@ -17,6 +17,41 @@ export default {
     this.cache.pb = new PocketBase(URL);
   },
 
+  async login(data: { username: string; password: string }): Promise<boolean> {
+    try {
+      await this.cache.pb
+        .collection("users")
+        .authWithPassword(data.username, data.password);
+      return this.checkLogin();
+    } catch (err) {
+      throw Error(`Login failed. ${err}`);
+      // return false;
+    }
+  },
+
+  async clear(): Promise<void> {
+    const documents = await this.cache.pb.collection("documents").getFullList();
+    for (const doc of documents) {
+      await this.cache.pb.collection("documents").delete(doc.id);
+    }
+  },
+
+  async checkLogin(): Promise<boolean> {
+    console.log("checking login");
+    try {
+      // console.log("token: ", this.pb.authStore.token);
+      const res = await this.cache.pb.collection("users").getList(1, 1, {
+        expand: "company",
+      });
+      if (res.items.length < 1) return false;
+
+      return true;
+    } catch (error) {
+      console.log("error: ", error);
+      return false;
+    }
+  },
+
   async uploadDocument(document: DocumentItem): Promise<DocumentItem> {
     const result = await this.cache.pb.collection("documents").create({
       content: document,
@@ -72,7 +107,7 @@ export default {
 
       return updatedMedium.content;
     } catch (e) {
-      throw Error(`Medium ${fileName} could not be uploaded. ${e}`);
+      throw Error(`Medium ${filePath} could not be uploaded. ${e}`);
     }
   },
 

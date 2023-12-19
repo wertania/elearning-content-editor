@@ -1,10 +1,13 @@
 import fs, { Dirent } from "fs";
+import path from "path";
 import type { Root } from "mdast";
 import { remark } from "remark";
 import remarkParse from "remark-parse";
 import { visit } from "unist-util-visit";
 import type { UniversalBlock } from "vue-blockful-editor";
 import { toString } from "mdast-util-to-string";
+import { dataProvider } from "./dataService";
+import { DocumentItem } from "./dataService/types";
 
 const parser = remark().use(remarkParse);
 
@@ -51,18 +54,23 @@ function transformMarkdown(md: string): UniversalBlock[] {
 
       case "paragraph":
         {
-          // TODO: Create markdown block.
           blocks.push({
             type: "markdown",
             data: {
-              code: "", // ...
+              code: toString(node),
             },
           });
         }
         break;
 
-      // TODO: More cases.
-      // case "image":
+      case "image": {
+        blocks.push({
+          type: "image",
+          data: {
+            src: node.url,
+          },
+        });
+      }
     }
   }
 
@@ -83,67 +91,137 @@ function transformMarkdown(md: string): UniversalBlock[] {
  * ```
  */
 export async function importFromDirectory(
-  mainLanguage: string,
   directory: string,
+  baseLanguage: string,
 ) {
-  const dir = directory + "/" + mainLanguage;
+  const dir = path.join(directory, baseLanguage);
+
   const languages = fs.readdirSync(directory).filter((file) => {
-    return file !== mainLanguage;
+    return file !== baseLanguage && file.length === 2;
   });
 
-  importFiles(dir, mainLanguage, languages);
+  console.log("Available languages", languages);
+
+  await importFiles(dir, baseLanguage, languages);
 }
 
 async function importFiles(
   dir: string,
-  mainLanguage: string,
+  baseLanguage: string,
   languages: string[] = [],
+  parentFolder?: string,
 ) {
-  const handleFile = async (file: Dirent, isTranslation: boolean = false) => {
-    console.log("import file", file.name);
+  type TFile = {
+    name: string;
+    path: string;
+  };
 
-    const extension = file.name.split(".").pop();
-
-    if (extension !== "md") return;
-
-    // const content = await fs.promises.readFile(dir + "/" + file.name, "utf-8");
-    // const blocks = transformMarkdown(content);
-
-    // TODO: save to database
-    const originId = "TODO";
-
-    if (isTranslation) {
-      return;
-    }
-  
-    // check if translation exists in different language
-    console.log("Path: ", dir + "/" + file.name);
-    
-    languages.map((language) => {
-      const path = (dir + "/" + file.name).replace(
-        `/${mainLanguage}/`,
-        `/${language}/`,
-      );
-
-      if (fs.existsSync(path)) {
-        handleFile(file, true);
-      }
+  const uploadFolder = async (folder: TFile, parentFolder?: string) => {
+    return await dataProvider.uploadDocument({
+      name: folder.name,
+      type: "folder",
+      version: 1,
+      parent: parentFolder,
+      header: folder.name,
+      description: "",
+      langCode: baseLanguage,
+      content: [],
+      media: [],
     });
   };
 
-  const handleFolder = async (folder: Dirent) => {
-    console.log("import folder", folder.name);
+  const uploadDocuemnt = async (
+    file: TFile,
+    content: UniversalBlock[] = [],
+    language?: string,
+    originId?: string,
+  ) => {
+    return await dataProvider.uploadDocument({
+      name: file.name,
+      type: "document",
+      version: 1,
+      parent: parentFolder,
+      originId: originId,
+      header: file.name,
+      description: "",
+      langCode: language || baseLanguage,
+      content: content,
+      media: [],
+    });
+  };
 
-    // TODO: save to database
+  const readFile = (file: TFile) => {
+    return fs.readFileSync(file.path, "utf8");
+  };
 
-    importFiles(dir + "/" + folder.name, mainLanguage, languages);
+  const getExtension = (file: TFile) => {
+    return path.extname(file.name).slice(1);
+  };
+
+  const translateFile = async (file: TFile, originId?: string) => {
+    if (!originId) {
+      throw new Error("Cannot translate file without originId");
+    }
+
+    await Promise.all(
+      languages.map(async (language) => {
+        const newPath = file.path.replace(`/${baseLanguage}/`, `/${language}/`);
+
+        if (!fs.existsSync(newPath)) return;
+
+        await processMdFile(
+          {
+            name: file.name,
+            path: newPath,
+          },
+          language,
+          originId,
+        );
+      }),
+    );
+  };
+
+  const processMdFile = async (
+    file: TFile,
+    language?: string,
+    originId?: string,
+  ): Promise<DocumentItem> => {
+    const content = readFile(file);
+    const blocks = transformMarkdown(content);
+    return await uploadDocuemnt(file, blocks, language, originId);
+  };
+
+  const handleFile = async (file: TFile) => {
+    const extension = getExtension(file);
+
+    if (extension === "md") {
+      const document = await processMdFile(file);
+      await translateFile(file, document.id);
+    }
+  };
+
+  const handleFolder = async (folder: TFile) => {
+    const newFolder = await uploadFolder(folder, parentFolder);
+
+    // recursively import nested folders
+    await importFiles(
+      path.join(dir, folder.name),
+      baseLanguage,
+      languages,
+      newFolder.id,
+    );
   };
 
   for await (const file of await fs.promises.opendir(dir)) {
+    const tFile: TFile = {
+      name: file.name,
+      path: path.join(dir, file.name),
+    };
+
     if (file.isDirectory()) {
-      handleFolder(file);
+      await handleFolder(tFile);
     } else if (file.isFile()) {
-      handleFile(file);
+      await handleFile(tFile);
     }
   }
 }

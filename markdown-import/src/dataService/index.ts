@@ -7,7 +7,12 @@ export interface DataProvider {
 
   cache?: any; // provider specific cache
 
-  initialize(): void;
+  initialize(): Promise<void>;
+
+  login(data?: { username: string; password: string }): Promise<boolean>;
+  checkLogin(): Promise<boolean>;
+
+  clear(): Promise<void>;
 
   uploadMedium(
     filePath: string,
