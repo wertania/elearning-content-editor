@@ -21,18 +21,11 @@ FROM vwf_pip AS vwf_base
 # Setze Arbeitsverzeichnis
 WORKDIR /app
 
-# Führe FastAPI-Server aus
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+# Kopiere alle Dateien in das Arbeitsverzeichnis
+COPY ./video-convert .
 
 # Expose port 8000
 EXPOSE 8000
 
-FROM vwf_base as dev
-
-# For development, the source code is mounted via a volume.
-VOLUME [ "/video-convert" ]
-
-FROM vwf_base as production
-
-# Kopiere alle Dateien in das Arbeitsverzeichnis
-COPY ./video-convert .
+# Führe FastAPI-Server aus
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
