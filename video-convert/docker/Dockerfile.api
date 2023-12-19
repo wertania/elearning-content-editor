@@ -21,7 +21,7 @@ FROM vwf_pip AS vwf_base
 # Setze Arbeitsverzeichnis
 WORKDIR /app
 
-# Führe den Streamlit-Server aus
+# Führe FastAPI-Server aus
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # Expose port 8000
