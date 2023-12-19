@@ -10,7 +10,7 @@ ENV PATH="/usr/bin:${PATH}"
 FROM vwf_ffmpeg AS vwf_pip
 
 # Kopiere requirements.txt in das Arbeitsverzeichnis
-COPY requirements.txt .
+COPY ./video-convert/requirements.txt .
 
 # Installiere Abhängigkeiten
 RUN pip install --no-cache-dir -r requirements.txt
@@ -22,17 +22,7 @@ FROM vwf_pip AS vwf_base
 WORKDIR /app
 
 # Copy sources
-COPY . .
+COPY ./video-convert .
 
+# Run app initial. Needs a external trigger to start again
 CMD python ./main.py
-
-# break cache
-FROM vwf_base AS dev
-
-# The source code is mounted via a volume.
-VOLUME [ "/app" ]
-
-FROM vwf_base AS production
-
-# Copy sources
-COPY . .
