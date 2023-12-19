@@ -4,13 +4,7 @@
       <GradientFont start-color="#f15bff" end-color="#780f72">
         <h1 style="font-size: 3em;"> Welcome to RevDocs</h1>
       </GradientFont>
-      <div v-if="provider === 'cosmosdb'">
-        <Button @click="triggerMicrosoftSignIn()" class="login__button" :disabled="loading">
-          <div class="login__loading-spinner" v-if="loading"></div>
-          <span v-else> Bei O365 anmelden </span>
-        </Button>
-      </div>
-      <div v-else-if="provider === 'pocketbase'">
+      <div v-if="provider === 'pocketbase'">
         <!--login with username and password -->
         <div class="p-fluid">
           <div class="p-field">
@@ -29,7 +23,6 @@
 </template>
 
 <script setup lang="ts">
-import { signIn } from './../services/auth';
 import Button from 'primevue/button';
 import { useGlobalStore } from './../stores/global';
 import { ref } from 'vue';
@@ -58,21 +51,6 @@ const loginPocketbase = async () => {
     error(e + "");
   }
   loading.value = false;
-}
-
-const triggerMicrosoftSignIn = async () => {
-  try {
-    loading.value = true;
-    const loginSuccess = await signIn('popup');
-    if (loginSuccess) {
-      await store.loginRedirect();
-    }
-    loading.value = false;
-  } catch (error) {
-    console.error(error);
-  } finally {
-    loading.value = false;
-  }
 };
 </script>
 

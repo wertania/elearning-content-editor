@@ -1,10 +1,8 @@
-import CosmosDbProvider from "./providers/cosmosdb/cosmosdb";
 import PocketBaseProvider from "./providers/pocketbase/pocketbase";
 import type { DataProvider } from "./types";
 
 // Register your providers here.
 const providerOptions: DataProvider[] = [
-  CosmosDbProvider,
   PocketBaseProvider,
 ];
 
