@@ -6,16 +6,21 @@ This version can output also timestamps
 import json
 import os
 from typing import List
-from video_types import Sentence, Transcript
-from config import transscription_base_path, audio_base_path
+
+from config import (
+    GOOGLE_BLOB_BUCKET,
+    audio_base_path,
+    google_creds,
+    transscription_base_path,
+)
 from google.cloud import speech
 from google.cloud import speech_v1 as speech
 from google.cloud import storage
 from google.cloud.speech_v1.types import SpeechContext
 from google.oauth2 import service_account
 from google.protobuf.json_format import MessageToDict
-from config import GOOGLE_CREDENTIALS_PATH, GOOGLE_BLOB_BUCKET
-from logging_output import info, error, warning, debug
+from logging_output import debug, error, info, warning
+from video_types import Sentence, Transcript
 
 bucket_name = GOOGLE_BLOB_BUCKET
 credentials = None
@@ -28,9 +33,7 @@ def authenticate():
         return
 
     # get google cloud credentials as file
-    credentials = service_account.Credentials.from_service_account_file(
-        GOOGLE_CREDENTIALS_PATH
-    )
+    credentials = service_account.Credentials.from_service_account_info(google_creds)
 
 
 def upload_wav_to_gcs(source_file_name: str) -> str:
