@@ -1,6 +1,6 @@
 <template>
   <div class="plugin-markdown">
-    <InkMde v-if="!readOnly" v-model="codeProxy" />
+    <InkMde v-if="!readOnly" v-model="codeProxy" :options="options" />
     <div v-else v-html="parsedMarkdown" />
   </div>
 </template>
@@ -9,7 +9,8 @@
 import { InkMde } from 'ink-mde/vue';
 import { computed } from 'vue';
 import { BlockMarkdown } from './types';
-import { parseMarkdown } from './../../services/markdown/liveparser'
+import { parseMarkdown } from './../../services/markdown/liveparser';
+import type { Options } from 'ink-mde';
 
 const props = defineProps<{
   readOnly: boolean;
@@ -38,8 +39,28 @@ const parsedMarkdown = computed(() => {
     return parseMarkdown(props.modelValue.data.code);
   }
   // else this is not needed
-  return "";
+  return '';
 });
+
+const options: Options = {
+  interface: {
+    toolbar: true,
+  },
+  toolbar: {
+    bold: true,
+    code: true,
+    codeBlock: true,
+    heading: true,
+    image: false,
+    italic: true,
+    link: true,
+    list: true,
+    orderedList: true,
+    quote: true,
+    taskList: true,
+    upload: false,
+  },
+};
 </script>
 
 <style lang="scss">

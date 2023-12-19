@@ -1,0 +1,44 @@
+version: "3.8"
+name: rev-docs
+services:
+  pocketbase:
+    build:
+      dockerfile: pocketbase.dockerfile
+      context: .
+    volumes:
+      - ./pb_data:/pb/pb_data
+      - ./pb_public:/pb/pb_public
+    ports:
+      - 8080:8080
+
+  video-convert-api:
+    build:
+      context: ../video-convert
+      dockerfile: docker/Dockerfile.api
+      target: dev
+    volumes:
+      - ../video-convert:/app
+    ports:
+      - 8000:8000
+    cpus: 2
+
+  video-convert-service:
+    build:
+      context: ../video-convert
+      dockerfile: docker/Dockerfile.service
+      target: dev
+    volumes:
+      - ../video-convert:/app
+    cpus: 2
+
+  editor:
+    build:
+      context: ../editor
+      dockerfile_inline: |
+        FROM node:20-alpine
+        WORKDIR /app
+        CMD ["./dev.sh"]
+    volumes:
+      - ../editor:/app
+    ports:
+      - 5173:5173

@@ -278,4 +278,35 @@ export default {
     console.log(id, parentId);
   },
   // end
+
+  // -------
+  // | PDF |
+  // -------
+
+  async addPDF(file) {
+    const result = await this.cache.pb.collection("pdfs").create({
+      file,
+    });
+
+    return result.id;
+  },
+
+  async getPDFUrl(id) {
+    const item = await this.cache.pb.collection("pdfs").getOne(id);
+    return await this.cache.pb.files.getUrl(item, item.file);
+  },
+
+  async dropPDF(id) {
+    await this.cache.pb.collection("pdfs").delete(id);
+  },
+
+  async addVideoTask(file: File, sentences: string): Promise<string> {
+    const result = await this.cache.pb.collection("videoTasks").create({
+      status: "unprocessed",
+      file,
+      sentences,
+    });
+
+    return result.id;
+  }
 } satisfies DataProvider;

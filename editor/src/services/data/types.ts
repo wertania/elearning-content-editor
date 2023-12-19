@@ -83,6 +83,12 @@ export interface DataProvider {
 
   dropNodes(ids: string[]): Promise<void>;
   moveNode(id: string, parentId: string | undefined): Promise<void>;
+
+  addPDF(file: File): Promise<string>;
+  getPDFUrl(id: string): Promise<string>;
+  dropPDF(id: string): Promise<void>;
+
+  addVideoTask(file: File, sentences: string): Promise<string>;
 }
 
 export interface SmartVideoConvertTask {

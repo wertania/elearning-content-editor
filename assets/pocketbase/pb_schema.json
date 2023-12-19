@@ -1,5 +1,73 @@
 [
   {
+    "id": "xl07xlbvd1rx9nx",
+    "name": "documents",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "9tlgfunw",
+        "name": "content",
+        "type": "json",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {}
+      }
+    ],
+    "indexes": [],
+    "listRule": "@request.auth.id != \"\"",
+    "viewRule": "@request.auth.id != \"\"",
+    "createRule": "@request.auth.id != \"\"",
+    "updateRule": "@request.auth.id != \"\"",
+    "deleteRule": "@request.auth.id != \"\"",
+    "options": {}
+  },
+  {
+    "id": "2gzvgy77gsja5pl",
+    "name": "config",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "gnjjpyr3",
+        "name": "name",
+        "type": "text",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      },
+      {
+        "system": false,
+        "id": "ouvrcv6a",
+        "name": "value",
+        "type": "text",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "min": null,
+          "max": null,
+          "pattern": ""
+        }
+      }
+    ],
+    "indexes": [],
+    "listRule": "@request.auth.id != \"\"",
+    "viewRule": "@request.auth.id != \"\"",
+    "createRule": "@request.auth.id != \"\"",
+    "updateRule": "@request.auth.id != \"\"",
+    "deleteRule": "@request.auth.id != \"\"",
+    "options": {}
+  },
+  {
     "id": "_pb_users_auth_",
     "name": "users",
     "type": "auth",
@@ -60,20 +128,26 @@
     }
   },
   {
-    "id": "xl07xlbvd1rx9nx",
-    "name": "documents",
+    "id": "66np483gffk1gxh",
+    "name": "pdfs",
     "type": "base",
     "system": false,
     "schema": [
       {
         "system": false,
-        "id": "9tlgfunw",
-        "name": "content",
-        "type": "json",
+        "id": "b2gr34mj",
+        "name": "file",
+        "type": "file",
         "required": false,
         "presentable": false,
         "unique": false,
-        "options": {}
+        "options": {
+          "maxSelect": 1,
+          "maxSize": 52428800,
+          "mimeTypes": ["application/pdf"],
+          "thumbs": [],
+          "protected": false
+        }
       }
     ],
     "indexes": [],
@@ -110,7 +184,7 @@
         "unique": false,
         "options": {
           "maxSelect": 1,
-          "maxSize": 5242880,
+          "maxSize": 52428800,
           "mimeTypes": [],
           "thumbs": [],
           "protected": false
@@ -123,6 +197,70 @@
     "createRule": "@request.auth.id != \"\"",
     "updateRule": "@request.auth.id != \"\"",
     "deleteRule": "@request.auth.id != \"\"",
+    "options": {}
+  },
+  {
+    "id": "doaq1jhcma9kf79",
+    "name": "videoTasks",
+    "type": "base",
+    "system": false,
+    "schema": [
+      {
+        "system": false,
+        "id": "zqixmvs4",
+        "name": "status",
+        "type": "select",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "maxSelect": 1,
+          "values": ["unprocessed", "processing", "processed"]
+        }
+      },
+      {
+        "system": false,
+        "id": "j2jxirn4",
+        "name": "file",
+        "type": "file",
+        "required": true,
+        "presentable": false,
+        "unique": false,
+        "options": {
+          "maxSelect": 1,
+          "maxSize": 52428800,
+          "mimeTypes": ["video/mp4"],
+          "thumbs": [],
+          "protected": false
+        }
+      },
+      {
+        "system": false,
+        "id": "ia9foyei",
+        "name": "sentences",
+        "type": "json",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {}
+      },
+      {
+        "system": false,
+        "id": "ttldpysa",
+        "name": "errors",
+        "type": "json",
+        "required": false,
+        "presentable": false,
+        "unique": false,
+        "options": {}
+      }
+    ],
+    "indexes": [],
+    "listRule": "@request.auth.id != \"\"",
+    "viewRule": "@request.auth.id != \"\"",
+    "createRule": "@request.auth.id != \"\"",
+    "updateRule": "@request.auth.id != \"\"",
+    "deleteRule": null,
     "options": {}
   }
 ]
