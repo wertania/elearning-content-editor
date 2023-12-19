@@ -24,6 +24,9 @@ WORKDIR /app
 # Führe den Streamlit-Server aus
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
 
+# Expose port 8000
+EXPOSE 8000
+
 FROM vwf_base as dev
 
 # For development, the source code is mounted via a volume.
