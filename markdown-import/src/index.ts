@@ -9,9 +9,14 @@ import { toString } from "mdast-util-to-string";
 import { dataProvider } from "./dataService";
 import { DocumentItem, Medium } from "./dataService/types";
 
-type TFile = {
+type TDocument = {
   name: string;
   path: string;
+  type: "document" | "folder";
+  translations: string[];
+  children?: TDocument[];
+  parent?: string;
+  originId?: string;
 };
 
 const parser = remark().use(remarkParse);
@@ -19,8 +24,6 @@ const parser = remark().use(remarkParse);
 function checkIsLocalFile(url: string) {
   return !(url.startsWith("http://") || url.startsWith("https://"));
 }
-
-const uploadedImages = new Map<string, Medium>();
 
 function getLocalImages(ast: Root): MarkdownImage[] {
   const localImages: MarkdownImage[] = [];
@@ -45,6 +48,7 @@ async function replaceImages(
   currentPath: string,
   language: string,
 ): Promise<Root> {
+  const uploadedImages = new Map<string, Medium>();
   const localImages = getLocalImages(ast);
 
   for (const node of localImages) {
@@ -68,7 +72,7 @@ async function replaceImages(
 }
 
 async function transformMarkdown(
-  file: TFile,
+  file: TDocument,
   md: string,
   language: string, // current language of the file
 ): Promise<UniversalBlock[]> {
@@ -134,19 +138,142 @@ async function transformMarkdown(
   return blocks;
 }
 
-/**
- * Imports markdown files from a directory.
- *
- * The directory structure can look like this:
- * ```
- * - en
- *   - introduction.md
- *   - image1.png
- * - de
- *   - introduction.md
- *   - image1.png
- * ```
- */
+const getTranslationPath = (
+  path: string,
+  baseLanguage: string,
+  language: string,
+) => {
+  return path.replace(`/${baseLanguage}/`, `/${language}/`);
+};
+
+const buildStructure = async (
+  dir: string,
+  baseLanguage: string,
+  languages: string[],
+): Promise<TDocument[]> => {
+  const documentStrcuture = [];
+
+  for await (const file of await fs.promises.opendir(dir)) {
+    const fullPath = path.join(dir, file.name);
+    const translations = [];
+
+    for await (const language of languages) {
+      const languagePath = getTranslationPath(fullPath, baseLanguage, language);
+      if (fs.existsSync(languagePath)) {
+        translations.push(language);
+      }
+    }
+
+    const document: TDocument = {
+      name: file.name,
+      path: fullPath,
+      type: file.isDirectory() ? "folder" : "document",
+      translations: translations,
+    };
+
+    documentStrcuture.push(document);
+
+    if (file.isDirectory()) {
+      const childDocuments = await buildStructure(
+        fullPath,
+        baseLanguage,
+        languages,
+      );
+
+      document.children = childDocuments;
+    }
+  }
+
+  return documentStrcuture;
+};
+
+const uploadDocument = async (
+  document: TDocument,
+  content: UniversalBlock[],
+  language: string,
+) => {
+  return await dataProvider.uploadDocument({
+    name: document.name,
+    type: document.type,
+    version: 1,
+    parent: document.parent,
+    header: document.name,
+    description: "",
+    langCode: language,
+    content: content,
+    originId: document.originId,
+    media: [],
+  });
+};
+
+const processFile = async (
+  file: TDocument,
+  language: string,
+): Promise<DocumentItem | undefined> => {
+  if (file.type === "folder") {
+    return await uploadDocument(file, [], language);
+  } else if (file.type === "document" && file.name.endsWith(".md")) {
+    const content = fs.readFileSync(file.path, "utf-8");
+    const blocks = await transformMarkdown(file, content, language);
+    return await uploadDocument(file, blocks, language);
+  }
+};
+
+const processFiles = async (
+  structure: TDocument[],
+  baseLanguage: string,
+  languages: string[],
+  parentIdsMap: Map<string, string> = new Map(),
+) => {
+  for (const document of structure) {
+    // Set the parent ID for the base language version
+    document.parent = parentIdsMap.get(baseLanguage);
+
+    // Process the base language version
+    const base = await processFile(document, baseLanguage);
+
+    if (!base || !base.id) continue;
+
+    // Update the parent IDs map for the base language
+    parentIdsMap.set(baseLanguage, base.id);
+
+    // Process each translation of the current document
+    for (const language of document.translations) {
+      if (language !== baseLanguage) {
+        document.path = getTranslationPath(
+          document.path,
+          baseLanguage,
+          language,
+        );
+
+        document.parent = parentIdsMap.get(language);
+        document.originId = base.id;
+
+        const translatedDocument = await processFile(document, language);
+
+        // Update the parent IDs map with the translated document's ID
+        if (translatedDocument && translatedDocument.id) {
+          parentIdsMap.set(language, translatedDocument.id);
+        }
+      }
+    }
+
+    // Process children
+    if (document.children) {
+      // Create a new map for child documents
+      const childParentIdsMap = new Map(parentIdsMap);
+
+      // Process children with the updated parent IDs map
+      await processFiles(
+        document.children,
+        baseLanguage,
+        languages,
+        childParentIdsMap,
+      );
+    }
+  }
+};
+
 export async function importFromDirectory(
   directory: string,
   baseLanguage: string,
@@ -159,125 +286,6 @@ export async function importFromDirectory(
 
   console.log("Available languages", languages);
 
-  await importFiles(dir, baseLanguage, languages);
-}
-
-async function importFiles(
-  dir: string,
-  baseLanguage: string,
-  languages: string[] = [],
-  parentFolder?: string,
-) {
-  const uploadFolder = async (folder: TFile, parentFolder?: string) => {
-    return await dataProvider.uploadDocument({
-      name: folder.name,
-      type: "folder",
-      version: 1,
-      parent: parentFolder,
-      header: folder.name,
-      description: "",
-      langCode: baseLanguage,
-      content: [],
-      media: [],
-    });
-  };
-
-  const uploadDocuemnt = async (
-    file: TFile,
-    content: UniversalBlock[] = [],
-    language?: string,
-    originId?: string,
-  ) => {
-    return await dataProvider.uploadDocument({
-      name: file.name,
-      type: "document",
-      version: 1,
-      parent: parentFolder,
-      originId: originId,
-      header: file.name,
-      description: "",
-      langCode: language || baseLanguage,
-      content: content,
-      media: [],
-    });
-  };
-
-  const readFile = (file: TFile) => {
-    return fs.readFileSync(file.path, "utf8");
-  };
-
-  const getExtension = (file: TFile) => {
-    return path.extname(file.name).slice(1);
-  };
-
-  const translateFile = async (file: TFile, originId?: string) => {
-    if (!originId) {
-      throw new Error("Cannot translate file without originId");
-    }
-
-    await Promise.all(
-      languages.map(async (language) => {
-        const newPath = file.path.replace(`/${baseLanguage}/`, `/${language}/`);
-
-        if (!fs.existsSync(newPath)) return;
-
-        await processMdFile(
-          {
-            name: file.name,
-            path: newPath,
-          },
-          language,
-          originId,
-        );
-      }),
-    );
-  };
-
-  const processMdFile = async (
-    file: TFile,
-    language?: string,
-    originId?: string,
-  ): Promise<DocumentItem> => {
-    const content = readFile(file);
-    const blocks = await transformMarkdown(
-      file,
-      content,
-      language ?? baseLanguage,
-    );
-    return await uploadDocuemnt(file, blocks, language, originId);
-  };
-
-  const handleFile = async (file: TFile) => {
-    const extension = getExtension(file);
-
-    if (extension === "md") {
-      const document = await processMdFile(file);
-      await translateFile(file, document.id);
-    }
-  };
-
-  const handleFolder = async (folder: TFile) => {
-    const newFolder = await uploadFolder(folder, parentFolder);
-
-    // recursively import nested folders
-    await importFiles(
-      path.join(dir, folder.name),
-      baseLanguage,
-      languages,
-      newFolder.id,
-    );
-  };
-
-  for await (const file of await fs.promises.opendir(dir)) {
-    const tFile: TFile = {
-      name: file.name,
-      path: path.join(dir, file.name),
-    };
-
-    if (file.isDirectory()) {
-      await handleFolder(tFile);
-    } else if (file.isFile()) {
-      await handleFile(tFile);
-    }
-  }
+  const structure = await buildStructure(dir, baseLanguage, languages);
+  await processFiles(structure, baseLanguage, languages);
 }

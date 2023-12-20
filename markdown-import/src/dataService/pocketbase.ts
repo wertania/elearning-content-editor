@@ -35,6 +35,12 @@ export default {
     for (const doc of documents) {
       await this.cache.pb.collection("documents").delete(doc.id);
     }
+
+    // delete media
+    const media = await this.cache.pb.collection("media").getFullList();
+    for (const m of media) {
+      await this.cache.pb.collection("media").delete(m.id);
+    }
   },
 
   async checkLogin(): Promise<boolean> {
