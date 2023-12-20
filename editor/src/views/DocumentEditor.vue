@@ -36,7 +36,7 @@
       <SplitButton class="ml-5" size="small" @click="addDocument('document')" label="Add" icon="fa-solid fa-plus"
         :model="menuAdd" />
       <ConfirmPopup />
-      <Button size="small" icon="fa-solid fa-trash" class="ml-1 bg-purple-600 border-none" @click="deleteSelected($event)"
+      <Button size="small" icon="fa-solid fa-trash" class="ml-1 border-none" @click="deleteSelected($event)"
         v-show="$doc.$state.selectedDocument" />
       <!-- <span class="p-input-icon-left ml-3">
         <i class="fa-solid fa-search" />
@@ -47,15 +47,15 @@
 
     <template #end>
       <li>
-        <Button icon="fa-solid fa-photo-film" size="small" class="bg-purple-600 border-none" @click="openMediaBrowser"
+        <Button icon="fa-solid fa-photo-film" size="small" class="border-none" @click="openMediaBrowser"
           v-show="$doc.$state.selectedDocument" />
       </li>
       <li>
-        <Button icon="fa-solid fa-save" size="small" class="bg-purple-600 border-none" @click="saveDocument"
+        <Button icon="fa-solid fa-save" size="small" class="border-none" @click="saveDocument"
           v-show="$doc.$state.selectedDocument" />
       </li>
       <li>
-        <Button icon="fa-solid fa-times" size="small" class="bg-purple-600 border-none" @click="closeDocument"
+        <Button icon="fa-solid fa-times" size="small" class="border-none" @click="closeDocument"
           v-show="$doc.$state.selectedDocument" />
       </li>
     </template>
@@ -87,7 +87,7 @@
             </div>
             <div class="flex flex-row flex-wrap m-2">
               <Button small icon="fa-solid fa-plus" @click="showAddLanguage = true"
-                :disabled="$doc.$state.missingLanguages.length < 1" class="bg-purple-600"></Button>
+                :disabled="$doc.$state.missingLanguages.length < 1" class=""></Button>
               <Dropdown small v-model="$doc.$state.selectedLanguage" :options="$doc.$state.availableLanguages"
                 option-label="name" option-value="code" class="ml-1 flex-auto"
                 :disabled="$doc.availableLanguages.length < 2" @change="switchLanguage" />

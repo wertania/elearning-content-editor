@@ -12,7 +12,7 @@
 
     <template #end>
       <li>
-        <Button icon="fa-solid fa-times" size="small" class="bg-purple-600 border-none" @click="resetForm"
+        <Button icon="fa-solid fa-times" size="small" class="border-none" @click="resetForm"
           v-if="inProgress" />
       </li>
     </template>
