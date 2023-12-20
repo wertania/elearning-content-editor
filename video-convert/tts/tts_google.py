@@ -1,16 +1,13 @@
+from config import google_creds, tts_base_path
 from google.cloud import texttospeech
 from google.oauth2 import service_account
-from config import GOOGLE_CREDENTIALS_PATH
-from config import tts_base_path
-from logging_output import info, error, warning, debug
+from logging_output import debug, error, info, warning
 
 
 def text_to_speech(text: str, filename: str) -> str:
     """Synthesizes speech from the input string of text."""
 
-    credentials = service_account.Credentials.from_service_account_file(
-        GOOGLE_CREDENTIALS_PATH
-    )
+    credentials = service_account.Credentials.from_service_account_info(google_creds)
 
     client = texttospeech.TextToSpeechClient(credentials=credentials)
 

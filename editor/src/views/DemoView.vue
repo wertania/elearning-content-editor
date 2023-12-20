@@ -5,7 +5,7 @@
         </template>
         <template #appname>
             <span class="appname">
-                RevDocs
+                {{ appName }}
             </span>
         </template>
         <template #start>
@@ -66,6 +66,7 @@
 <script setup lang="ts">
 import AppLayout from './../components/AppLayout.vue';
 import InputText from 'primevue/inputtext';
+const appName = import.meta.env.VITE_APP_NAME;
 
 </script>
 
