@@ -22,6 +22,21 @@ function checkIsLocalFile(url: string) {
 
 const uploadedImages = new Map<string, Medium>();
 
+function getLocalImages(ast: Root): MarkdownImage[] {
+  const localImages: MarkdownImage[] = [];
+
+  visit(ast, "image", (node: MarkdownImage) => {
+    const url = node.url;
+    const isLocalFile = checkIsLocalFile(url);
+
+    if (isLocalFile) {
+      localImages.push(node);
+    }
+  });
+
+  return localImages;
+}
+
 /**
  * Parses the markdown and uploads all images it finds, replacing the image URLs.
  */
@@ -30,16 +45,7 @@ async function replaceImages(
   currentPath: string,
   language: string,
 ): Promise<Root> {
-  const localImages = new Set<MarkdownImage>();
-
-  visit(ast, "image", (node: MarkdownImage) => {
-    const url = node.url;
-    const isLocalFile = checkIsLocalFile(url);
-
-    if (isLocalFile) {
-      localImages.add(node);
-    }
-  });
+  const localImages = getLocalImages(ast);
 
   for (const node of localImages) {
     const url = node.url;
