@@ -3,6 +3,7 @@ import type { DataProvider } from "./index";
 import type { DocumentItem, Medium, MediumType } from "./types";
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 
 const URL: string = process.env.POCKETBASE_URL || "http://127.0.0.1:8090";
 
@@ -75,7 +76,8 @@ export default {
       const fileName = path.basename(filePath);
 
       const file = new FormData();
-      file.append("file", new Blob([fs.readFileSync(filePath)]), fileName);
+      const blob = new Blob([fs.readFileSync(filePath)]);
+      file.append("file", blob, fileName);
 
       const result = await this.cache.pb.collection("media").create(file);
 

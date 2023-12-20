@@ -1,44 +1,85 @@
-import fs, { Dirent } from "fs";
+import fs from "fs";
 import path from "path";
-import type { Root } from "mdast";
+import type { Root, Image as MarkdownImage } from "mdast";
 import { remark } from "remark";
 import remarkParse from "remark-parse";
 import { visit } from "unist-util-visit";
 import type { UniversalBlock } from "vue-blockful-editor";
 import { toString } from "mdast-util-to-string";
 import { dataProvider } from "./dataService";
-import { DocumentItem } from "./dataService/types";
+import { DocumentItem, Medium } from "./dataService/types";
+
+type TFile = {
+  name: string;
+  path: string;
+};
 
 const parser = remark().use(remarkParse);
+
+function checkIsLocalFile(url: string) {
+  return !(url.startsWith("http://") || url.startsWith("https://"));
+}
+
+const uploadedImages = new Map<string, Medium>();
 
 /**
  * Parses the markdown and uploads all images it finds, replacing the image URLs.
  */
-function uploadImages(ast: Root) {
-  visit(ast, "image", (node) => {
-    const url = node.url;
+async function replaceImages(
+  ast: Root,
+  currentPath: string,
+  language: string,
+): Promise<Root> {
+  const localImages = new Set<MarkdownImage>();
 
-    // TODO: Check if `url` is a local file (check for http/https).
-    const isLocalFile = true;
+  visit(ast, "image", (node: MarkdownImage) => {
+    const url = node.url;
+    const isLocalFile = checkIsLocalFile(url);
 
     if (isLocalFile) {
-      // TODO: If yes, read the file and upload it.
-      // Probably needs a base path as well to locate the image file.
-      // fs.readFileSync(...)
-      // TODO: Replace `url` with the new URL.
-      // node.url = newUrl;
+      localImages.add(node);
     }
   });
+
+  for (const node of localImages) {
+    const url = node.url;
+
+    const filePath = path.join(currentPath, url);
+    const image = uploadedImages.get(filePath);
+
+    if (image) {
+      node.url = image.url;
+      continue;
+    }
+
+    const uploadedImage = await dataProvider.uploadMedium(filePath, language);
+    uploadedImages.set(filePath, uploadedImage);
+
+    node.url = uploadedImage.url;
+  }
+
+  return ast;
 }
 
-function transformMarkdown(md: string): UniversalBlock[] {
+async function transformMarkdown(
+  file: TFile,
+  md: string,
+  language: string, // current language of the file
+): Promise<UniversalBlock[]> {
   // Parse the tree.
-  const ast = parser.parse(md);
+  const plainRoot = parser.parse(md);
+
+  // Upload all images.
+  const root = await replaceImages(
+    plainRoot,
+    path.dirname(file.path),
+    language,
+  );
 
   // Transform the tree.
   const blocks: UniversalBlock[] = [];
 
-  for (const node of ast.children) {
+  for (const node of root.children) {
     switch (node.type) {
       case "heading":
         {
@@ -54,6 +95,16 @@ function transformMarkdown(md: string): UniversalBlock[] {
 
       case "paragraph":
         {
+          if (node.children.length == 1 && node.children[0].type == "image") {
+            blocks.push({
+              type: "image",
+              data: {
+                src: node.children[0].url,
+              },
+            });
+            break;
+          }
+
           blocks.push({
             type: "markdown",
             data: {
@@ -111,11 +162,6 @@ async function importFiles(
   languages: string[] = [],
   parentFolder?: string,
 ) {
-  type TFile = {
-    name: string;
-    path: string;
-  };
-
   const uploadFolder = async (folder: TFile, parentFolder?: string) => {
     return await dataProvider.uploadDocument({
       name: folder.name,
@@ -187,7 +233,11 @@ async function importFiles(
     originId?: string,
   ): Promise<DocumentItem> => {
     const content = readFile(file);
-    const blocks = transformMarkdown(content);
+    const blocks = await transformMarkdown(
+      file,
+      content,
+      language ?? baseLanguage,
+    );
     return await uploadDocuemnt(file, blocks, language, originId);
   };
 
