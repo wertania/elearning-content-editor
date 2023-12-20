@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-svg-logo">
+  <div class="bg-svg-logo" :style="{ '--bg-image': `url(${bgSvgLogoUrl})` }">
     <div class="login">
       <GradientFont start-color="#f15bff" end-color="#780f72">
-        <h1 style="font-size: 3em;"> Welcome to RevDocs</h1>
+        <h1 style="font-size: 3em;">{{ welcomeSlogan }}</h1>
       </GradientFont>
       <div v-if="provider === 'pocketbase'">
         <!--login with username and password -->
@@ -30,8 +30,12 @@ import { dataProvider } from './../services/data/index';
 import TextInput from 'primevue/inputtext';
 import { error } from './../services/toast';
 import GradientFont from './../components/GradientFont.vue';
+
 const provider = dataProvider.name;
 const store = useGlobalStore();
+
+const welcomeSlogan = import.meta.env.VITE_TEMPLATE_WELCOME_SLOGAN ?? "Welcome to RevDocs";
+const bgSvgLogoUrl = import.meta.env.VITE_TEMPLATE_START_LOGO ?? "./../assets/logo.svg";
 
 // directly redirect for localdb
 if (provider === 'localdb') {
@@ -76,10 +80,10 @@ const loginPocketbase = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('./../assets/logo.svg');
+  background-image: var(--bg-image);
   background-repeat: no-repeat;
-  background-position: -20% 100%;
-  background-size: 50%;
+  background-position: -5% 100%;
+  background-size: 35%;
   opacity: 0.1;
   z-index: -1; // Damit es hinter den Kinderelementen liegt
 }

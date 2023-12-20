@@ -21,7 +21,7 @@
 
     <template #appname>
       <GradientFont direction="rtl" start-color="#eaa3ff" end-color="#5e085a" style="font-weight: 800; font-size: 25px;">
-        RevDocs
+        {{ appName }}
       </GradientFont>
     </template>
 
@@ -33,17 +33,17 @@
     <template #end>
       <li>
         <ConfirmPopup />
-        <Button v-tooltip="'Re-Upload media'" icon="fa-solid fa-repeat" class="bg-purple-300 border-none"
+        <Button v-tooltip="'Re-Upload media'" icon="fa-solid fa-repeat" class="border-none"
           @click="uploadDialogControl = { show: true, mode: 'replace' }"
           v-show="selection && Object.keys(selection).length > 0" />
       </li>
       <li>
-        <Button v-tooltip="'Delete media'" icon="fa-solid fa-trash" class="bg-purple-300 border-none"
+        <Button v-tooltip="'Delete media'" icon="fa-solid fa-trash" class="border-none"
           @click="deleteSelected($event)" v-show="selection && Object.keys(selection).length > 0" />
       </li>
       <li>
         <div class="border-">
-          <Button icon="fa-solid fa-times" class="ml-1 bg-purple-300 border-none" @click="closeDocument" v-if="documentId"
+          <Button icon="fa-solid fa-times" class="ml-1 border-none" @click="closeDocument" v-if="documentId"
             v-tooltip="'Show all media and close ' + documentId" />
         </div>
       </li>
@@ -111,6 +111,7 @@ const $media = useMediaStore(); // media store
 const confirm = useConfirm(); // confirm dialog
 const $global = useGlobalStore(); // global store
 const route = useRoute();
+const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
 
 const documentId = ref<string | null>(route.params.documentId !== '' && !Array.isArray(route.params.documentId) ? route.params.documentId : null);
 const uploadDialogControl = ref({ show: false, mode: <'main' | 'sub' | 'replace'>'main' }); // control: dialog for uploading a new file

@@ -3,7 +3,7 @@
   <Dialog v-model:visible="showAnswerDialog" modal header="Let´s answer your question..." :style="{ width: '70vw' }">
     <template #default>
       <div class="p-1">
-        Hi! I´m your RevDocs AI documentation assistant. Type in your question and I´ll try to find the answer for you.
+        Hi! I´m your AI documentation assistant. Type in your question and I´ll try to find the answer for you.
       </div>
       <div id="search-bar">
         <div class="p-inputgroup w-full">
@@ -53,12 +53,13 @@
 
   <AppLayout>
     <template #logo>
-      <img src="./../assets/logo.png" class="w-full cursor-pointer" @click="router.push({ name: 'home' })">
+      <img :src="logoUrl" class="w-full cursor-pointer" @click="router.push({ name: 'home' })">
     </template>
 
     <template #appname>
-      <GradientFont direction="rtl" start-color="#eaa3ff" end-color="#5e085a" style="font-weight: 800; font-size: 25px;">
-        RevDocs
+      <GradientFont direction="rtl" :start-color="logoStartColor" :end-color="logoEndColor"
+        style="font-weight: 800; font-size: 25px;">
+        {{ appName }}
       </GradientFont>
     </template>
 
@@ -103,7 +104,7 @@
       </div>
       <div v-else-if="$doc.selectedDocument != null && $doc.selectedDocument.type === 'document'">
         <h1>
-          <GradientFont start-color="purple" end-color="#ff26a4">
+          <GradientFont :start-color="logoStartColor" :end-color="logoEndColor">
             {{ $doc.selectedDocument?.header }}
           </GradientFont>
         </h1>
@@ -156,6 +157,11 @@ const answerDependingDocuments: Ref<DocumentMeta[]> = ref([]);
 const searchText = ref('');
 const showSearchResults = ref(false);
 const searchResults: Ref<DocumentSearchResult[]> = ref([]);
+
+const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
+const logoUrl = import.meta.env.VITE_TEMPLATE_LOGO_URL ?? "./../assets/logo.png";
+const logoStartColor = import.meta.env.VITE_TEMPLATE_LOGO_START_COLOR ?? "#eaa3ff";
+const logoEndColor = import.meta.env.VITE_TEMPLATE_LOGO_END_COLOR ?? "#5e085a";
 
 watch(searchText, () => {
   if (searchText.value.length > 0) {
