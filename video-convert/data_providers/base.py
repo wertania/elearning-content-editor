@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from enum import Enum
-from typing import Optional
+from typing import Optional, Literal
+import json
 
 
 class UnconvertedVideo:
@@ -15,6 +16,14 @@ class UnconvertedVideo:
 
     def __str__(self):
         return str((self.url, self.filename, self.file_extension, self.sentences))
+
+
+class VideoContent:
+    def __init__(self, type: Literal["image", "video", "audio"]):
+        self.type = type
+
+    def to_json(self) -> str:
+        return json.dumps(self.__dict__)
 
 
 class VideoStatus(str, Enum):
