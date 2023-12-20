@@ -1,11 +1,24 @@
 <template>
   <div class="plugin-medium">
     <template v-if="mediumUrl && loadedMedium">
-      <img class="mt-3 mb-3" v-if="loadedMedium.type === 'image'" :src="mediumUrl" />
+      <img
+        class="mt-3 mb-3"
+        v-if="loadedMedium.type === 'image'"
+        :src="mediumUrl"
+      />
 
-      <video class="mt-3 mb-3" v-else-if="loadedMedium.type === 'video'" :src="loadedMedium.url" />
+      <video
+        class="mt-3 mb-3"
+        v-else-if="loadedMedium.type === 'video'"
+        :src="mediumUrl"
+        controls
+      />
 
-      <audio class="mt-3 mb-3" v-else-if="loadedMedium.type === 'audio'" :src="loadedMedium.url" />
+      <audio
+        class="mt-3 mb-3"
+        v-else-if="loadedMedium.type === 'audio'"
+        :src="mediumUrl"
+      />
 
       <Message v-else severity="warn">
         Unknown medium type "{{ loadedMedium.type }}".
@@ -13,7 +26,12 @@
     </template>
 
     <template v-else-if="!readOnly">
-      <FileUpload custom-upload :multiple="false" @uploader="uploader" mode="advanced" />
+      <FileUpload
+        custom-upload
+        :multiple="false"
+        @uploader="uploader"
+        mode="advanced"
+      />
     </template>
 
     <Message v-if="isNotFound && !loading" severity="warn" :closable="false">
@@ -37,7 +55,10 @@ const uploader = async (e: FileUploadUploaderEvent) => {
   const file = Array.isArray(e.files) ? e.files[0] : e.files;
 
   // Upload the medium and receive an ID.
-  const { id } = await dataProvider.addMedium(file, $documents.selectedDocument?.langCode || $documents.baseLanguage);
+  const { id } = await dataProvider.addMedium(
+    file,
+    $documents.selectedDocument?.langCode || $documents.baseLanguage,
+  );
 
   // Update the stored medium ID.
   const updated = props.modelValue;
@@ -46,7 +67,7 @@ const uploader = async (e: FileUploadUploaderEvent) => {
 };
 
 const props = defineProps<{
-  readOnly: boolean;
+  readOnly?: boolean;
   modelValue: BlockMedium;
 }>();
 
@@ -57,9 +78,7 @@ const emit = defineEmits<{
 const mediumId = ref<string>();
 const loadedMedium = ref<Medium>();
 const mediumUrl = ref<null | string>(null);
-const isNotFound = computed(
-  () => props.modelValue.data.id && !loadedMedium.value?.url,
-);
+const isNotFound = computed(() => props.modelValue.data.id && !mediumUrl.value);
 
 // Load the medium when the ID changes.
 const loading = ref(true);
