@@ -2,8 +2,8 @@
   <div class="pdf-container">
     <span>{{ name }}</span>
     <VPButton :href="url" text="Download" theme="alt" />
-    <div class="pdf-container-preview">
-      <iframe :src="url" />
+    <div class="pdf-container__preview">
+      <iframe class="pdf-container__iframe" :src="url" />
     </div>
   </div>
 </template>
@@ -17,7 +17,7 @@ defineProps<{
 }>();
 </script>
 
-<style>
+<style lang="scss">
 .pdf-container {
   margin: 1rem 0;
   display: flex;
@@ -27,22 +27,22 @@ defineProps<{
   align-items: center;
   justify-content: center;
   padding: 1rem;
-}
 
-.pdf-container > * {
-  margin: 0.5rem;
-}
+  > * {
+    margin: 0.5rem;
+  }
 
-.pdf-container-preview {
-  width: 100%;
-  height: auto;
-  max-height: 80vh;
-  aspect-ratio: 1 / 1.414;
-}
+  &__preview {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    aspect-ratio: 1 / 1.414;
+  }
 
-iframe {
-  border: none;
-  width: 100%;
-  height: 100%;
+  &__iframe {
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>
