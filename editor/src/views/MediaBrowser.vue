@@ -21,7 +21,7 @@
 
     <template #appname>
       <GradientFont direction="rtl" start-color="#eaa3ff" end-color="#5e085a" style="font-weight: 800; font-size: 25px;">
-        RevDocs
+        {{ appName }}
       </GradientFont>
     </template>
 
@@ -111,6 +111,7 @@ const $media = useMediaStore(); // media store
 const confirm = useConfirm(); // confirm dialog
 const $global = useGlobalStore(); // global store
 const route = useRoute();
+const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
 
 const documentId = ref<string | null>(route.params.documentId !== '' && !Array.isArray(route.params.documentId) ? route.params.documentId : null);
 const uploadDialogControl = ref({ show: false, mode: <'main' | 'sub' | 'replace'>'main' }); // control: dialog for uploading a new file

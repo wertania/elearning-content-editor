@@ -23,12 +23,12 @@
 
   <AppLayout>
     <template #logo>
-      <img src="./../assets/logo.png" class="w-full cursor-pointer" @click="router.push({ name: 'home' })">
+      <img :src="logoUrl" class="w-full cursor-pointer" @click="router.push({ name: 'home' })">
     </template>
 
     <template #appname>
-      <GradientFont direction="rtl" start-color="#eaa3ff" end-color="#5e085a" style="font-weight: 800; font-size: 25px;">
-        RevDocs
+      <GradientFont direction="rtl" :start-color="logoStartColor" :end-color="logoEndColor" style="font-weight: 800; font-size: 25px;">
+        {{ appName }}
       </GradientFont>
     </template>
 
@@ -132,6 +132,10 @@ const confirm = useConfirm(); // confirm dialog
 const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
 const router = useRouter(); // router
+const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
+const logoUrl = import.meta.env.VITE_TEMPLATE_LOGO_URL ?? "./../assets/logo.png";
+const logoStartColor = import.meta.env.VITE_TEMPLATE_LOGO_START_COLOR ?? "#eaa3ff";
+const logoEndColor = import.meta.env.VITE_TEMPLATE_LOGO_END_COLOR ?? "#5e085a";
 
 // "add" split-button
 const menuAdd = [
