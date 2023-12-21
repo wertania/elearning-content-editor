@@ -5,7 +5,7 @@ import { dataProvider, initializeDataProvider } from "./src/dataService";
 (async function main() {
   const config = loadConfig();
 
-  await initializeDataProvider(config.dataProvider);
+  await initializeDataProvider(config.dataProvider, { url: config.url });
 
   await dataProvider.login({
     username: config.user,

@@ -7,7 +7,7 @@ export interface DataProvider {
 
   cache?: any; // provider specific cache
 
-  initialize(): Promise<void>;
+  initialize(options?: any): Promise<void>;
 
   login(data?: { username: string; password: string }): Promise<boolean>;
   checkLogin(): Promise<boolean>;
@@ -32,13 +32,16 @@ const providerOptions: DataProvider[] = [PocketBaseProvider];
 // Instantiate a provider.
 export let dataProvider: DataProvider;
 
-export async function initializeDataProvider(dataProviderName: string) {
+export async function initializeDataProvider(
+  dataProviderName: string,
+  options?: any,
+) {
   console.log(`Using data provider '${dataProviderName}'.`);
 
   for (const p of providerOptions) {
     if (p.name === dataProviderName) {
       dataProvider = p;
-      await dataProvider.initialize?.();
+      await dataProvider.initialize?.(options);
 
       return;
     }

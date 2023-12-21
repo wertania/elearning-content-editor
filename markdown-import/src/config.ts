@@ -22,12 +22,20 @@ export function loadConfig() {
 
   const parsed = parseArgs(process.argv, { string: ["password"] });
 
-  return {
-    dataProvider: MDI_DATAPROVIDER || parsed.dataProvider,
+  const config = {
+    dataProvider: parsed.dataProvider || MDI_DATAPROVIDER,
     user: MDI_DATAPROVIDER_USER || parsed.user,
     password: MDI_DATAPROVIDER_PASSWORD || parsed.password,
     url: MDI_DATAPROVIDER_URL || parsed.url,
     baseLanguage: MDI_BASE_LANGUAGE || parsed.baseLanguage,
     sourcePath: MDI_SOURCE_PATH || parsed._[2],
   };
+
+  if (Object.values(config).some((value) => !value)) {
+    throw new Error(
+      "Missing configuration option(s). Please check your .env file or command line arguments.",
+    );
+  }
+
+  return config;
 }

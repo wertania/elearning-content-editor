@@ -4,8 +4,7 @@
   "description": "",
   "main": "main.ts",
   "scripts": {
-    "start": "tsx main.ts --baseLanguage de --dataProvider pocketbase ./testfiles --user leon --password '12345678' --url http://localhost:8080",
-    "build": "tsc"
+    "start": "tsx ./main.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,12 +19,12 @@
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
     "unist-util-visit": "^5.0.0",
-    "vue-blockful-editor": "^0.3.1"
+    "vue-blockful-editor": "^0.3.1",
+    "tsx": "^4.6.2"
   },
   "devDependencies": {
     "@types/minimist": "^1.2.5",
     "@types/node": "^20.10.5",
-    "tsx": "^4.6.2",
     "typescript": "^5.3.3"
   }
 }
