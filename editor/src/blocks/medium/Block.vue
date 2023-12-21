@@ -2,20 +2,20 @@
   <div class="plugin-medium">
     <template v-if="mediumUrl && loadedMedium">
       <img
-        class="mt-3 mb-3"
+        class="mt-3 mb-3 w-full"
         v-if="loadedMedium.type === 'image'"
         :src="mediumUrl"
       />
 
       <video
-        class="mt-3 mb-3"
+        class="mt-3 mb-3 w-full"
         v-else-if="loadedMedium.type === 'video'"
         :src="mediumUrl"
         controls
       />
 
       <audio
-        class="mt-3 mb-3"
+        class="mt-3 mb-3 w-full"
         v-else-if="loadedMedium.type === 'audio'"
         :src="mediumUrl"
       />
