@@ -30,15 +30,19 @@ export interface DataProvider {
 const providerOptions: DataProvider[] = [PocketBaseProvider];
 
 // Instantiate a provider.
-export const dataProvider = (() => {
-  const providerName = process.env.DOCUMENT_DATASOURCE;
-  console.log(`Using data provider '${providerName}'.`);
+export let dataProvider: DataProvider;
+
+export async function initializeDataProvider(dataProviderName: string) {
+  console.log(`Using data provider '${dataProviderName}'.`);
 
   for (const p of providerOptions) {
-    if (p.name === providerName) {
-      return p;
+    if (p.name === dataProviderName) {
+      dataProvider = p;
+      await dataProvider.initialize?.();
+
+      return;
     }
   }
 
-  throw Error(`Cannot find unregistered data provider '${providerName}'.`);
-})();
+  throw Error(`Cannot find unregistered data provider '${dataProviderName}'.`);
+}

@@ -17,6 +17,7 @@ type TDocument = {
   children?: TDocument[];
   parent?: string;
   originId?: string;
+  media?: Set<string>;
 };
 
 const parser = remark().use(remarkParse);
@@ -53,19 +54,22 @@ async function replaceImages(
 
   for (const node of localImages) {
     const url = node.url;
-
     const filePath = path.join(currentPath, url);
-    const image = uploadedImages.get(filePath);
 
-    if (image) {
-      node.url = image.url;
-      continue;
+    // Get cached image or upload it.
+    let image = uploadedImages.get(filePath);
+    if (!image) {
+      image = await dataProvider.uploadMedium(filePath, language);
+      uploadedImages.set(filePath, image);
     }
 
-    const uploadedImage = await dataProvider.uploadMedium(filePath, language);
-    uploadedImages.set(filePath, uploadedImage);
+    node.url = image.url;
 
-    node.url = uploadedImage.url;
+    // Remember the medium ID.
+    node.data = {
+      ...node.data,
+      id: image.id,
+    };
   }
 
   return ast;
@@ -86,6 +90,19 @@ async function transformMarkdown(
     language,
   );
 
+  const addMediumBlock = (id: string) => {
+    // Add the image ID to the file's media array.
+    if (!file.media) file.media = new Set();
+    file.media.add(id);
+
+    blocks.push({
+      type: "medium",
+      data: {
+        id,
+      },
+    });
+  };
+
   // Transform the tree.
   const blocks: UniversalBlock[] = [];
 
@@ -105,32 +122,40 @@ async function transformMarkdown(
 
       case "paragraph":
         {
-          if (node.children.length == 1 && node.children[0].type == "image") {
-            blocks.push({
-              type: "image",
-              data: {
-                src: node.children[0].url,
-              },
+          // Filter out text nodes that only contain whitespace.
+          const nodesWithoutEmptyText = node.children.filter(
+            (child) => child.type !== "text" || /\w/g.test(toString(child)),
+          );
+
+          // If the paragraph contains only images, insert an image block for each one.
+          if (nodesWithoutEmptyText.every((child) => child.type === "image")) {
+            const images = nodesWithoutEmptyText as MarkdownImage[];
+
+            images.forEach((image) => {
+              // @ts-ignore
+              addMediumBlock(image.data.id);
             });
+
             break;
           }
+
+          // Interpret the block as pure markdown.
+          const code = node.position
+            ? md.slice(node.position.start.offset, node.position.end.offset)
+            : toString(node);
 
           blocks.push({
             type: "markdown",
             data: {
-              code: toString(node),
+              code,
             },
           });
         }
         break;
 
       case "image": {
-        blocks.push({
-          type: "image",
-          data: {
-            src: node.url,
-          },
-        });
+        // @ts-ignore
+        addMediumBlock(node.data.id);
       }
     }
   }
@@ -151,9 +176,12 @@ const buildStructure = async (
   baseLanguage: string,
   languages: string[],
 ): Promise<TDocument[]> => {
-  const documentStrcuture = [];
+  const documentStructure = [];
 
   for await (const file of await fs.promises.opendir(dir)) {
+    // Only look at markdown files and directories.
+    if (!file.name.endsWith(".md") && !file.isDirectory()) continue;
+
     const fullPath = path.join(dir, file.name);
     const translations = [];
 
@@ -171,7 +199,7 @@ const buildStructure = async (
       translations: translations,
     };
 
-    documentStrcuture.push(document);
+    documentStructure.push(document);
 
     if (file.isDirectory()) {
       const childDocuments = await buildStructure(
@@ -184,7 +212,7 @@ const buildStructure = async (
     }
   }
 
-  return documentStrcuture;
+  return documentStructure;
 };
 
 const uploadDocument = async (
@@ -202,7 +230,7 @@ const uploadDocument = async (
     langCode: language,
     content: content,
     originId: document.originId,
-    media: [],
+    media: Array.from(document.media ?? []),
   });
 };
 
@@ -212,7 +240,7 @@ const processFile = async (
 ): Promise<DocumentItem | undefined> => {
   if (file.type === "folder") {
     return await uploadDocument(file, [], language);
-  } else if (file.type === "document" && file.name.endsWith(".md")) {
+  } else if (file.type === "document") {
     const content = fs.readFileSync(file.path, "utf-8");
     const blocks = await transformMarkdown(file, content, language);
     return await uploadDocument(file, blocks, language);
@@ -225,6 +253,8 @@ const processFiles = async (
   languages: string[],
   parentIdsMap: Map<string, string> = new Map(),
 ) => {
+  const childParentIdsMap = new Map();
+
   for (const document of structure) {
     // Set the parent ID for the base language version
     document.parent = parentIdsMap.get(baseLanguage);
@@ -235,34 +265,24 @@ const processFiles = async (
     if (!base || !base.id) continue;
 
     // Update the parent IDs map for the base language
-    parentIdsMap.set(baseLanguage, base.id);
+    childParentIdsMap.set(baseLanguage, base.id);
 
     // Process each translation of the current document
     for (const language of document.translations) {
-      if (language !== baseLanguage) {
-        document.path = getTranslationPath(
-          document.path,
-          baseLanguage,
-          language,
-        );
+      document.path = getTranslationPath(document.path, baseLanguage, language);
+      document.parent = parentIdsMap.get(language);
+      document.originId = base.id;
 
-        document.parent = parentIdsMap.get(language);
-        document.originId = base.id;
+      const translatedDocument = await processFile(document, language);
 
-        const translatedDocument = await processFile(document, language);
-
-        // Update the parent IDs map with the translated document's ID
-        if (translatedDocument && translatedDocument.id) {
-          parentIdsMap.set(language, translatedDocument.id);
-        }
+      // Update the parent IDs map with the translated document's ID
+      if (translatedDocument && translatedDocument.id) {
+        childParentIdsMap.set(language, translatedDocument.id);
       }
     }
 
     // Process children
     if (document.children) {
-      // Create a new map for child documents
-      const childParentIdsMap = new Map(parentIdsMap);
-
       // Process children with the updated parent IDs map
       await processFiles(
         document.children,
@@ -280,9 +300,10 @@ export async function importFromDirectory(
 ) {
   const dir = path.join(directory, baseLanguage);
 
-  const languages = fs.readdirSync(directory).filter((file) => {
-    return file !== baseLanguage && file.length === 2;
-  });
+  const languages = fs
+    .readdirSync(directory, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name !== baseLanguage)
+    .map(({ name }) => name);
 
   console.log("Available languages", languages);
 
