@@ -139,6 +139,7 @@ export const loadPages = async () => {
           },
         ],
         media: [],
+        hidden: false,
       },
       children,
       isTopic: true,

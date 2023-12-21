@@ -1,13 +1,26 @@
 <template>
   <div class="content-editor" v-if="selectedDocument">
-    <MetaData v-model:header="selectedDocument.header" v-model:description="selectedDocument.description"
-      v-model:lang-code="selectedDocument.langCode" v-model:name="selectedDocument.name"
-      :hasOrigin="selectedDocument.originId != null" :type="selectedDocument.type" />
+    <MetaData
+      v-model:header="selectedDocument.header"
+      v-model:description="selectedDocument.description"
+      v-model:lang-code="selectedDocument.langCode"
+      v-model:name="selectedDocument.name"
+      v-model:hidden="selectedDocument.hidden"
+      :hasOrigin="selectedDocument.originId != null"
+      :type="selectedDocument.type"
+    />
 
     <!-- <div class="content-editor__label">Content</div> -->
     <div class="content-editor__block-editor">
-      <BlockEditor v-if="selectedDocument.type === 'document'" v-model="page" :readOnly="false" :debug="false"
-        :plugins="plugins" :showAllBlockControls="true" :disableColumns="true" />
+      <BlockEditor
+        v-if="selectedDocument.type === 'document'"
+        v-model="page"
+        :readOnly="false"
+        :debug="false"
+        :plugins="plugins"
+        :showAllBlockControls="true"
+        :disableColumns="true"
+      />
     </div>
 
     <!-- Dummy container that adds whitespace to the editor area for usability. -->
@@ -41,10 +54,10 @@ const selectedDocument = computed({
     return $doc.$state.selectedDocument;
   },
   set(newValue) {
-    console.log('set selected document');
     $doc.$state.selectedDocument = newValue;
   },
 });
+
 const content = computed({
   get() {
     return $doc.$state.selectedDocument?.content || [];
@@ -60,7 +73,13 @@ const page = ref<BlockPage>({
 });
 
 // block editor plugins
-const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown, PluginPdf];
+const plugins = [
+  PluginParagraph,
+  PluginHeader,
+  PluginMedium,
+  PluginMarkdown,
+  PluginPdf,
+];
 </script>
 
 <style lang="scss">

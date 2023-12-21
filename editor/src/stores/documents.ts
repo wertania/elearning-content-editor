@@ -385,6 +385,7 @@ export const useDocumentStore = defineStore("documents", {
         parent: this.$state.selectedDocument?.parent ?? undefined,
         originId: translate ? this.$state.selectedDocument?.id : undefined,
         media: this.$state.selectedDocument?.media ?? [],
+        hidden: false,
       };
 
       // create document in backend
@@ -418,6 +419,7 @@ export const useDocumentStore = defineStore("documents", {
           : [],
         parent: parent ?? undefined,
         media: [],
+        hidden: false,
       };
 
       this.resetSelectedDocument();

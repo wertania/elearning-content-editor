@@ -1,28 +1,54 @@
 <template>
   <div v-if="!showDetails" class="flex card-container">
-    <div class="flex-grow-1 flex align-items-center font-bold surface-100 border-round-md mr-2 pl-2">
-      {{ header }}</div>
+    <div
+      class="flex-grow-1 flex align-items-center font-bold surface-100 border-round-md mr-2 pl-2"
+    >
+      {{ header }}
+    </div>
     <!-- <div class="flex-none flex align-items-center justify-content-center bg-blue-500 font-bold text-white m-2 px-5 py-3 border-round">PrimeFlex</div> -->
-    <Button icon="fa-solid fa-pen" @click="showDetails = true" class="flex-none" />
+    <Button
+      icon="fa-solid fa-pen"
+      @click="showDetails = true"
+      class="flex-none"
+    />
   </div>
   <Transition :duration="550">
-    <div v-if="showDetails" class="border-round-md p-2 border-300 border-solid border-1">
+    <div
+      v-if="showDetails"
+      class="border-round-md p-2 border-300 border-solid border-1"
+    >
       <div class="meta-data__item">
         <label class="content-editor__label" for="name">
           Name for menu (please write in base language: {{ baseLang }})
         </label>
-        <InputText small id="name" :value="name" @update:model-value="$emit('update:name', $event)" />
+        <InputText
+          small
+          id="name"
+          :value="name"
+          @update:model-value="$emit('update:name', $event)"
+        />
       </div>
 
       <div class="meta-data__item">
         <label class="content-editor__label" for="header">Header</label>
-        <InputText small id="header" :value="header" @update:model-value="$emit('update:header', $event)" />
+        <InputText
+          small
+          id="header"
+          :value="header"
+          @update:model-value="$emit('update:header', $event)"
+        />
       </div>
 
       <div class="meta-data__item" v-show="type === 'document'">
-        <label class="content-editor__label" for="description">Short description</label>
-        <InputText small id="description" :value="description"
-          @update:model-value="$emit('update:description', $event)" />
+        <label class="content-editor__label" for="description">
+          Short description
+        </label>
+        <InputText
+          small
+          id="description"
+          :value="description"
+          @update:model-value="$emit('update:description', $event)"
+        />
       </div>
 
       <div class="meta-data__item">
@@ -30,13 +56,37 @@
           Language Code
           {{ hasOrigin ? '' : ' (automatically set to base language)' }}
         </label>
-        <Dropdown small id="langCode" :disabled="!hasOrigin" :options="[
-          { label: 'German', val: 'de' },
-          { label: 'English', val: 'en' },
-        ]" option-value="val" option-label="label" v-model="selectedLangCode"
-          @update:model-value="$emit('update:langCode', $event)" />
+        <Dropdown
+          small
+          id="langCode"
+          :disabled="!hasOrigin"
+          :options="[
+            { label: 'German', val: 'de' },
+            { label: 'English', val: 'en' },
+          ]"
+          option-value="val"
+          option-label="label"
+          v-model="selectedLangCode"
+          @update:model-value="$emit('update:langCode', $event)"
+        />
       </div>
-      <Button small label="Hide Details" @click="showDetails = false" class="mt-2 mb-2" />
+
+      <div class="meta-data__item">
+        <label class="content-editor__label" for="hidden">Hidden</label>
+        <Checkbox
+          id="hidden"
+          :binary="true"
+          v-bind:model-value="hidden"
+          @update:model-value="$emit('update:hidden', $event)"
+        />
+      </div>
+
+      <Button
+        small
+        label="Hide Details"
+        @click="showDetails = false"
+        class="mt-2 mb-2"
+      />
     </div>
   </Transition>
 </template>
@@ -47,6 +97,7 @@
  * Will be rendered at the top of the content editor.
  */
 import InputText from 'primevue/inputtext';
+import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
 import { computed, ref } from 'vue';
 import Button from 'primevue/button';
@@ -60,6 +111,7 @@ const props = defineProps<{
   langCode: string;
   hasOrigin: boolean;
   type: string;
+  hidden: boolean;
 }>();
 
 const showDetails = ref<boolean>(false);
@@ -72,6 +124,7 @@ const emit = defineEmits([
   'update:header',
   'update:description',
   'update:langCode',
+  'update:hidden',
 ]);
 
 const selectedLangCode = computed<string>({
@@ -85,15 +138,19 @@ const selectedLangCode = computed<string>({
   &__item {
     display: flex;
     flex-direction: column;
+    margin-bottom: 0.5rem;
   }
 }
 
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 0.5s ease, height 1s ease;
+  transition:
+    opacity 0.5s ease,
+    height 1s ease;
 }
 
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
-}</style>
+}
+</style>

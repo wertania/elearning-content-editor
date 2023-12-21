@@ -24,7 +24,7 @@ const sorter = (a: DocumentTreeItem, b: DocumentTreeItem): number => {
 
 const buildTreeItem = (
   item: DocumentItem,
-  documents: DocumentItem[]
+  documents: DocumentItem[],
 ): DocumentTreeItem => {
   const children = documents
     .filter((childItem) => childItem.parent === item.id)
@@ -86,14 +86,24 @@ export const vitepressDataProvider = {
     tree: any[];
     list: any[];
   }> {
-    let filter = `${
-      query?.langCodes ? "content.langCode ~ '" + query.langCodes + "'" : ""
-    } `;
-    filter = filter + (query?.hasOrigin ? "content.originId != null " : "");
-    filter =
-      filter +
-      (query?.originId ? "content.originId = '" + query.originId + "'" : "");
-    filter = filter.trim();
+    const filterParts: string[] = [];
+
+    if (query?.langCodes) {
+      filterParts.push("content.langCode ~ '" + query.langCodes + "'");
+    }
+
+    if (query?.hasOrigin) {
+      filterParts.push("content.originId != null");
+    }
+
+    if (query?.originId) {
+      filterParts.push("content.originId = '" + query.originId + "'");
+    }
+
+    filterParts.push("content.hidden = false");
+
+    // Join all filter parts with ' && ' to form a valid Pocketbase filter query
+    let filter = filterParts.join(" && ").trim();
 
     console.log("getDocuments from pocketbase", filter);
     const result = await this.cache.pb.collection("documents").getList(1, 500, {
