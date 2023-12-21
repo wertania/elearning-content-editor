@@ -1,6 +1,44 @@
-export interface BaseDataService {
-  initialize(): void;
+import "dotenv/config";
+import PocketBaseProvider from "./pocketbase";
+import { DocumentItem, Medium } from "./types";
 
-  uploadMedium(): Promise<any>;
-  uploadDocument(): Promise<any>;
+export interface DataProvider {
+  name: string;
+
+  cache?: any; // provider specific cache
+
+  initialize(): Promise<void>;
+
+  login(data?: { username: string; password: string }): Promise<boolean>;
+  checkLogin(): Promise<boolean>;
+
+  clear(): Promise<void>;
+
+  uploadMedium(
+    filePath: string,
+    langCode: string,
+    documentId?: string | string[],
+    originId?: string,
+  ): Promise<Medium>;
+
+  uploadDocument(document: DocumentItem): Promise<DocumentItem>;
+
+  getFileURL(id: string): Promise<string>;
 }
+
+// Register your providers here.
+const providerOptions: DataProvider[] = [PocketBaseProvider];
+
+// Instantiate a provider.
+export const dataProvider = (() => {
+  const providerName = process.env.DOCUMENT_DATASOURCE;
+  console.log(`Using data provider '${providerName}'.`);
+
+  for (const p of providerOptions) {
+    if (p.name === providerName) {
+      return p;
+    }
+  }
+
+  throw Error(`Cannot find unregistered data provider '${providerName}'.`);
+})();
