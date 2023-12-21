@@ -4,8 +4,6 @@ import { dataProvider, initializeDataProvider } from "./src/dataService";
 
 (async function main() {
   const config = loadConfig();
-  console.log(config);
-  
 
   await initializeDataProvider(config.dataProvider);
 
@@ -13,8 +11,6 @@ import { dataProvider, initializeDataProvider } from "./src/dataService";
     username: config.user,
     password: config.password,
   });
-
-  // await dataProvider.clear();
 
   await importFromDirectory(config.sourcePath, config.baseLanguage);
 })();
