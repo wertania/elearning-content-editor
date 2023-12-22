@@ -87,7 +87,7 @@ export const loadPages = async () => {
     const myPathPart = "/" + toUrl(item.name);
 
     if (parent) {
-      return myPathPart; //return getPath(parent) + myPathPart;??? HACK
+      return getPath(parent) + myPathPart;
     } else {
       return myPathPart;
     }
