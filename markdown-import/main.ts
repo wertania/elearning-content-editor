@@ -12,5 +12,9 @@ import { dataProvider, initializeDataProvider } from "./src/dataService";
     password: config.password,
   });
 
-  await importFromDirectory(config.sourcePath, config.baseLanguage);
+  await importFromDirectory(
+    config.sourcePath,
+    config.baseLanguage,
+    config.targetFolder || undefined,
+  );
 })();
