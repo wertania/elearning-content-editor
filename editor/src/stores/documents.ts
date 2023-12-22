@@ -86,7 +86,7 @@ export const useDocumentStore = defineStore("documents", {
     async getDocument(
       id: string,
       preferedLanguageCode?: string,
-    ): Promise<void> {
+    ): Promise<DocumentItem | undefined> {
       try {
         // rest first
         this.$state.selectedDocument = null;
@@ -115,13 +115,16 @@ export const useDocumentStore = defineStore("documents", {
             console.log("translation found", translation);
             this.$state.selectedDocument = translation;
             this.$state.selectedLanguage = translation.langCode;
+            return translation;
           } else {
             // else fallback to base document
             this.$state.selectedDocument = document;
+            return document;
           }
         } else {
           // set selected document
           this.$state.selectedDocument = document;
+          return document;
         }
       } catch (e) {
         error(e + "");
