@@ -4,7 +4,7 @@ import type { DocumentItem, Medium, MediumType } from "./types";
 import fs from "fs";
 import path from "path";
 
-const URL: string = process.env.POCKETBASE_URL || "http://127.0.0.1:8090";
+let URL: string;
 
 export default {
   name: "pocketbase",
@@ -13,8 +13,50 @@ export default {
     pb: null,
   },
 
-  async initialize() {
-    this.cache.pb = new PocketBase(URL);
+  async initialize({ url }: { url: string }) {
+    URL = url;
+    this.cache.pb = new PocketBase(url);
+  },
+
+  async login(data: { username: string; password: string }): Promise<boolean> {
+    try {
+      await this.cache.pb
+        .collection("users")
+        .authWithPassword(data.username, data.password);
+      return this.checkLogin();
+    } catch (err) {
+      throw Error(`Login failed. ${err}`);
+      // return false;
+    }
+  },
+
+  async clear(): Promise<void> {
+    const documents = await this.cache.pb.collection("documents").getFullList();
+    for (const doc of documents) {
+      await this.cache.pb.collection("documents").delete(doc.id);
+    }
+
+    // delete media
+    const media = await this.cache.pb.collection("media").getFullList();
+    for (const m of media) {
+      await this.cache.pb.collection("media").delete(m.id);
+    }
+  },
+
+  async checkLogin(): Promise<boolean> {
+    console.log("checking login");
+    try {
+      // console.log("token: ", this.pb.authStore.token);
+      const res = await this.cache.pb.collection("users").getList(1, 1, {
+        expand: "company",
+      });
+      if (res.items.length < 1) return false;
+
+      return true;
+    } catch (error) {
+      console.log("error: ", error);
+      return false;
+    }
   },
 
   async uploadDocument(document: DocumentItem): Promise<DocumentItem> {
@@ -40,7 +82,8 @@ export default {
       const fileName = path.basename(filePath);
 
       const file = new FormData();
-      file.append("file", new Blob([fs.readFileSync(filePath)]), fileName);
+      const blob = new Blob([fs.readFileSync(filePath)]);
+      file.append("file", blob, fileName);
 
       const result = await this.cache.pb.collection("media").create(file);
 
@@ -72,7 +115,7 @@ export default {
 
       return updatedMedium.content;
     } catch (e) {
-      throw Error(`Medium ${fileName} could not be uploaded. ${e}`);
+      throw Error(`Medium ${filePath} could not be uploaded. ${e}`);
     }
   },
 
