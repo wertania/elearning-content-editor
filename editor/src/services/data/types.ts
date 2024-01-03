@@ -29,7 +29,7 @@ export interface Medium {
   filename: string;
   originId?: string; // id of the original document (e.g. translations)
   providerSpecific?: any; // provider specific data
-  documents: string[]; // list of document ids
+  // documents: string[]; // list of document ids
 }
 export type MediumAddRequest = Omit<Medium, "id" | "version">;
 

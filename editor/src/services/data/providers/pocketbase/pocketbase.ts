@@ -7,7 +7,7 @@ import type {
   MediumQuery,
   MediumType,
 } from '../../types';
-import { buildTree } from '../../helpers';
+import { buildTree, getDocumentMediaIds } from '../../helpers';
 import PocketBase from 'pocketbase';
 import { $global } from './../../../../main';
 
@@ -96,16 +96,16 @@ export default {
 
   async getDataForDocument(id: string): Promise<DocumentItem> {
     const result = await this.cache.pb.collection('documents').getOne(id);
-    console.log(result);
-    const document = { ...result.content, id: result.id };
-    return document;
+    return { ...result.content, id: result.id, media: result.media };
   },
 
   async addDocument(document: DocumentItem): Promise<DocumentItem> {
     const result = await this.cache.pb.collection('documents').create({
       content: document,
+      media: getDocumentMediaIds(document),
     });
-    return { ...result.content, id: result.id };
+
+    return { ...result.content, id: result.id, media: result.media };
   },
 
   async dropDocument(id: string): Promise<void> {
@@ -114,29 +114,25 @@ export default {
 
   async updateDocument(document: DocumentItem): Promise<DocumentItem> {
     // get all media-ids from document.content to update them in document.media
-    const mediaIds = [];
-    for (const item of document.content) {
-      if (item.type === 'medium' && item.data.id && item.data.id !== '') {
-        mediaIds.push(item.data.id);
-      }
-    }
-    document.media = mediaIds;
+    document.media = getDocumentMediaIds(document);
+
     const result = await this.cache.pb
       .collection('documents')
       .update(document.id, { content: document });
 
     // update also all media-entries
-    for (const id of mediaIds) {
-      const medium = await this.getMedium(id);
-      if (!medium) continue;
-      if (medium.documents.indexOf(document.id) === -1) {
-        medium.documents.push(document.id);
-        await this.cache.pb.collection('media').update(id, {
-          content: medium,
-        });
-      }
-    }
-    return { ...result.content, id: result.id };
+    // for (const id of document.media) {
+    //   const medium = await this.getMedium(id);
+    //   if (!medium) continue;
+    //   if (medium.documents.indexOf(document.id) === -1) {
+    //     medium.documents.push(document.id);
+    //     await this.cache.pb.collection('media').update(id, {
+    //       content: medium,
+    //     });
+    //   }
+    // }
+
+    return { ...result.content, id: result.id, media: result.media };
   },
 
   // ---------
@@ -201,6 +197,7 @@ export default {
       const result = await this.cache.pb.collection('media').create({
         file,
       });
+      
       const url = await this.cache.pb.files.getUrl(result, result.file);
       const dbEntry: Medium = {
         id: result.id,
@@ -212,11 +209,11 @@ export default {
         hash: '',
         filename: result.id,
         originId: originId || undefined,
-        documents: documentId
-          ? Array.isArray(documentId)
-            ? documentId
-            : [documentId]
-          : [],
+        // documents: documentId
+        //   ? Array.isArray(documentId)
+        //     ? documentId
+        //     : [documentId]
+        //   : [],
       };
 
       // update db
