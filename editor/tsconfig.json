@@ -22,8 +22,7 @@
 
     "baseUrl": ".",
     "paths": {
-      "hh-components": ["./src/ui"],
-      "hh-components/*": ["./src/ui/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
