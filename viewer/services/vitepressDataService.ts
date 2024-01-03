@@ -53,6 +53,7 @@ export const vitepressDataProvider = {
 
   async initialize() {
     this.cache.pb = new PocketBase(POCKETBASE_URL);
+    this.cache.pb.autoCancellation(false);
   },
 
   async login(): Promise<boolean> {
@@ -86,9 +87,8 @@ export const vitepressDataProvider = {
     tree: any[];
     list: any[];
   }> {
-    let filter = `${
-      query?.langCodes ? "content.langCode ~ '" + query.langCodes + "'" : ""
-    } `;
+    let filter = `${query?.langCodes ? "content.langCode ~ '" + query.langCodes + "'" : ""
+      } `;
     filter = filter + (query?.hasOrigin ? "content.originId != null " : "");
     filter =
       filter +
