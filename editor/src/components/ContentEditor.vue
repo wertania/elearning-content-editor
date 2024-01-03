@@ -87,6 +87,11 @@ const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown, Pl
     display: flex;
     flex-direction: column;
     gap: 1rem;
+
+    // Fix for small devices.
+    .flex.m-0 .w-1\/12 {
+      min-width: fit-content;
+    }
   }
 }
 </style>
