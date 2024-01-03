@@ -21,3 +21,5 @@ aisearch/importer/test
 .DS_Store
 
 .venv/
+
+node_modules/
