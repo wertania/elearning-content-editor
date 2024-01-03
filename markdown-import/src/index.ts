@@ -11,6 +11,7 @@ import { DocumentItem, Medium } from "./dataService/types";
 
 type TDocument = {
   name: string;
+  title?: string;
   path: string;
   type: "document" | "folder";
   translations: string[];
@@ -172,6 +173,14 @@ async function transformMarkdown(
         }
         break;
 
+      // @ts-ignore: Ignore fallthrough error due to no break.
+      case "heading": {
+        // Set the title of the file to the first heading of the markdown document.
+        if (!file.title) file.title = toString(node);
+
+        // Do not break out of the switch.
+      }
+
       default:
         // Continue the current markdown block.
         if (mdStart === null) mdStart = node.position.start.offset!;
@@ -243,16 +252,16 @@ const uploadDocument = async (
   language: string,
 ) => {
   return await dataProvider.uploadDocument({
-    name: document.name,
     type: document.type,
-    version: 1,
+    name: document.title ?? document.name,
+    header: document.title ?? document.name,
     parent: document.parent,
-    header: document.name,
+    originId: document.originId,
     description: "",
     langCode: language,
     content: content,
-    originId: document.originId,
     media: Array.from(document.media ?? []),
+    version: 1,
   });
 };
 
