@@ -297,6 +297,8 @@ ul.mobile-submenu-list > li {
     display: grid;
     gap: 1rem;
 
+    overflow: auto;
+
     width: 100%;
     grid-template-columns: max(25%, 250px) 1fr;
 
