@@ -211,14 +211,21 @@ const search = async () => {
  * AI Search
  */
 const aiSearch = async () => {
+  if (questionText.value.length < 10) {
+    error('Please enter a question with at least 10 characters.');
+    return;
+  }
+  // clone question
+  const question = questionText.value + "";
   // reset old values
   resetSearch();
   // fetch new answer
   loading.value = true;
   try {
-    const res: AiSearchResult = await post(`${$global.aiSearchUrl}/question`, { text: questionText.value, count: 5 }, true);
+    const res: AiSearchResult = await post(`${$global.aiSearchUrl}/question`, { text: question, count: 5 }, true);
     answerText.value = res.answer;
     answerDependingDocuments.value = res.documents;
+
   } catch (e) {
     error(e + "");
   }
