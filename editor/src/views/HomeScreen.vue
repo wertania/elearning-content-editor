@@ -38,9 +38,7 @@
                         Document Editor
                     </h2>
                 </GardientBox>
-
             </div>
-
         </template>
     </AppLayout>
 </template>
@@ -50,6 +48,7 @@ import GardientBox from './../components/GardientBox.vue';
 import AppLayout from './../components/AppLayout.vue';
 import GradientFont from './../components/GradientFont.vue';
 import { useRouter } from 'vue-router';
+import MediaBrowser from './../components/MediaBrowser.vue';
 const router = useRouter();
 const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
 
