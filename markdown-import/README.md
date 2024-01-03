@@ -14,11 +14,12 @@ You can provide the options via command line arguments like this:
 
 ```sh
 npm run start --
-  --baseLanguage   The base language to use for the import
+  --baseLanguage   The base language to use for the import (pocketbase)
   --dataProvider   The data provider implementation to use
   --url            The URL to the data provider
   --user           The username to use for the data provider
   --password       The password to use for the data provider
+  --targetFolder   The folder to store the imported files in (optional)
   <sourcePath>     The path to the markdown files to import
 ```
 
@@ -31,10 +32,11 @@ MDI_DATAPROVIDER_PASSWORD=
 MDI_DATAPROVIDER_URL=
 MDI_BASE_LANGUAGE=
 MDI_SOURCE_PATH=
+MDI_TARGET_FOLDER=
 ```
 
 Example:
 
 ```sh
-npm run start -- --baseLanguage de --dataProvider pocketbase --user user --password password --url http://localhost:8080 ./testfiles
+npm run start -- --baseLanguage de --dataProvider pocketbase --user user --password password --url http://localhost:8080 --targetFolder imported ./testfiles
 ```

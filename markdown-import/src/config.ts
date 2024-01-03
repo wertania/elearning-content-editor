@@ -8,9 +8,10 @@ export interface Config {
   url: string;
   baseLanguage: string;
   sourcePath: string;
+  targetFolder: string | null;
 }
 
-export function loadConfig() {
+export function loadConfig(): Config {
   const {
     MDI_DATAPROVIDER,
     MDI_DATAPROVIDER_USER,
@@ -18,6 +19,7 @@ export function loadConfig() {
     MDI_DATAPROVIDER_URL,
     MDI_BASE_LANGUAGE,
     MDI_SOURCE_PATH,
+    MDI_TARGET_FOLDER,
   } = process.env;
 
   const parsed = parseArgs(process.argv, { string: ["password"] });
@@ -29,9 +31,10 @@ export function loadConfig() {
     url: MDI_DATAPROVIDER_URL || parsed.url,
     baseLanguage: MDI_BASE_LANGUAGE || parsed.baseLanguage,
     sourcePath: MDI_SOURCE_PATH || parsed._[2],
+    targetFolder: MDI_TARGET_FOLDER || parsed.targetFolder || null,
   };
 
-  if (Object.values(config).some((value) => !value)) {
+  if (Object.values(config).some((value) => typeof value === "undefined")) {
     throw new Error(
       "Missing configuration option(s). Please check your .env file or command line arguments.",
     );

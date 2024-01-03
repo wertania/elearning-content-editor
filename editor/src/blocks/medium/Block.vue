@@ -103,7 +103,7 @@ watch(
 .plugin-medium {
   img {
     margin: auto;
-    width: 80%;
+    width: auto;
   }
 }
 </style>

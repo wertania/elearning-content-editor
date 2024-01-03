@@ -8,21 +8,15 @@
   },
   "isort.args": ["--profile", "black"],
   "python.analysis.typeCheckingMode": "basic",
+  "cSpell.words": [
+    "blockful",
+    "DATAPROVIDER",
+    "mdast",
+    "unist"
+  ],
   "github.copilot.enable": {
     "*": true,
     "plaintext": true,
     "markdown": true
-  },
-  "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    "**/Thumbs.db": true
-  },
-  "hide-files.files": [],
-  "cSpell.words": [
-    "blockful"
-  ]
+  }
 }
