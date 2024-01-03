@@ -1,13 +1,25 @@
 <template>
   <div class="content-editor" v-if="selectedDocument">
-    <MetaData v-model:header="selectedDocument.header" v-model:description="selectedDocument.description"
-      v-model:lang-code="selectedDocument.langCode" v-model:name="selectedDocument.name"
-      :hasOrigin="selectedDocument.originId != null" :type="selectedDocument.type" />
+    <MetaData
+      v-model:header="selectedDocument.header"
+      v-model:description="selectedDocument.description"
+      v-model:lang-code="selectedDocument.langCode"
+      v-model:name="selectedDocument.name"
+      :hasOrigin="selectedDocument.originId != null"
+      :type="selectedDocument.type"
+    />
 
     <!-- <div class="content-editor__label">Content</div> -->
     <div class="content-editor__block-editor">
-      <BlockEditor v-if="selectedDocument.type === 'document'" v-model="page" :readOnly="false" :debug="false"
-        :plugins="plugins" :showAllBlockControls="true" :disableColumns="true" />
+      <BlockEditor
+        v-if="selectedDocument.type === 'document'"
+        v-model="page"
+        :readOnly="false"
+        :debug="false"
+        :plugins="plugins"
+        :showAllBlockControls="true"
+        :disableColumns="true"
+      />
     </div>
 
     <!-- Dummy container that adds whitespace to the editor area for usability. -->
@@ -60,7 +72,13 @@ const page = ref<BlockPage>({
 });
 
 // block editor plugins
-const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown, PluginPdf];
+const plugins = [
+  PluginParagraph,
+  PluginHeader,
+  PluginMedium,
+  PluginMarkdown,
+  PluginPdf,
+];
 </script>
 
 <style lang="scss">
@@ -88,9 +106,18 @@ const plugins = [PluginParagraph, PluginHeader, PluginMedium, PluginMarkdown, Pl
     flex-direction: column;
     gap: 1rem;
 
+    overflow: auto;
+
     // Fix for small devices.
-    .flex.m-0 .w-1\/12 {
-      min-width: fit-content;
+    .flex.m-0 {
+      width: 100%;
+      display: grid !important;
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem;
+
+      > * {
+        width: auto !important;
+      }
     }
   }
 }
