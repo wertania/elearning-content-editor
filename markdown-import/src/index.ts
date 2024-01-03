@@ -8,6 +8,7 @@ import type { UniversalBlock } from "vue-blockful-editor";
 import { toString } from "mdast-util-to-string";
 import { dataProvider } from "./dataService";
 import { DocumentItem, Medium } from "./dataService/types";
+import logger from "./logger";
 
 type TDocument = {
   name: string;
@@ -327,7 +328,9 @@ export async function importFromDirectory(
     .filter((entry) => entry.isDirectory() && entry.name !== baseLanguage)
     .map(({ name }) => name);
 
-  console.log("Available languages", languages);
+  logger.info("Importing from", dir);
+  logger.info("Base language", baseLanguage);
+  logger.info("Available languages", languages);
 
   const structure = await buildStructure(dir, baseLanguage, languages);
   await processFiles(structure, baseLanguage, languages);

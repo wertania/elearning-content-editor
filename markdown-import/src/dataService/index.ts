@@ -1,6 +1,7 @@
 import "dotenv/config";
 import PocketBaseProvider from "./pocketbase";
 import { DocumentItem, Medium } from "./types";
+import logger from "../logger";
 
 export interface DataProvider {
   name: string;
@@ -36,7 +37,7 @@ export async function initializeDataProvider(
   dataProviderName: string,
   options?: any,
 ) {
-  console.log(`Using data provider '${dataProviderName}'.`);
+  logger.info(`Using data provider '${dataProviderName}'.`);
 
   for (const p of providerOptions) {
     if (p.name === dataProviderName) {
