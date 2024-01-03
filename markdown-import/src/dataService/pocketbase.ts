@@ -3,6 +3,7 @@ import type { DataProvider } from "./index";
 import type { DocumentItem, Medium, MediumType } from "./types";
 import fs from "fs";
 import path from "path";
+import { getDocumentMediaIds } from "../helpers";
 
 let URL: string;
 
@@ -60,10 +61,16 @@ export default {
   },
 
   async uploadDocument(document: DocumentItem): Promise<DocumentItem> {
+    const mediaIds = getDocumentMediaIds(document);
+
+    delete document.media;
+
     const result = await this.cache.pb.collection("documents").create({
       content: document,
+      media: mediaIds,
     });
-    return { ...result.content, id: result.id };
+
+    return { ...result.content, id: result.id, media: result.media };
   },
 
   async uploadMedium(
@@ -112,6 +119,18 @@ export default {
         .update(result.id, {
           content: dbEntry,
         });
+
+      if (documentId) {
+        for (const id of documentId) {
+          const document = await this.cache.pb
+            .collection("documents")
+            .getOne(id);
+
+          await this.cache.pb.collection("documents").update(id, {
+            media: [...document.media, updatedMedium.id],
+          });
+        }
+      }
 
       return updatedMedium.content;
     } catch (e) {

@@ -77,11 +77,17 @@ export default {
     const result = await this.cache.pb.collection('documents').getList(1, 500, {
       filter,
     });
+
     if (result.status && result.status !== 200) {
       throw Error(`Documents could not be fetched. ${result.message}`);
     }
+
     const contents = result.items.map((item: any) => {
       return { ...item.content, id: item.id }; // overwrite id since this is empty in content
+    });
+
+    contents.forEach((document: DocumentItem) => {
+      document.media = getDocumentMediaIds(document);
     });
 
     return {
@@ -100,9 +106,13 @@ export default {
   },
 
   async addDocument(document: DocumentItem): Promise<DocumentItem> {
+    const mediaIds = getDocumentMediaIds(document);
+
+    delete document.media;
+
     const result = await this.cache.pb.collection('documents').create({
       content: document,
-      media: getDocumentMediaIds(document),
+      media: mediaIds,
     });
 
     return { ...result.content, id: result.id, media: result.media };
@@ -114,23 +124,13 @@ export default {
 
   async updateDocument(document: DocumentItem): Promise<DocumentItem> {
     // get all media-ids from document.content to update them in document.media
-    document.media = getDocumentMediaIds(document);
+    const mediaIds = getDocumentMediaIds(document);
+
+    delete document.media;
 
     const result = await this.cache.pb
       .collection('documents')
-      .update(document.id, { content: document });
-
-    // update also all media-entries
-    // for (const id of document.media) {
-    //   const medium = await this.getMedium(id);
-    //   if (!medium) continue;
-    //   if (medium.documents.indexOf(document.id) === -1) {
-    //     medium.documents.push(document.id);
-    //     await this.cache.pb.collection('media').update(id, {
-    //       content: medium,
-    //     });
-    //   }
-    // }
+      .update(document.id, { content: document, media: mediaIds });
 
     return { ...result.content, id: result.id, media: result.media };
   },
@@ -138,7 +138,6 @@ export default {
   // ---------
   // | MEDIA |
   // ---------
-
   async getMediums(query?: MediumQuery): Promise<any> {
     let filter = `${
       query?.documentId ? "content.documents ~ '" + query.documentId + "'" : ''
@@ -197,8 +196,9 @@ export default {
       const result = await this.cache.pb.collection('media').create({
         file,
       });
-      
+
       const url = await this.cache.pb.files.getUrl(result, result.file);
+
       const dbEntry: Medium = {
         id: result.id,
         version: 1,
@@ -209,11 +209,6 @@ export default {
         hash: '',
         filename: result.id,
         originId: originId || undefined,
-        // documents: documentId
-        //   ? Array.isArray(documentId)
-        //     ? documentId
-        //     : [documentId]
-        //   : [],
       };
 
       // update db
@@ -222,7 +217,19 @@ export default {
         .update(result.id, {
           content: dbEntry,
         });
-      console.log(updatedMedium);
+
+      if (documentId) {
+        for (const id of documentId) {
+          const document = await this.cache.pb
+            .collection('documents')
+            .getOne(id);
+
+          await this.cache.pb.collection('documents').update(id, {
+            media: [...document.media, updatedMedium.id],
+          });
+        }
+      }
+
       return updatedMedium.content;
     } catch (e) {
       throw Error(`Medium ${file.name} could not be uploaded. ${e}`);

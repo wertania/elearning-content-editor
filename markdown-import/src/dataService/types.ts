@@ -12,7 +12,7 @@ export type DocumentItem = {
   description: string; // short description
   langCode: string; // 'de', 'en', 'fr', ...
   content: UniversalBlock[];
-  media: string[]; // list of medium ids
+  media?: string[]; // list of medium ids
 };
 
 export type MediumType = "video" | "audio" | "image";
