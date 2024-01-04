@@ -2,8 +2,8 @@
   <template v-if="isLoading"> Loading... </template>
   <template v-else-if="id && mediumUrl">
     <img v-if="type === 'image'" :src="mediumUrl" style="width: 100%;" />
-    <audio v-if="type === 'audio'" :src="mediumUrl" style="width: 100%;" />
-    <video v-if="type === 'video'" :src="mediumUrl" style="width: 100%;" />
+    <audio v-if="type === 'audio'" :src="mediumUrl" style="width: 100%;" controls />
+    <video v-if="type === 'video'" :src="mediumUrl" style="width: 100%;" controls />
   </template>
   <template v-else>
     Unknown medium type "{{ type }}".

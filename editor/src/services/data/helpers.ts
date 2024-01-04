@@ -13,6 +13,16 @@ export const buildTree = (items: DocumentItem[]): DocumentTreeItem[] => {
   return rootItems.map((item) => buildTreeItem(item, items));
 };
 
+export const getFileType = (filename: string): MediumType | 'unknown' => {
+  const ext = filename.split('.').pop()?.toLowerCase();
+  if (!ext) return 'unknown';
+  if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext)) return 'image';
+  if (['mp3', 'wav', 'ogg'].includes(ext)) return 'audio';
+  if (['mp4', 'webm'].includes(ext)) return 'video';
+
+  return 'unknown';
+};
+
 export const buildTreeItem = (
   item: DocumentItem,
   documents: DocumentItem[],

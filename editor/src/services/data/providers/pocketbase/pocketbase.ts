@@ -5,9 +5,8 @@ import type {
   DocumentTreeItem,
   Medium,
   MediumQuery,
-  MediumType,
 } from '../../types';
-import { buildTree, getDocumentMediaIds } from '../../helpers';
+import { buildTree, getDocumentMediaIds, getFileType } from '../../helpers';
 import PocketBase from 'pocketbase';
 import { $global } from './../../../../main';
 
@@ -188,10 +187,12 @@ export default {
     originId?: string,
   ) {
     try {
-      let type: MediumType = 'image';
-      if (file.name.endsWith('.mp4') || file.name.endsWith('.webm')) {
-        type = 'video';
+      const type = getFileType(file.name);
+
+      if (type === 'unknown') {
+        throw Error(`Medium ${file.name} has an unknown type.`);
       }
+
       // first upload the file itself
       const result = await this.cache.pb.collection('media').create({
         file,

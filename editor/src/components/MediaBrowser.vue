@@ -3,7 +3,7 @@
   <Dialog
     v-model:visible="uploadDialogControl.show"
     modal
-    header="Add image/video"
+    header="Add media"
     :style="{ width: '40vw' }"
   >
     <template #default>
@@ -23,8 +23,7 @@
         <FileUpload
           class="mt-4"
           mode="basic"
-          accept="video/*, image/*"
-          :maxFileSize="1000000"
+          accept="video/*, image/*, audio/*"
           customUpload
           @uploader="upload($event)"
         />

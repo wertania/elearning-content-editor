@@ -3,7 +3,7 @@ import type { DataProvider } from "./index";
 import type { DocumentItem, Medium, MediumType } from "./types";
 import fs from "fs";
 import path from "path";
-import { getDocumentMediaIds } from "../helpers";
+import { getDocumentMediaIds, getFileType } from "../helpers";
 
 let URL: string;
 
@@ -80,14 +80,15 @@ export default {
     originId?: string,
   ): Promise<Medium> {
     try {
-      let type: MediumType = "image";
-
-      if (filePath.endsWith(".mp4") || filePath.endsWith(".webm")) {
-        type = "video";
-      }
-
+      
       const fileName = path.basename(filePath);
 
+      const type = getFileType(fileName);
+
+      if (type === 'unknown') {
+        throw Error(`Medium ${fileName} has an unknown type.`);
+      }
+      
       const file = new FormData();
       const blob = new Blob([fs.readFileSync(filePath)]);
       file.append("file", blob, fileName);
