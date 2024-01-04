@@ -101,7 +101,7 @@ export const vitepressDataProvider = {
       filterParts.push("content.originId = '" + query.originId + "'");
     }
 
-    filterParts.push("content.hidden = false");
+    filterParts.push("(content.hidden = false || content.hidden = null)");
 
     // Join all filter parts with ' && ' to form a valid Pocketbase filter query
     const filter = filterParts.join(" && ").trim();
