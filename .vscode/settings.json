@@ -9,10 +9,12 @@
   "isort.args": ["--profile", "black"],
   "python.analysis.typeCheckingMode": "basic",
   "cSpell.words": [
+    "BASELANG",
     "blockful",
     "DATAPROVIDER",
     "mdast",
-    "unist"
+    "unist",
+    "vitepress"
   ],
   "github.copilot.enable": {
     "*": true,

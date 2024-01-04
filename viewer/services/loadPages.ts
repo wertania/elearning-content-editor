@@ -122,7 +122,7 @@ export const loadPages = async () => {
       name:
         "Language: " +
         (languageLookup.find((i) => i.code === langCode)?.name ?? langCode),
-      path: `/${langCode}/index`,
+      path: langCode,
       doc: {
         // some empty dummy document
         version: 1,
