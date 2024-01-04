@@ -5,6 +5,7 @@
       v-model:description="selectedDocument.description"
       v-model:lang-code="selectedDocument.langCode"
       v-model:name="selectedDocument.name"
+      v-model:hidden="selectedDocument.hidden"
       :hasOrigin="selectedDocument.originId != null"
       :type="selectedDocument.type"
     />
@@ -53,10 +54,10 @@ const selectedDocument = computed({
     return $doc.$state.selectedDocument;
   },
   set(newValue) {
-    console.log('set selected document');
     $doc.$state.selectedDocument = newValue;
   },
 });
+
 const content = computed({
   get() {
     return $doc.$state.selectedDocument?.content || [];
