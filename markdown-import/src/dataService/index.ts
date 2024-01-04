@@ -7,7 +7,7 @@ export interface DataProvider {
 
   cache?: any; // provider specific cache
 
-  initialize(): Promise<void>;
+  initialize(options?: any): Promise<void>;
 
   login(data?: { username: string; password: string }): Promise<boolean>;
   checkLogin(): Promise<boolean>;
@@ -30,15 +30,22 @@ export interface DataProvider {
 const providerOptions: DataProvider[] = [PocketBaseProvider];
 
 // Instantiate a provider.
-export const dataProvider = (() => {
-  const providerName = process.env.DOCUMENT_DATASOURCE;
-  console.log(`Using data provider '${providerName}'.`);
+export let dataProvider: DataProvider;
+
+export async function initializeDataProvider(
+  dataProviderName: string,
+  options?: any,
+) {
+  console.log(`Using data provider '${dataProviderName}'.`);
 
   for (const p of providerOptions) {
-    if (p.name === providerName) {
-      return p;
+    if (p.name === dataProviderName) {
+      dataProvider = p;
+      await dataProvider.initialize?.(options);
+
+      return;
     }
   }
 
-  throw Error(`Cannot find unregistered data provider '${providerName}'.`);
-})();
+  throw Error(`Cannot find unregistered data provider '${dataProviderName}'.`);
+}

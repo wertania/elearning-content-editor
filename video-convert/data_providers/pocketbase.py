@@ -1,6 +1,11 @@
 from pocketbase import PocketBase
 from pocketbase.client import FileUpload
-from data_providers.base import BaseDataProvider, UnconvertedVideo, VideoStatus
+from data_providers.base import (
+    BaseDataProvider,
+    UnconvertedVideo,
+    VideoStatus,
+    VideoContent,
+)
 from config import VIDEO_UPLOAD_URL, VIDEO_UPLOAD_USER, VIDEO_UPLOAD_PASSWORD
 from typing import Optional
 import urllib.request
@@ -67,6 +72,8 @@ class PocketBaseDataProvider(BaseDataProvider):
         self.pb.collection("media").create(
             {
                 "file": FileUpload((filename, file)),
+                "content": VideoContent("video").to_json(),
+                # TODO: langCode
             }
         )
 

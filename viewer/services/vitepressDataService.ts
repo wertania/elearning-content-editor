@@ -53,6 +53,7 @@ export const vitepressDataProvider = {
 
   async initialize() {
     this.cache.pb = new PocketBase(POCKETBASE_URL);
+    this.cache.pb.autoCancellation(false);
   },
 
   async login(): Promise<boolean> {
@@ -103,7 +104,7 @@ export const vitepressDataProvider = {
     filterParts.push("content.hidden = false");
 
     // Join all filter parts with ' && ' to form a valid Pocketbase filter query
-    let filter = filterParts.join(" && ").trim();
+    const filter = filterParts.join(" && ").trim();
 
     console.log("getDocuments from pocketbase", filter);
     const result = await this.cache.pb.collection("documents").getList(1, 500, {

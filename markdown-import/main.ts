@@ -1,14 +1,20 @@
 import { importFromDirectory } from "./src";
-import { dataProvider } from "./src/dataService";
+import { loadConfig } from "./src/config";
+import { dataProvider, initializeDataProvider } from "./src/dataService";
 
 (async function main() {
-  await dataProvider.initialize();
+  const config = loadConfig();
+
+  await initializeDataProvider(config.dataProvider, { url: config.url });
+
   await dataProvider.login({
-    username: "leon",
-    password: "12345678",
+    username: config.user,
+    password: config.password,
   });
 
-  // await dataProvider.clear();
-
-  await importFromDirectory("./testfiles", "de");
+  await importFromDirectory(
+    config.sourcePath,
+    config.baseLanguage,
+    config.targetFolder || undefined,
+  );
 })();

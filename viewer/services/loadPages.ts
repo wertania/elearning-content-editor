@@ -72,13 +72,13 @@ export const loadPages = async () => {
     .filter((lang) => lang !== baseLang)
     .filter((lang, index, self) => self.indexOf(lang) === index);
 
-  let dictWithOriginAndLangCode: { [id: string]: DocumentItem } = {};
   // form list to dictionary with id as key
 
-  dictWithOriginAndLangCode = allWithOrigin.list.reduce((acc, item) => {
-    acc[item.originId + "_" + item.langCode] = item;
-    return acc;
-  }, {} as { [id: string]: DocumentItem });
+  const dictWithOriginAndLangCode: Record<string, DocumentItem> =
+    allWithOrigin.list.reduce((acc, item) => {
+      acc[item.originId + "_" + item.langCode] = item;
+      return acc;
+    }, {} as Record<string, DocumentItem>);
 
   // --------------------------------
   // define some internal helpers to map the tree to an navigation tree
@@ -87,7 +87,7 @@ export const loadPages = async () => {
     const myPathPart = "/" + toUrl(item.name);
 
     if (parent) {
-      return myPathPart; //return getPath(parent) + myPathPart;??? HACK
+      return getPath(parent) + myPathPart;
     } else {
       return myPathPart;
     }
@@ -177,11 +177,16 @@ export const loadPages = async () => {
       const itemWithSameOriginId =
         dictWithOriginAndLangCode[item.doc.id + "_" + langCode] ?? null;
       if (itemWithSameOriginId) {
-        // replace item
+        // Replace item, but keep children. They are transformed recursively below.
+        const children = item.children;
         item = mapDocItem(itemWithSameOriginId, langCode, item.path);
+        item.children = children;
       }
       // else return original item but change the path
-      item.path = replaceLangCode(item.path, langCode);
+      else {
+        item.path = replaceLangCode(item.path, langCode);
+      }
+
       return item;
     };
     const mapPageTree = (tree: Page[], lang: string) => {
@@ -202,6 +207,7 @@ export const loadPages = async () => {
       // create a new tree with the found items. if an item is not found, use the baseLang item
       const copyBaseLangTree = JSON.parse(JSON.stringify(baseLangTree));
       const treeForLang = mapPageTree(copyBaseLangTree, lang);
+
       // add to full tree
       const langPage = createLanguagePageDummy(lang, treeForLang);
       fullTree.push(langPage);
@@ -223,6 +229,7 @@ export const loadPages = async () => {
     "./debug.baseLangList.json",
     JSON.stringify(listToDebug, null, 2),
   );
+
   // set cache
   pagesCache = {
     list: baseLangList,

@@ -3,9 +3,8 @@ import type { DataProvider } from "./index";
 import type { DocumentItem, Medium, MediumType } from "./types";
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
 
-const URL: string = process.env.POCKETBASE_URL || "http://127.0.0.1:8090";
+let URL: string;
 
 export default {
   name: "pocketbase",
@@ -14,8 +13,9 @@ export default {
     pb: null,
   },
 
-  async initialize() {
-    this.cache.pb = new PocketBase(URL);
+  async initialize({ url }: { url: string }) {
+    URL = url;
+    this.cache.pb = new PocketBase(url);
   },
 
   async login(data: { username: string; password: string }): Promise<boolean> {

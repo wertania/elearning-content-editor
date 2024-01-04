@@ -7,7 +7,7 @@
         <template #appname>
             <GradientFont direction="rtl" start-color="#eaa3ff" end-color="#5e085a"
                 style="font-weight: 800; font-size: 25px;">
-                RevDocs
+                {{ appName }}
             </GradientFont>
         </template>
 
@@ -51,6 +51,7 @@ import AppLayout from './../components/AppLayout.vue';
 import GradientFont from './../components/GradientFont.vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
+const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
 
 const staticViewerRoute = import.meta.env.VITE_STATIC_RENDERED_PAGE_URL ?? "/";
 const openFastViewer = () => {

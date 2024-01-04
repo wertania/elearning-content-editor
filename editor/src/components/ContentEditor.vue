@@ -106,6 +106,20 @@ const plugins = [
     display: flex;
     flex-direction: column;
     gap: 1rem;
+
+    overflow: auto;
+
+    // Fix for small devices.
+    .flex.m-0 {
+      width: 100%;
+      display: grid !important;
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem;
+
+      > * {
+        width: auto !important;
+      }
+    }
   }
 }
 </style>
