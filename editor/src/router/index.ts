@@ -25,6 +25,7 @@ const routes = [
     path: "/media/:documentId?",
     component: () => import("../views/MediaBrowserView.vue"),
     name: "media",
+    props: true
   },
   {
     path: "/mediabrowser",

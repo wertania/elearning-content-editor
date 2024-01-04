@@ -23,7 +23,7 @@ export const useMediaStore = defineStore("media", {
      * Initialize the store with data from the backend
      * get all documents and build a tree
      */
-    async initialize(documentId?: undefined | string): Promise<void> {
+    async initialize(documentId?: string): Promise<void> {
       try {
         const data = await dataProvider.getMediums({ documentId });
         this.$state.media = data;
