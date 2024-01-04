@@ -1,20 +1,27 @@
 import { importFromDirectory } from "./src";
 import { loadConfig } from "./src/config";
 import { dataProvider, initializeDataProvider } from "./src/dataService";
+import logger from "./src/logger";
 
 (async function main() {
-  const config = loadConfig();
+  try {
+    logger.info("Starting import...");
 
-  await initializeDataProvider(config.dataProvider, { url: config.url });
+    const config = loadConfig();
 
-  await dataProvider.login({
-    username: config.user,
-    password: config.password,
-  });
+    await initializeDataProvider(config.dataProvider, { url: config.url });
 
-  await importFromDirectory(
-    config.sourcePath,
-    config.baseLanguage,
-    config.targetFolder || undefined,
-  );
+    await dataProvider.login({
+      username: config.user,
+      password: config.password,
+    });
+
+    await importFromDirectory(
+      config.sourcePath,
+      config.baseLanguage,
+      config.targetFolder || undefined,
+    );
+  } catch (error) {
+    logger.error(error);
+  }
 })();

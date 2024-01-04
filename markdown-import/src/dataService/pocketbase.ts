@@ -3,6 +3,7 @@ import type { DataProvider } from "./index";
 import type { DocumentItem, Medium, MediumType } from "./types";
 import fs from "fs";
 import path from "path";
+import logger from "../logger";
 
 let URL: string;
 
@@ -44,7 +45,7 @@ export default {
   },
 
   async checkLogin(): Promise<boolean> {
-    console.log("checking login");
+    logger.info("checking login");
     try {
       // console.log("token: ", this.pb.authStore.token);
       const res = await this.cache.pb.collection("users").getList(1, 1, {
@@ -54,7 +55,7 @@ export default {
 
       return true;
     } catch (error) {
-      console.log("error: ", error);
+      logger.error(error);
       return false;
     }
   },
@@ -63,6 +64,9 @@ export default {
     const result = await this.cache.pb.collection("documents").create({
       content: document,
     });
+
+    logger.logDocumentCreation(result.id, result.content.name);
+
     return { ...result.content, id: result.id };
   },
 
@@ -122,7 +126,7 @@ export default {
   async getFileURL(id: string) {
     const result = await this.cache.pb.collection("media").getOne(id);
 
-    console.log(result);
+    logger.info(result);
 
     if (result.status && result.status !== 200) {
       throw Error(`Medium ${id} could not be fetched. ${result.message}`);
@@ -130,7 +134,7 @@ export default {
 
     const url = await this.cache.pb.files.getUrl(result, result.file);
 
-    console.log(url);
+    logger.info(url);
 
     return url.startsWith("http") ? url : URL + url;
   },
