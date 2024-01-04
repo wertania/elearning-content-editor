@@ -12,6 +12,7 @@ import logger from "./logger";
 
 type TDocument = {
   name: string;
+  title?: string;
   path: string;
   type: "document" | "folder";
   translations: string[];
@@ -173,6 +174,14 @@ async function transformMarkdown(
         }
         break;
 
+      // @ts-ignore: Ignore fallthrough error due to no break.
+      case "heading": {
+        // Set the title of the file to the first heading of the markdown document.
+        if (!file.title) file.title = toString(node);
+
+        // Do not break out of the switch.
+      }
+
       default:
         // Continue the current markdown block.
         if (mdStart === null) mdStart = node.position.start.offset!;
@@ -244,16 +253,16 @@ const uploadDocument = async (
   language: string,
 ) => {
   return await dataProvider.uploadDocument({
-    name: document.name,
     type: document.type,
-    version: 1,
+    name: document.title ?? document.name,
+    header: document.title ?? document.name,
     parent: document.parent,
-    header: document.name,
+    originId: document.originId,
     description: "",
     langCode: language,
     content: content,
-    originId: document.originId,
     media: Array.from(document.media ?? []),
+    version: 1,
   });
 };
 
@@ -274,13 +283,15 @@ const processFiles = async (
   structure: TDocument[],
   baseLanguage: string,
   languages: string[],
+  targetFolderIds?: Map<string, string>,
   parentIdsMap: Map<string, string> = new Map(),
 ) => {
   const childParentIdsMap = new Map();
 
   for (const document of structure) {
     // Set the parent ID for the base language version
-    document.parent = parentIdsMap.get(baseLanguage);
+    document.parent =
+      parentIdsMap.get(baseLanguage) ?? targetFolderIds?.get(baseLanguage);
 
     // Process the base language version
     const base = await processFile(document, baseLanguage);
@@ -293,7 +304,8 @@ const processFiles = async (
     // Process each translation of the current document
     for (const language of document.translations) {
       document.path = getTranslationPath(document.path, baseLanguage, language);
-      document.parent = parentIdsMap.get(language);
+      document.parent =
+        parentIdsMap.get(language) ?? targetFolderIds?.get(language);
       document.originId = base.id;
 
       const translatedDocument = await processFile(document, language);
@@ -311,15 +323,56 @@ const processFiles = async (
         document.children,
         baseLanguage,
         languages,
+        targetFolderIds,
         childParentIdsMap,
       );
     }
   }
 };
 
+async function uploadTargetFolder(
+  name: string,
+  baseLanguage: string,
+  languages: string[],
+): Promise<Map<string, string>> {
+  const result = new Map<string, string>();
+
+  const origin = await dataProvider.uploadDocument({
+    version: 1,
+    name,
+    type: "folder",
+    header: name,
+    description: "",
+    langCode: baseLanguage,
+    content: [],
+    media: [],
+  });
+
+  result.set(baseLanguage, origin.id!);
+
+  for (const language of languages) {
+    const response = await dataProvider.uploadDocument({
+      version: 1,
+      originId: origin.id,
+      name,
+      type: "folder",
+      header: name,
+      description: "",
+      langCode: language,
+      content: [],
+      media: [],
+    });
+
+    result.set(language, response.id!);
+  }
+
+  return result;
+}
+
 export async function importFromDirectory(
   directory: string,
   baseLanguage: string,
+  targetFolder?: string,
 ) {
   const dir = path.join(directory, baseLanguage);
 
@@ -332,6 +385,10 @@ export async function importFromDirectory(
   logger.info("Base language", baseLanguage);
   logger.info("Available languages", languages);
 
+  const targetFolderIds = targetFolder
+    ? await uploadTargetFolder(targetFolder, baseLanguage, languages)
+    : undefined;
+
   const structure = await buildStructure(dir, baseLanguage, languages);
-  await processFiles(structure, baseLanguage, languages);
+  await processFiles(structure, baseLanguage, languages, targetFolderIds);
 }

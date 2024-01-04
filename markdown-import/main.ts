@@ -16,7 +16,11 @@ import logger from "./src/logger";
       password: config.password,
     });
 
-    await importFromDirectory(config.sourcePath, config.baseLanguage);
+    await importFromDirectory(
+      config.sourcePath,
+      config.baseLanguage,
+      config.targetFolder || undefined,
+    );
   } catch (error) {
     logger.error(error);
   }
