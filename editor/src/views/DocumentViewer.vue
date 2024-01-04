@@ -40,7 +40,7 @@
             :key="doc.name"
             :label="doc.name"
             class="mr-2"
-            @click="info(doc.source)"
+            @click="openDocument(doc.id)"
           />
         </div>
       </div>
@@ -360,6 +360,15 @@ const aiSearch = async () => {
     error(e + '');
   }
   loading.value = false;
+};
+
+/**
+ * open document with given id
+ */
+const openDocument = (id: string) => {
+  const url = '/#/view/' + id;
+  console.log('openDocument', url);
+  router.push(url);
 };
 
 /**
