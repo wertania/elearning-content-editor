@@ -8,7 +8,7 @@
     }"
   >
     <div
-      class="flex overflow-hidden w-full h-6rem"
+      class="flex overflow-hidden w-full h-6rem justify-content-around"
       :class="{
         lightmode: colorMode === 'light',
         darkmode: colorMode !== 'light',
