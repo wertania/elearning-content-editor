@@ -25,7 +25,7 @@ const browserLanguageSupported = $doc.languages.find(
   (l) => l.code === navigator.language.split('-')[0],
 );
 
-const preferedLanguage = ref<string>(
+const preferredLanguage = ref<string>(
   route.query.lang?.toString() ??
     browserLanguageSupported?.code ??
     $doc.baseLanguage,
@@ -38,7 +38,7 @@ const selectDocument = async () => {
     return;
   }
 
-  const document = await $doc.getDocument(id, preferedLanguage.value);
+  const document = await $doc.getDocument(id, preferredLanguage.value);
 
   if (!document) {
     router.replace({ name: mode });
@@ -50,7 +50,7 @@ watch(
   () => route.query.lang?.toString(),
   (lang?: string) => {
     if (!lang) return;
-    preferedLanguage.value = lang;
+    preferredLanguage.value = lang;
     selectDocument();
   },
 );
