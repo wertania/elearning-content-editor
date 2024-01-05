@@ -8,7 +8,7 @@
     }"
   >
     <div
-      class="flex overflow-hidden w-full h-6rem"
+      class="flex overflow-hidden w-full h-6rem justify-content-around"
       :class="{
         lightmode: colorMode === 'light',
         darkmode: colorMode !== 'light',
@@ -116,6 +116,7 @@
     :class="{
       lightmode: colorMode === 'light',
       darkmode: colorMode !== 'light',
+      showSidebar: showSidebar && !!slots.sidebar,
     }"
   >
     <div v-if="showSidebar" style="min-width: 250px">
@@ -133,6 +134,18 @@ import { ref, Ref, watch, computed, onMounted } from 'vue';
 import { useGlobalStore } from '@/stores/global';
 import DarkModeToggle from './DarkModeToggle.vue';
 const $global = useGlobalStore();
+
+const slots = defineSlots<{
+  sidebar: any;
+  content: any;
+  logo: any;
+  appname: any;
+  start: any;
+  center: any;
+  'before-end': any;
+  end: any;
+  submenu: any;
+}>();
 
 const props = defineProps({
   hideSidebar: {
@@ -229,6 +242,12 @@ const toggleToLight = () => {
 };
 
 $global.getUserSettings();
+
+defineExpose({
+  closeSidebar: () => {
+    showEndMenu.value = false;
+  },
+});
 </script>
 
 <style lang="scss">
@@ -278,11 +297,17 @@ ul.mobile-submenu-list > li {
     display: grid;
     gap: 1rem;
 
-    width: 100%;
-    grid-template-columns: 100%;
+    overflow: auto;
 
-    @media screen and (min-width: 768px) {
-      grid-template-columns: max(25%, 250px) 1fr;
+    width: 100%;
+    grid-template-columns: max(25%, 250px) 1fr;
+
+    &:not(.showSidebar) {
+      grid-template-columns: 100%;
+    }
+
+    @media screen and (max-width: 768px) {
+      grid-template-columns: 100%;
     }
   }
 }

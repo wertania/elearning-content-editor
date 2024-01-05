@@ -12,7 +12,7 @@
         </template>
 
         <template #content>
-            <div class="m-auto m-0 w-4 mt-5 h-screen">
+            <div class="m-auto m-0 w-4 mt-5 h-screen min-w-min">
                 <GradientFont class=" mt-5 mb-5 text-center" start-color="rgb(255 249 154)" end-color="rgb(255 162 222)"
                     style="font-weight: 800; font-size: 25px;">
                     <h2>Welcome back</h2>

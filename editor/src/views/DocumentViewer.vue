@@ -110,7 +110,7 @@
     </template>
   </Dialog>
 
-  <AppLayout>
+  <AppLayout ref="appLayoutRef">
     <template #logo>
       <img
         :src="logoUrl"
@@ -147,18 +147,18 @@
     </template>
 
     <template #end>
-      <li>
-        <div class="flex align-content-center">
-          <Dropdown
-            small
-            :options="$doc.languages"
-            option-label="name"
-            option-value="code"
-            v-model="preferedLanguage"
-          />
-          <i class="fa-solid fa-language text-4xl ml-2 mt-1"></i>
-        </div>
-      </li>
+      <div
+        class="document-viewer__language-dropdown flex align-content-center flex-grow-1"
+      >
+        <Dropdown
+          small
+          :options="$doc.languages"
+          option-label="name"
+          option-value="code"
+          v-model="preferedLanguage"
+        />
+        <i class="fa-solid fa-language text-4xl ml-2 mt-1"></i>
+      </div>
     </template>
 
     <template #sidebar>
@@ -235,7 +235,7 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Chip from 'primevue/chip';
 import { useRoute, useRouter } from 'vue-router';
-import { error, info } from './../services/toast';
+import { error } from './../services/toast';
 import { post } from './../services/http';
 import {
   AiSearchResult,
@@ -243,12 +243,15 @@ import {
   DocumentSearchResult,
 } from './../types/services';
 import { PluginPdf } from '../blocks/pdf';
+import logoUrl from '@/assets/logo.svg';
 
 const router = useRouter();
 const route = useRoute();
 const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
 const loading = ref(false);
+
+const appLayoutRef = ref<InstanceType<typeof AppLayout>>();
 
 // ai search
 const showAnswerDialog = ref(false);
@@ -261,8 +264,6 @@ const showSearchResults = ref(false);
 const searchResults: Ref<DocumentSearchResult[]> = ref([]);
 
 const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
-const logoUrl =
-  import.meta.env.VITE_TEMPLATE_LOGO_URL ?? './../assets/logo.png';
 const logoStartColor =
   import.meta.env.VITE_TEMPLATE_LOGO_START_COLOR ?? '#eaa3ff';
 const logoEndColor = import.meta.env.VITE_TEMPLATE_LOGO_END_COLOR ?? '#5e085a';
@@ -366,7 +367,7 @@ const aiSearch = async () => {
  * open document with given id
  */
 const openDocument = (id: string) => {
-  const url = '/#/view/' + id;
+  const url = '/view/' + id;
   console.log('openDocument', url);
   router.push(url);
 };
@@ -393,6 +394,22 @@ const loadDocument = async (node: TreeNode) => {
   const n = node as DocumentTreeItem;
   nodeSelected.value = { type: n.type, id: n.id, parent: n.parent };
   console.log('loadDocument', node.id);
-  router.push({ name: 'view', params: { documentId: node.id } });
+  await $doc.getDocument(node.id, preferedLanguage.value);
+
+  openDocument(n.id);
+
+  appLayoutRef.value?.closeSidebar();
 };
 </script>
+
+<style lang="scss">
+.document-viewer {
+  &__language-dropdown {
+    margin-right: 1rem;
+
+    .p-dropdown {
+      flex-grow: 1;
+    }
+  }
+}
+</style>

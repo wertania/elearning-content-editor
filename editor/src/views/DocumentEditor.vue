@@ -46,7 +46,7 @@
     </template>
   </Dialog>
 
-  <AppLayout>
+  <AppLayout ref="appLayoutRef">
     <template #logo>
       <img
         :src="logoUrl"
@@ -236,6 +236,8 @@ const logoStartColor =
   import.meta.env.VITE_TEMPLATE_LOGO_START_COLOR ?? '#eaa3ff';
 const logoEndColor = import.meta.env.VITE_TEMPLATE_LOGO_END_COLOR ?? '#5e085a';
 
+const appLayoutRef = ref<InstanceType<typeof AppLayout>>();
+
 // "add" split-button
 const menuAdd = [
   {
@@ -284,6 +286,8 @@ const loadDocument = async (node: TreeNode) => {
   }
   
   $global.requestPending = false;
+
+  appLayoutRef.value?.closeSidebar();
 };
 
 /**
