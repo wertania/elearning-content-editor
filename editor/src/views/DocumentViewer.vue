@@ -213,7 +213,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, ComputedRef, watch, Ref, onMounted } from 'vue';
+import { ref, computed, ComputedRef, watch, Ref } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
@@ -400,20 +400,6 @@ const loadDocument = async (node: TreeNode) => {
 
   appLayoutRef.value?.closeSidebar();
 };
-
-// App Start
-onMounted(async () => {
-  // get the document store and initialize it
-  // router.push({ name: 'view', params: { documentId: node.id } });
-  // $global.$state.isLoading = true;
-  // await $doc.initialize();
-  // // check if a document is selected
-  // if (!$doc.selectedDocument && $doc.documentsFlat.length > 0) {
-  //   console.log('select first document');
-  //   $doc.getDocument($doc.documentTree[0].id, preferedLanguage.value);
-  // }
-  // $global.$state.isLoading = false;
-});
 </script>
 
 <style lang="scss">
