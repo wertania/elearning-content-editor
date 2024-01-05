@@ -40,7 +40,7 @@
             :key="doc.name"
             :label="doc.name"
             class="mr-2"
-            @click="info(doc.source)"
+            @click="openDocument(doc.id)"
           />
         </div>
       </div>
@@ -213,7 +213,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, ComputedRef, watch, Ref } from 'vue';
+import { ref, computed, ComputedRef, watch, Ref, onMounted } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
@@ -234,8 +234,8 @@ import Dropdown from 'primevue/dropdown';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import Chip from 'primevue/chip';
-import { useRouter } from 'vue-router';
-import { error, info } from './../services/toast';
+import { useRoute, useRouter } from 'vue-router';
+import { error } from './../services/toast';
 import { post } from './../services/http';
 import {
   AiSearchResult,
@@ -246,6 +246,7 @@ import { PluginPdf } from '../blocks/pdf';
 import logoUrl from '@/assets/logo.svg';
 
 const router = useRouter();
+const route = useRoute();
 const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
 const loading = ref(false);
@@ -279,16 +280,25 @@ watch(searchText, () => {
 const browserLanguageSupported = $doc.languages.find(
   (l) => l.code === navigator.language.split('-')[0],
 );
-const preferedLanguage = ref<string>(
-  browserLanguageSupported?.code ?? $doc.baseLanguage,
-);
-watch(preferedLanguage, () => {
-  if (!$doc.baseDocument) return;
-  // const orgId = $doc.selectedDocument.id;
-  // reset view
-  // $doc.selectedDocument = null;
-  // load document in new language
-  $doc.getDocument($doc.baseDocument.id, preferedLanguage.value);
+
+const preferedLanguage = computed({
+  get() {
+    return (
+      route.query.lang?.toString() ??
+      browserLanguageSupported?.code ??
+      $doc.baseLanguage
+    );
+  },
+
+  set(newLang: string) {
+    router.push({
+      name: 'view',
+      params: {
+        documentId: $doc.baseDocument?.id,
+      },
+      query: { lang: newLang },
+    });
+  },
 });
 
 const page: ComputedRef<BlockPage> = computed(() => {
@@ -354,6 +364,15 @@ const aiSearch = async () => {
 };
 
 /**
+ * open document with given id
+ */
+const openDocument = (id: string) => {
+  const url = '/view/' + id;
+  console.log('openDocument', url);
+  router.push(url);
+};
+
+/**
  * reset search
  */
 const resetSearch = () => {
@@ -377,20 +396,23 @@ const loadDocument = async (node: TreeNode) => {
   console.log('loadDocument', node.id);
   await $doc.getDocument(node.id, preferedLanguage.value);
 
+  openDocument(n.id);
+
   appLayoutRef.value?.closeSidebar();
 };
 
 // App Start
 onMounted(async () => {
   // get the document store and initialize it
-  $global.$state.isLoading = true;
-  await $doc.initialize();
-  // check if a document is selected
-  if (!$doc.selectedDocument && $doc.documentsFlat.length > 0) {
-    console.log('select first document');
-    $doc.getDocument($doc.documentTree[0].id, preferedLanguage.value);
-  }
-  $global.$state.isLoading = false;
+  // router.push({ name: 'view', params: { documentId: node.id } });
+  // $global.$state.isLoading = true;
+  // await $doc.initialize();
+  // // check if a document is selected
+  // if (!$doc.selectedDocument && $doc.documentsFlat.length > 0) {
+  //   console.log('select first document');
+  //   $doc.getDocument($doc.documentTree[0].id, preferedLanguage.value);
+  // }
+  // $global.$state.isLoading = false;
 });
 </script>
 

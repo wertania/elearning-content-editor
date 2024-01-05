@@ -207,7 +207,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
@@ -274,14 +274,17 @@ const nodeSelected = ref<{ type: string; id: string; parent?: string } | null>(
 );
 const loadDocument = async (node: TreeNode) => {
   $global.requestPending = true;
+
   const n = node as DocumentTreeItem;
   nodeSelected.value = { type: n.type, id: n.id, parent: n.parent };
-  console.log('loadDocument', node.id);
   $doc.$state.editMode = 'edit';
-  await $doc.getDocument(node.id);
+
+  router.push({ name: 'edit', params: { documentId: node.id } });
+
   if ($doc.$state.missingLanguages.length > 0) {
     languageToAdd.value = $doc.$state.missingLanguages[0].code;
   }
+  
   $global.requestPending = false;
 
   appLayoutRef.value?.closeSidebar();
@@ -291,7 +294,13 @@ const loadDocument = async (node: TreeNode) => {
  * change the language
  */
 const switchLanguage = async (data: any) => {
-  await $doc.switchLanguage(data.value);
+  router.push({
+    name: 'edit',
+    params: {
+      documentId: $doc.$state.baseDocument?.id,
+    },
+    query: { lang: data.value },
+  });
 };
 
 /**
@@ -401,17 +410,10 @@ const handleDragOverContainer = (event: DragEvent) => {
 
   event.preventDefault();
 };
+
 const handleDragEnd = () => {
   draggedOver.value = null;
 };
-
-// App Start
-onMounted(async () => {
-  // get the document store and initialize it
-  $global.$state.isLoading = true;
-  await $doc.initialize();
-  $global.$state.isLoading = false;
-});
 </script>
 
 <style lang="scss">
