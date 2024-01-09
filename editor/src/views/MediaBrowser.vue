@@ -38,8 +38,8 @@
           v-show="selection && Object.keys(selection).length > 0" />
       </li>
       <li>
-        <Button v-tooltip="'Delete media'" icon="fa-solid fa-trash" class="border-none"
-          @click="deleteSelected($event)" v-show="selection && Object.keys(selection).length > 0" />
+        <Button v-tooltip="'Delete media'" icon="fa-solid fa-trash" class="border-none" @click="deleteSelected($event)"
+          v-show="selection && Object.keys(selection).length > 0" />
       </li>
       <li>
         <div class="border-">
