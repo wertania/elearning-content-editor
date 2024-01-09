@@ -14,85 +14,75 @@
     </template>
   </Dialog>
 
-  <AppLayout :hide-sidebar="true">
-    <template #logo>
-      <img :src="logoUrl" class="w-full cursor-pointer" @click="router.push({ name: 'edit' })">
-    </template>
-
-    <template #appname>
-      <div class="flex align-items-center">
-        <h2>
-          {{ appName + " " }}
-        </h2>
-        <h4 class="ml-2">
-          > Media Browser
-        </h4>
+  <Toolbar>
+    <template #start>
+      <div class="flex flex-row gap-1">
+        <SplitButton v-if="!_documentId" @click="uploadDialogControl = { show: true, mode: 'main' }" label="Add"
+          icon="fa-solid fa-plus" :model="menuAdd" />
       </div>
     </template>
-
-    <template #start>
-      <SplitButton @click="uploadDialogControl = { show: true, mode: 'main' }" label="Add" icon="fa-solid fa-plus"
-        :model="menuAdd" />
-    </template>
-
     <template #end>
       <div class="flex flex-row gap-1">
         <ConfirmPopup />
-        <Button v-tooltip="'Re-Upload media'" icon="fa-solid fa-repeat" class="border-none"
+        <Button v-tooltip="'Re-Upload media'" icon="fa-solid fa-repeat" class="border-none ml-1"
           @click="uploadDialogControl = { show: true, mode: 'replace' }"
           v-show="selection && Object.keys(selection).length > 0" />
       </div>
       <div class="flex flex-row gap-1">
-        <Button v-tooltip="'Delete media'" icon="fa-solid fa-trash" class="border-none" @click="deleteSelected($event)"
-          v-show="selection && Object.keys(selection).length > 0" />
+        <Button v-tooltip="'Delete media'" icon="fa-solid fa-trash" class="border-none ml-1"
+          @click="deleteSelected($event)" v-show="selection && Object.keys(selection).length > 0" />
       </div>
       <div class="flex flex-row gap-1">
-        <Button icon="fa-solid fa-times" class="border-none" @click="closeDocument" v-if="documentId"
+        <Button icon="fa-solid fa-times" class="border-none ml-1" @click="closeDocument" v-if="_documentId"
           v-tooltip="'Show all media and close ' + documentId" />
       </div>
     </template>
+  </Toolbar>
 
-    <template #content>
 
-      <div>
-        <div v-if="$global.$state.isLoading || $global.$state.requestPending"
-          class="flex justify-content-center flex-wrap mt-5">
-          <ProgressSpinner />
-        </div>
-        <div v-else class="grid w-full mt-1" style="height: calc(100vh - 105px);">
-          <div class="col-6">
-            <DataTable :value="$media.media" @row-select="selectItem($event)" selection-mode="single"
-              v-model:selection="selection">
-              <Column field="id" header="ID"></Column>
-              <Column field="type" header="Type"></Column>
-              <!-- <Column field="url" header="URL"></Column>
+  <div id="media-browser-main">
+    <div v-if="$global.$state.isLoading || $global.$state.requestPending"
+      class="flex justify-content-center flex-wrap mt-5">
+      <ProgressSpinner />
+    </div>
+    <div v-else-if="$media.media.length === 0" class="flex justify-content-center flex-wrap mt-5">
+      <h3>No media found</h3>
+    </div>
+    <div v-else class="grid w-full mt-1" style="height: calc(100vh - 105px);">
+      <div class="col-6">
+        <DataTable :value="$media.media" @row-select="selectItem($event)" selection-mode="single"
+          v-model:selection="selection">
+          <Column field="id" header="ID"></Column>
+          <Column field="type" header="Type"></Column>
+          <!-- <Column field="url" header="URL"></Column>
         <Column field="name" header="Name"></Column> -->
-            </DataTable>
+        </DataTable>
+      </div>
+      <div class="col-6">
+        <div v-if="itemSelected">
+          <div class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2">
+            <Button icon="fa-solid fa-plus" @click="uploadDialogControl = { show: true, mode: 'sub' }"
+              :disabled="missingLanguages.length < 1"></Button>
+            <Dropdown v-model="selectedLanugage" option-label="name" option-value="code" :options="subLanguages"
+              class="ml-1 flex-auto" :disabled="false" @change="switchLanguage" />
           </div>
-          <div class="col-6">
-            <div v-if="itemSelected">
-              <div class="flex flex-row flex-wrap card-container blue-container ml-2 mr-2 mb-2">
-                <Button icon="fa-solid fa-plus" @click="uploadDialogControl = { show: true, mode: 'sub' }"
-                  :disabled="missingLanguages.length < 1"></Button>
-                <Dropdown v-model="selectedLanugage" option-label="name" option-value="code" :options="subLanguages"
-                  class="ml-1 flex-auto" :disabled="false" @change="switchLanguage" />
-              </div>
-              <MediaViewer :id="itemSelected.id" :type="itemSelected.type" />
-            </div>
-          </div>
+          <MediaViewer :id="itemSelected.id" :type="itemSelected.type" />
+        </div>
+        <div v-else>
+          <h4 class="w-full text-center">No item selected</h4>
         </div>
       </div>
-    </template>
-  </AppLayout>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import Button from 'primevue/button';
-import AppLayout from './../components/AppLayout.vue';
 import SplitButton from 'primevue/splitbutton';
 import Dropdown from 'primevue/dropdown';
+import Toolbar from 'primevue/toolbar';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useGlobalStore } from '../stores/global';
 import { useConfirm } from "primevue/useconfirm";
@@ -101,26 +91,25 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { Medium } from './../services/data/types';
 import MediaViewer from './../components/MediaViewer.vue';
-import { useRoute } from 'vue-router';
 import Dialog from 'primevue/dialog';
 import FileUpload from 'primevue/fileupload';
 import { dataProvider } from './../services/data';
 import { error, info } from './../services/toast';
 import { LanguageItem, mapLangCodesToLanguageItems, getMissingLanguagesItems, baseLanguage } from './../services/language/languageService'
-import { useRouter } from 'vue-router';
 
-const logoUrl = import.meta.env.VITE_TEMPLATE_LOGO_URL ?? "./../assets/logo.png";
-const router = useRouter();
 const $media = useMediaStore(); // media store
 const confirm = useConfirm(); // confirm dialog
 const $global = useGlobalStore(); // global store
-const route = useRoute();
-const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
 
-const documentId = ref<string | null>(route.params.documentId !== '' && !Array.isArray(route.params.documentId) ? route.params.documentId : null);
 const uploadDialogControl = ref({ show: false, mode: <'main' | 'sub' | 'replace'>'main' }); // control: dialog for uploading a new file
 const selection = ref<any>(null);
 const languageToAdd = ref(baseLanguage); // dropdown: sub-language to add
+
+// props
+const props = defineProps<{
+  documentId?: string;
+}>();
+const _documentId = ref<string | null>(props.documentId ?? null);
 
 // "add" split-button
 const menuAdd = [
@@ -243,8 +232,9 @@ const deleteSelected = (event: any) => {
 /**
  * Close the current document.
  */
+
 const closeDocument = async () => {
-  documentId.value = null;
+  _documentId.value = null;
   selection.value = {};
   itemSelected.value = null;
   await init();
@@ -252,7 +242,7 @@ const closeDocument = async () => {
 
 const init = async () => {
   $global.$state.isLoading = true;
-  await $media.initialize(documentId.value ?? undefined);
+  await $media.initialize(_documentId.value ?? undefined);
   $global.$state.isLoading = false;
   selection.value = {};
   itemSelected.value = null;

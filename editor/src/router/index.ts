@@ -23,7 +23,7 @@ const routes = [
   },
   {
     path: '/media/:documentId?',
-    component: () => import('../views/MediaBrowser.vue'),
+    component: () => import('../views/MediaViewer.vue'),
     name: 'media',
   },
   {
