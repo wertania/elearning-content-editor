@@ -24,6 +24,7 @@ export default {
 
   async initialize() {
     this.cache.pb = new PocketBase(URL);
+    this.cache.pb.autoCancellation(false);
   },
 
   async login(data: { username: string; password: string }): Promise<boolean> {
