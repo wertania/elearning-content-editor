@@ -12,6 +12,7 @@ VIDEO_UPLOAD_USER = os.getenv("VIDEO_UPLOAD_USER") or ""
 VIDEO_UPLOAD_PASSWORD = os.getenv("VIDEO_UPLOAD_PASSWORD") or ""
 VIDEO_UPLOAD_URL = os.getenv("VIDEO_UPLOAD_URL") or ""
 OPTIMIZE_TRANSCRIPT = os.getenv("OPTIMIZE_TRANSCRIPT", "true").lower() != "false"
+OPENAI_STT_MODEL = os.getenv("OPENAI_STT_MODEL", "openai/whisper-small")
 
 # Google service user file
 GOOGLE_BLOB_BUCKET = os.getenv("GOOGLE_BLOB_BUCKET")
