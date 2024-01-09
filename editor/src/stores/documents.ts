@@ -419,8 +419,8 @@ export const useDocumentStore = defineStore("documents", {
         content: type === "document"
           ? [
             {
-              type: "paragraph",
-              data: { text: "" },
+              type: "markdown",
+              data: { code: "" }
             },
           ]
           : [],
