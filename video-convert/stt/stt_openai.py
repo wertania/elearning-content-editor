@@ -1,8 +1,6 @@
 import whisper_timestamped as whisper
 import config
-from video_types import Transcript
-import json
-from video_types import Sentence
+from video_types import Transcript, Sentence
 
 print(f'ℹ️ Loading model "{config.OPENAI_STT_MODEL}"...')
 model = whisper.load_model(config.OPENAI_STT_MODEL, device="cpu")
@@ -27,14 +25,7 @@ def speech_to_text(audio_file_path: str) -> Transcript:
         plot_word_alignment=False,
     )
 
-    # print(json.dumps(result, ensure_ascii=False))
-    with open("./result.json", "w") as file:
-        file.write(json.dumps(result, ensure_ascii=False))
-
     sentences = list(map(lambda x: Sentence(x["text"], x["start"]), result["segments"]))
     transcript = Transcript(sentences)
-
-    with open("./transcript.json", "w") as file:
-        file.write(transcript.to_json())
 
     return transcript
