@@ -16,13 +16,18 @@
 
   <AppLayout :hide-sidebar="true">
     <template #logo>
-      <img src="./../assets/logo.png" class="w-full cursor-pointer" @click="router.push({ name: 'edit' })">
+      <img :src="logoUrl" class="w-full cursor-pointer" @click="router.push({ name: 'edit' })">
     </template>
 
     <template #appname>
-      <GradientFont direction="rtl" start-color="#eaa3ff" end-color="#5e085a" style="font-weight: 800; font-size: 25px;">
-        {{ appName }}
-      </GradientFont>
+      <div class="flex align-items-center">
+        <h2>
+          {{ appName + " " }}
+        </h2>
+        <h4 class="ml-2">
+          > Media Browser
+        </h4>
+      </div>
     </template>
 
     <template #start>
@@ -31,22 +36,20 @@
     </template>
 
     <template #end>
-      <li>
+      <div class="flex flex-row gap-1">
         <ConfirmPopup />
         <Button v-tooltip="'Re-Upload media'" icon="fa-solid fa-repeat" class="border-none"
           @click="uploadDialogControl = { show: true, mode: 'replace' }"
           v-show="selection && Object.keys(selection).length > 0" />
-      </li>
-      <li>
+      </div>
+      <div class="flex flex-row gap-1">
         <Button v-tooltip="'Delete media'" icon="fa-solid fa-trash" class="border-none" @click="deleteSelected($event)"
           v-show="selection && Object.keys(selection).length > 0" />
-      </li>
-      <li>
-        <div class="border-">
-          <Button icon="fa-solid fa-times" class="ml-1 border-none" @click="closeDocument" v-if="documentId"
-            v-tooltip="'Show all media and close ' + documentId" />
-        </div>
-      </li>
+      </div>
+      <div class="flex flex-row gap-1">
+        <Button icon="fa-solid fa-times" class="border-none" @click="closeDocument" v-if="documentId"
+          v-tooltip="'Show all media and close ' + documentId" />
+      </div>
     </template>
 
     <template #content>
@@ -106,6 +109,7 @@ import { error, info } from './../services/toast';
 import { LanguageItem, mapLangCodesToLanguageItems, getMissingLanguagesItems, baseLanguage } from './../services/language/languageService'
 import { useRouter } from 'vue-router';
 
+const logoUrl = import.meta.env.VITE_TEMPLATE_LOGO_URL ?? "./../assets/logo.png";
 const router = useRouter();
 const $media = useMediaStore(); // media store
 const confirm = useConfirm(); // confirm dialog
@@ -243,11 +247,12 @@ const closeDocument = async () => {
   documentId.value = null;
   selection.value = {};
   itemSelected.value = null;
+  await init();
 };
 
 const init = async () => {
   $global.$state.isLoading = true;
-  await $media.initialize();
+  await $media.initialize(documentId.value ?? undefined);
   $global.$state.isLoading = false;
   selection.value = {};
   itemSelected.value = null;
