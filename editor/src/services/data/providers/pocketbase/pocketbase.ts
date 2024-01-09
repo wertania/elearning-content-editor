@@ -66,9 +66,8 @@ export default {
     tree: DocumentTreeItem[];
     list: DocumentItem[];
   }> {
-    let filter = `${
-      query?.langCodes ? "content.langCode ~ '" + query.langCodes + "'" : ''
-    } `;
+    let filter = `${query?.langCodes ? "content.langCode ~ '" + query.langCodes + "'" : ''
+      } `;
     filter = filter + (query?.hasOrigin ? 'content.originId != null ' : '');
     filter =
       filter +
@@ -130,8 +129,10 @@ export default {
     for (const id of mediaIds) {
       const medium = await this.getMedium(id);
       if (!medium) continue;
-      if (medium.documents.indexOf(document.id) === -1) {
+      if (!medium.documents || medium.documents.indexOf(document.id) === -1) {
+        medium.documents = medium.documents || [];
         medium.documents.push(document.id);
+        // console.log('updating medium: ', medium);
         await this.cache.pb.collection('media').update(id, {
           content: medium,
         });
@@ -145,9 +146,8 @@ export default {
   // ---------
 
   async getMediums(query?: MediumQuery): Promise<any> {
-    let filter = `${
-      query?.documentId ? "content.documents ~ '" + query.documentId + "'" : ''
-    } `;
+    let filter = `${query?.documentId ? "content.documents ~ '" + query.documentId + "'" : ''
+      } `;
     filter =
       filter +
       (query?.originId ? "content.originId = '" + query.originId + "' " : '');

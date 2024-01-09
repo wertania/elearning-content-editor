@@ -19,6 +19,8 @@
       <div class="flex flex-row gap-1">
         <SplitButton v-if="!_documentId" @click="uploadDialogControl = { show: true, mode: 'main' }" label="Add"
           icon="fa-solid fa-plus" :model="menuAdd" />
+        <Button v-if="!_documentId" @click="getMediaWithoutDocument"
+          v-tooltip="'Get all items without a document reference'" icon="fa-solid fa-book-bookmark" class="border-none ml-1" />
       </div>
     </template>
     <template #end>
@@ -232,7 +234,6 @@ const deleteSelected = (event: any) => {
 /**
  * Close the current document.
  */
-
 const closeDocument = async () => {
   _documentId.value = null;
   selection.value = {};
@@ -240,6 +241,20 @@ const closeDocument = async () => {
   await init();
 };
 
+/**
+ * Get all media without document reference
+ */
+const getMediaWithoutDocument = async () => {
+  $global.$state.isLoading = true;
+  await $media.getMediaWithoutDocument();
+  $global.$state.isLoading = false;
+  selection.value = {};
+  itemSelected.value = null;
+};
+
+/**
+ * Get all media
+ */
 const init = async () => {
   $global.$state.isLoading = true;
   await $media.initialize(_documentId.value ?? undefined);
