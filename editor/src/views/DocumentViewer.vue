@@ -151,7 +151,7 @@ import {
   DocumentSearchResult,
 } from './../types/services';
 import { PluginPdf } from '../blocks/pdf';
-import logoUrl from '@/assets/logo.svg';
+const logoUrl = import.meta.env.VITE_TEMPLATE_LOGO_URL ?? "./../assets/logo.svg";
 
 const router = useRouter();
 const route = useRoute();
