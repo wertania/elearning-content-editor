@@ -32,10 +32,10 @@
 
     <template #start>
       <SplitButton class="ml-5" size="small" @click="addDocument('document')" label="Add" icon="fa-solid fa-plus"
-        :model="menuAdd" />
+        :model="menuAdd" v-tooltip="'Add entry'" />
       <ConfirmPopup />
       <Button size="small" icon="fa-solid fa-trash" class="ml-1 border-none" @click="deleteSelected($event)"
-        v-show="$doc.$state.selectedDocument" />
+        v-show="$doc.$state.selectedDocument" v-tooltip="'Delete entry'" />
       <!-- <span class="p-input-icon-left ml-3">
         <i class="fa-solid fa-search" />
         <InputText placeholder="Search" class="w-12rem surface-100 border-round-lg border-none h-3rem font-medium"
@@ -45,14 +45,17 @@
 
     <template #end>
       <div class="flex flex-row gap-1">
+        <Button icon="fa-solid fa-arrow-up-right-from-square" size="small" class="border-none" @click="openViewer"
+          v-show="$doc.$state.selectedDocument" v-tooltip="'Show document in viewer'" />
+
         <Button icon="fa-solid fa-photo-film" size="small" class="border-none" @click="openMediaBrowser"
-          v-show="$doc.$state.selectedDocument" />
+          v-show="$doc.$state.selectedDocument" v-tooltip="'Show media for this document'" />
 
         <Button icon="fa-solid fa-save" size="small" class="border-none" @click="saveDocument"
-          v-show="$doc.$state.selectedDocument" />
+          v-show="$doc.$state.selectedDocument" v-tooltip="'Save document'" />
 
         <Button icon="fa-solid fa-times" size="small" class="border-none" @click="closeDocument"
-          v-show="$doc.$state.selectedDocument" />
+          v-show="$doc.$state.selectedDocument" v-tooltip="'Close document'" />
       </div>
     </template>
 
@@ -84,7 +87,7 @@
             </div>
             <div class="flex flex-row flex-wrap m-2">
               <Button small icon="fa-solid fa-plus" @click="showAddLanguage = true"
-                :disabled="$doc.$state.missingLanguages.length < 1" class=""></Button>
+                :disabled="$doc.$state.missingLanguages.length < 1" v-tooltip="'Add translation'"></Button>
               <Dropdown small v-model="$doc.$state.selectedLanguage" :options="$doc.$state.availableLanguages"
                 option-label="name" option-value="code" class="ml-1 flex-auto"
                 :disabled="$doc.availableLanguages.length < 2" @change="switchLanguage" />
@@ -269,6 +272,13 @@ const openMediaBrowser = () => {
   // router.push({ name: 'media', params: { documentId: $doc.$state.selectedDocument?.id } });
   // open in new tab
   window.open(`/#/media/${$doc.$state.selectedDocument?.id}`, '_blank');
+};
+
+/**
+ * Open the viewer for the current document.
+ */
+const openViewer = () => {
+  window.open(`/#/view/${$doc.$state.selectedDocument?.id}`, '_blank');
 };
 
 /**
