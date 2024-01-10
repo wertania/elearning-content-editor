@@ -1,4 +1,4 @@
-import { DocumentItem } from '../../types';
+import { DocumentItem, SmartVideoStatus, SmartVideoTranscriptWithTimestamps } from '../../types';
 import type {
   DataProvider,
   DocumentQuery,
@@ -18,7 +18,7 @@ export default {
   name: 'pocketbase',
 
   cache: {
-    pb: null,
+    pb: null as null | PocketBase,
     login: null,
   },
 
@@ -309,13 +309,46 @@ export default {
     await this.cache.pb.collection('pdfs').delete(id);
   },
 
-  async addVideoTask(file: File, sentences: string): Promise<string> {
+  // --------------
+  // | SmartVideo |
+  // --------------
+
+  async addVideoTask(file: File): Promise<string> {
     const result = await this.cache.pb.collection('videoTasks').create({
-      status: 'unprocessed',
+      status: 'unpreprocessed',
       file,
-      sentences,
     });
 
     return result.id;
   },
+
+  async getVideoTask(id: string): Promise<any> {
+    const result = await this.cache.pb.collection('videoTasks').getOne(id, {
+      requestKey: null,
+    });
+    return result.content;
+  },
+
+  async getVideoTasks(status: SmartVideoStatus[]) {
+    const result = await this.cache.pb.collection('videoTasks').getList(1, 999, {
+      filter: `${status.map((s) => `status = '${s}'`).join(' || ')}`,
+    });
+    return result.items;
+  },
+
+  async dropVideoTask(id: string): Promise<void> {
+    await this.cache.pb.collection('videoTasks').delete(id);
+  },
+
+  async updateVideoStatus(id: string, status: SmartVideoStatus): Promise<void> {
+    await this.cache.pb.collection('videoTasks').update(id, { status });
+  },
+
+  async updateVideoTranscript(
+    id: string,
+    sentences: SmartVideoTranscriptWithTimestamps[],
+  ): Promise<void> {
+    await this.cache.pb.collection('videoTasks').update(id, { sentences });
+  },
+
 } satisfies DataProvider;

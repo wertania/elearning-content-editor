@@ -253,7 +253,7 @@ const menuAdd = [
   },
   {
     label: 'Add smart video',
-    command: () => router.push({ name: 'smart-video-converter' }),
+    command: () => router.push({ name: 'smart-video-dashboard' }),
   },
 ];
 

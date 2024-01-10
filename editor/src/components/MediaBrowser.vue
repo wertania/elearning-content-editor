@@ -187,7 +187,7 @@ const _documentId = ref<string | null>(props.documentId ?? null);
 const menuAdd = [
   {
     label: 'Add smart video',
-    command: () => window.open('/#/smart-video-converter', '_blank'),
+    command: () => window.open('/#/smart-video-dashboard', '_blank'),
   },
   {
     label: 'Upload mage/video',
