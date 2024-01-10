@@ -1,6 +1,11 @@
 <template>
   <!-- AI Answer Dialog -->
-  <Dialog v-model:visible="showAnswerDialog" modal header="Let´s answer your question..." :style="{ width: '70vw' }">
+  <Dialog
+    v-model:visible="showAnswerDialog"
+    modal
+    header="Let´s answer your question..."
+    :style="{ width: '70vw' }"
+  >
     <template #default>
       <div class="p-1">
         Hi! I´m your AI documentation assistant. Type in your question and I´ll
@@ -8,11 +13,20 @@
       </div>
       <div id="search-bar">
         <div class="p-inputgroup w-full">
-          <InputText placeholder="Your question in natural language"
-            class="w-full surface-100 border-round-lg border-none h-3rem font-medium" size="small" v-model="questionText"
-            @keydown.enter="aiSearch()" :disabled="loading" />
-          <Button icon="fa-solid fa-search" class="border-none border-round-lg ml-1" @click="aiSearch()"
-            :disabled="questionText.length < 10 || loading" />
+          <InputText
+            placeholder="Your question in natural language"
+            class="w-full surface-100 border-round-lg border-none h-3rem font-medium"
+            size="small"
+            v-model="questionText"
+            @keydown.enter="aiSearch()"
+            :disabled="loading"
+          />
+          <Button
+            icon="fa-solid fa-search"
+            class="border-none border-round-lg ml-1"
+            @click="aiSearch()"
+            :disabled="questionText.length < 10 || loading"
+          />
         </div>
       </div>
       <div v-if="answerText.length > 0">
@@ -21,49 +35,88 @@
         </p>
         <div class="flex align-items-center">
           <span class="mr-2">Sources:</span>
-          <Chip v-for="doc in answerDependingDocuments" :key="doc.name" :label="doc.name" class="mr-2"
-            @click="openDocument(doc.id)" />
+          <Chip
+            v-for="doc in answerDependingDocuments"
+            :key="doc.name"
+            :label="doc.name"
+            class="mr-2"
+            @click="openDocument(doc.id)"
+          />
         </div>
       </div>
       <div>
-        <Button label="Close" class="mt-4" @click="
-          showAnswerDialog = false;
-        resetSearch();
-        " />
+        <Button
+          label="Close"
+          class="mt-4"
+          @click="
+            showAnswerDialog = false;
+            resetSearch();
+          "
+        />
       </div>
     </template>
   </Dialog>
 
   <!-- Standard Search Results -->
-  <Dialog v-model:visible="showSearchResults" modal header="Search" :style="{ width: '40vw' }">
+  <Dialog
+    v-model:visible="showSearchResults"
+    modal
+    header="Search"
+    :style="{ width: '40vw' }"
+  >
     <template #default>
       <div id="search-bar">
         <div class="p-inputgroup w-full">
-          <InputText placeholder="Search" class="w-full surface-100 border-round-lg border-none h-3rem font-medium"
-            size="small" v-model="searchText" :autofocus="true" @keydown.enter="search()" :disabled="loading" />
-          <Button icon="fa-solid fa-search" class="border-none border-round-lg ml-1" @click="search()"
-            :disabled="loading" />
+          <InputText
+            placeholder="Search"
+            class="w-full surface-100 border-round-lg border-none h-3rem font-medium"
+            size="small"
+            v-model="searchText"
+            :autofocus="true"
+            @keydown.enter="search()"
+            :disabled="loading"
+          />
+          <Button
+            icon="fa-solid fa-search"
+            class="border-none border-round-lg ml-1"
+            @click="search()"
+            :disabled="loading"
+          />
         </div>
       </div>
       <div v-if="searchResults.length > 0" class="flex flex-column">
-        <Chip v-for="doc in searchResults" :key="doc.id" :label="doc.metadata.name" class="mt-2 cursor-pointer" @click="
-          loadDocument({ id: doc.id, type: 'document' });
-        resetSearch();
-        showSearchResults = false;
-        " />
+        <Chip
+          v-for="doc in searchResults"
+          :key="doc.id"
+          :label="doc.metadata.name"
+          class="mt-2 cursor-pointer"
+          @click="
+            loadDocument({ id: doc.id, type: 'document' });
+            resetSearch();
+            showSearchResults = false;
+          "
+        />
       </div>
       <div>
-        <Button label="Close" class="mt-4" @click="
-          showSearchResults = false;
-        resetSearch();
-        " />
+        <Button
+          label="Close"
+          class="mt-4"
+          @click="
+            showSearchResults = false;
+            resetSearch();
+          "
+        />
       </div>
     </template>
   </Dialog>
 
   <AppLayout ref="appLayoutRef">
     <template #logo>
-      <img :src="logoUrl" class="w-full cursor-pointer" @click="router.push({ name: 'home' })" />
+      <img
+        :src="logoUrl"
+        class="w-full cursor-pointer"
+        @click="router.push({ name: 'home' })"
+      />
     </template>
 
     <template #appname>
@@ -75,15 +128,30 @@
     <template #start>
       <span class="p-input-icon-left ml-3">
         <i class="fa-solid fa-search" />
-        <InputText placeholder="Search" class="w-12rem surface-100 border-round-lg border-none h-3rem font-medium"
-          size="small" v-model="searchText" />
+        <InputText
+          placeholder="Search"
+          class="w-12rem surface-100 border-round-lg border-none h-3rem font-medium"
+          size="small"
+          v-model="searchText"
+        />
       </span>
-      <i class="fa-solid fa-wand-magic-sparkles text-xl ml-2 mt-1 cursor-pointer" @click="showAnswerDialog = true"></i>
+      <i
+        class="fa-solid fa-wand-magic-sparkles text-xl ml-2 mt-1 cursor-pointer"
+        @click="showAnswerDialog = true"
+      ></i>
     </template>
 
     <template #end>
-      <div class="document-viewer__language-dropdown flex align-content-center flex-grow-1">
-        <Dropdown small :options="$doc.languages" option-label="name" option-value="code" v-model="preferedLanguage" />
+      <div
+        class="document-viewer__language-dropdown flex align-content-center flex-grow-1"
+      >
+        <Dropdown
+          small
+          :options="$doc.languages"
+          option-label="name"
+          option-value="code"
+          v-model="preferedLanguage"
+        />
         <i class="fa-solid fa-language text-4xl ml-2 mt-1"></i>
       </div>
     </template>
@@ -92,8 +160,14 @@
       <div class="flex flex-column">
         <!-- Tree -->
         <div style="height: calc(100vh - 6rem)" class="document-tree">
-          <Tree class="pt-2 pb-3 pr-2" selectionMode="single" v-model:selectionKeys="selection" :value="$doc.documentTree"
-            @node-select="loadDocument" :disabled="true">
+          <Tree
+            class="pt-2 pb-3 pr-2"
+            selectionMode="single"
+            v-model:selectionKeys="selection"
+            :value="$doc.documentTree"
+            @node-select="loadDocument"
+            :disabled="true"
+          >
             <template #default="slotProps">
               <div class="document-editor__tree-draggable">
                 <span>{{ slotProps.node.name }}</span>
@@ -105,17 +179,27 @@
     </template>
 
     <template #content>
-      <div v-if="$global.$state.isLoading || $global.$state.requestPending"
-        class="flex justify-content-center flex-wrap mt-5">
+      <div
+        v-if="$global.$state.isLoading || $global.$state.requestPending"
+        class="flex justify-content-center flex-wrap mt-5"
+      >
         <ProgressSpinner />
       </div>
-      <div v-else-if="$doc.selectedDocument != null &&
-        $doc.selectedDocument.type === 'document'
-        ">
+      <div
+        v-else-if="
+          $doc.selectedDocument != null &&
+          $doc.selectedDocument.type === 'document'
+        "
+      >
         <h1>
           {{ $doc.selectedDocument?.header }}
         </h1>
-        <BlockEditor :read-only="true" v-model="page" :debug="false" :plugins="plugins" />
+        <BlockEditor
+          :read-only="true"
+          v-model="page"
+          :debug="false"
+          :plugins="plugins"
+        />
       </div>
     </template>
   </AppLayout>
@@ -151,7 +235,8 @@ import {
   DocumentSearchResult,
 } from './../types/services';
 import { PluginPdf } from '../blocks/pdf';
-const logoUrl = import.meta.env.VITE_TEMPLATE_LOGO_URL ?? "./../assets/logo.svg";
+const logoUrl =
+  import.meta.env.VITE_TEMPLATE_LOGO_URL ?? './../assets/logo.svg';
 
 const router = useRouter();
 const route = useRoute();

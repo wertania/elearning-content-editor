@@ -1,17 +1,19 @@
 <template>
   <AppLayout :hide-sidebar="true">
     <template #logo>
-      <img :src="logoUrl" class="w-full cursor-pointer" @click="router.push({ name: 'edit' })">
+      <img
+        :src="logoUrl"
+        class="w-full cursor-pointer"
+        @click="router.push({ name: 'edit' })"
+      />
     </template>
 
     <template #appname>
       <div class="flex align-items-center">
         <h2>
-          {{ appName + " " }}
+          {{ appName + ' ' }}
         </h2>
-        <h4 class="ml-2">
-          > Media Browser
-        </h4>
+        <h4 class="ml-2">> Media Browser</h4>
       </div>
     </template>
 
@@ -28,11 +30,16 @@ import MediaBrowser from './../components/MediaBrowser.vue';
 import { useRoute } from 'vue-router';
 import { useRouter } from 'vue-router';
 
-const logoUrl = import.meta.env.VITE_TEMPLATE_LOGO_URL ?? "./../assets/logo.png";
+const logoUrl =
+  import.meta.env.VITE_TEMPLATE_LOGO_URL ?? './../assets/logo.png';
 const router = useRouter();
 const route = useRoute();
 const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
 
 // get documentId from route
-const documentId = ref<string | undefined>(route.params.documentId !== '' && !Array.isArray(route.params.documentId) ? route.params.documentId : undefined);
+const documentId = ref<string | undefined>(
+  route.params.documentId !== '' && !Array.isArray(route.params.documentId)
+    ? route.params.documentId
+    : undefined,
+);
 </script>

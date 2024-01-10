@@ -6,7 +6,13 @@
       "source.organizeImports": "explicit"
     }
   },
-  "isort.args": ["--profile", "black"],
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "isort.args": [
+    "--profile",
+    "black"
+  ],
   "python.analysis.typeCheckingMode": "basic",
   "cSpell.words": [
     "BASELANG",
@@ -20,5 +26,7 @@
     "*": true,
     "plaintext": true,
     "markdown": true
-  }
+  },
+  "prettier.singleAttributePerLine": true,
+  "prettier.bracketSameLine": true
 }

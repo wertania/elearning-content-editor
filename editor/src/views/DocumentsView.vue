@@ -27,8 +27,8 @@ const browserLanguageSupported = $doc.languages.find(
 
 const preferredLanguage = ref<string>(
   route.query.lang?.toString() ??
-  browserLanguageSupported?.code ??
-  $doc.baseLanguage,
+    browserLanguageSupported?.code ??
+    $doc.baseLanguage,
 );
 
 const selectDocument = async () => {

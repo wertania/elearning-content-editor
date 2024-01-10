@@ -1,18 +1,33 @@
 <template>
   <AppLayout :hide-sidebar="true">
     <template #logo>
-      <img src="./../assets/logo.png" class="w-full cursor-pointer" @click="router.push({ name: 'edit' })" />
+      <img
+        src="./../assets/logo.png"
+        class="w-full cursor-pointer"
+        @click="router.push({ name: 'edit' })"
+      />
     </template>
 
     <template #appname>
-      <GradientFont direction="rtl" start-color="#eaa3ff" end-color="#5e085a" style="font-weight: 800; font-size: 25px">
+      <GradientFont
+        direction="rtl"
+        start-color="#eaa3ff"
+        end-color="#5e085a"
+        style="font-weight: 800; font-size: 25px"
+      >
         {{ appName }}
       </GradientFont>
     </template>
 
     <template #end>
       <li>
-        <Button icon="fa-solid fa-times" size="small" class="border-none" @click="resetForm" v-if="inProgress" />
+        <Button
+          icon="fa-solid fa-times"
+          size="small"
+          class="border-none"
+          @click="resetForm"
+          v-if="inProgress"
+        />
       </li>
     </template>
 
@@ -31,8 +46,14 @@
             with the optimized script and a neutral speaker in different
             languages.
           </p>
-          <FileUpload mode="basic" accept="video/*" customUpload :max-file-size="50000000" @uploader="upload($event)"
-            :disabled="loading" />
+          <FileUpload
+            mode="basic"
+            accept="video/*"
+            customUpload
+            :max-file-size="50000000"
+            @uploader="upload($event)"
+            :disabled="loading"
+          />
         </div>
 
         <div v-if="smartVideoProcessing">
@@ -52,14 +73,22 @@
           </div>
           <div class="grid" v-for="sentence in smartVideoProcessing.sentences">
             <div class="col-2">
-              <InputNumber v-model="sentence.start_time" :min="0" class="w-full" />
+              <InputNumber
+                v-model="sentence.start_time"
+                :min="0"
+                class="w-full"
+              />
             </div>
             <div class="col-10">
               <InputText v-model="sentence.text" class="w-full" />
             </div>
           </div>
           <div>
-            <Button v-if="inProgress" label="Save and render Video" @click="renderVideo" />
+            <Button
+              v-if="inProgress"
+              label="Save and render Video"
+              @click="renderVideo"
+            />
           </div>
         </div>
       </div>
