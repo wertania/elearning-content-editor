@@ -1,4 +1,8 @@
-import { DocumentItem, SmartVideoStatus, SmartVideoTranscriptWithTimestamps } from '../../types';
+import {
+  DocumentItem,
+  SmartVideoStatus,
+  SmartVideoTranscriptWithTimestamps,
+} from '../../types';
 import type {
   DataProvider,
   DocumentQuery,
@@ -10,6 +14,7 @@ import type {
 import { buildTree } from '../../helpers';
 import PocketBase from 'pocketbase';
 import { $global } from './../../../../main';
+import { request } from 'http';
 
 const URL: string =
   import.meta.env.VITE_POCKETBASE_URL || 'http://127.0.0.1:8090';
@@ -62,12 +67,42 @@ export default {
     this.cache.pb.authStore.clear();
   },
 
+  async register(
+    username: string,
+    password: string,
+    email: string,
+    name: string,
+  ): Promise<void> {
+    await this.cache.pb.collection('users').create({
+      email,
+      username,
+      password,
+      passwordConfirm: password,
+      name,
+    });
+    await this.requestEmailVerification(email);
+  },
+
+  async requestEmailVerification(email: string): Promise<void> {
+    await this.cache.pb.collection('users').requestVerification(email);
+  },
+
+  async requestPasswordReset(email: string): Promise<void> {
+    await this.cache.pb.collection('users').requestPasswordReset(email);
+  },
+
+  async updateEmail(email: string): Promise<void> {
+    // send request email change email
+    await this.cache.pb.collection('users').requestEmailChange(email);
+  },
+
   async getDocuments(query?: DocumentQuery): Promise<{
     tree: DocumentTreeItem[];
     list: DocumentItem[];
   }> {
-    let filter = `${query?.langCodes ? "content.langCode ~ '" + query.langCodes + "'" : ''
-      } `;
+    let filter = `${
+      query?.langCodes ? "content.langCode ~ '" + query.langCodes + "'" : ''
+    } `;
     filter = filter + (query?.hasOrigin ? 'content.originId != null ' : '');
     filter =
       filter +
@@ -146,8 +181,9 @@ export default {
   // ---------
 
   async getMediums(query?: MediumQuery): Promise<any> {
-    let filter = `${query?.documentId ? "content.documents ~ '" + query.documentId + "'" : ''
-      } `;
+    let filter = `${
+      query?.documentId ? "content.documents ~ '" + query.documentId + "'" : ''
+    } `;
     filter =
       filter +
       (query?.originId ? "content.originId = '" + query.originId + "' " : '');
@@ -330,9 +366,11 @@ export default {
   },
 
   async getVideoTasks(status: SmartVideoStatus[]) {
-    const result = await this.cache.pb.collection('videoTasks').getList(1, 999, {
-      filter: `${status.map((s) => `status = '${s}'`).join(' || ')}`,
-    });
+    const result = await this.cache.pb
+      .collection('videoTasks')
+      .getList(1, 999, {
+        filter: `${status.map((s) => `status = '${s}'`).join(' || ')}`,
+      });
     return result.items;
   },
 
@@ -350,5 +388,4 @@ export default {
   ): Promise<void> {
     await this.cache.pb.collection('videoTasks').update(id, { sentences });
   },
-
 } satisfies DataProvider;

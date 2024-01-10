@@ -54,8 +54,8 @@
           class="desktop-submenu-list flex gap-3 align-items-center m-3"
         >
           <slot name="end"></slot>
-
           <DarkModeToggle />
+          <Button icon="fa-solid fa-right-from-bracket" @click="logout" />
         </div>
 
         <!-- Mobile Menu -->
@@ -76,10 +76,15 @@
           }"
           style="top: 5rem; min-height: calc(100vh - 5rem)"
         >
-          <div class="flex justify-content-between align-items-center">
+          <div class="flex justify-content-end align-items-center">
             <slot name="before-end"></slot>
             <slot name="end"></slot>
             <DarkModeToggle />
+            <Button
+              class="ml-3"
+              icon="fa-solid fa-right-from-bracket"
+              @click="logout"
+            />
           </div>
 
           <div class="flex flex-column flex-grow-1">
@@ -133,6 +138,9 @@
 import { ref, Ref, watch, computed, onMounted } from 'vue';
 import { useGlobalStore } from '@/stores/global';
 import DarkModeToggle from './DarkModeToggle.vue';
+import Button from 'primevue/button';
+import { dataProvider } from '@/services/data';
+import { router } from '@/router';
 const $global = useGlobalStore();
 
 const slots = defineSlots<{
@@ -248,6 +256,11 @@ defineExpose({
     showEndMenu.value = false;
   },
 });
+
+const logout = async () => {
+  await dataProvider.logout();
+  router.push('/login');
+};
 </script>
 
 <style lang="scss">

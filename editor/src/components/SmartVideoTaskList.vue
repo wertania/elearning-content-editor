@@ -36,7 +36,7 @@ import Column from 'primevue/column';
 import Button from 'primevue/button';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { dataProvider } from './../services/data';
-import { ref, Ref, onMounted, watch } from 'vue';
+import { ref, Ref, onMounted, watch, onUnmounted } from 'vue';
 import { SmartVideoStatus, SmartVideoTask } from './../services/data/types';
 import { useConfirm } from 'primevue/useconfirm';
 import { error, info } from './../services/toast';
@@ -104,7 +104,11 @@ onMounted(() => {
   getData();
 });
 // reload data every 30 seconds
-setInterval(() => {
+const interval = setInterval(() => {
   getData();
 }, 30000);
+// restart interval on unmount
+onUnmounted(() => {
+  clearInterval(interval);
+});
 </script>
