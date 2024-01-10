@@ -118,6 +118,10 @@
         <TabPanel header="Converted Videos">
           <SmartVideoTaskList :status="['processed']" :showMediaId="true" />
         </TabPanel>
+
+        <TabPanel header="(Processing)">
+          <SmartVideoTaskList :status="['preprocessing', 'processing']" />
+        </TabPanel>
       </TabView>
     </template>
   </AppLayout>
