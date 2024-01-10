@@ -6,6 +6,9 @@
       "source.organizeImports": "explicit"
     }
   },
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "isort.args": ["--profile", "black"],
   "python.analysis.typeCheckingMode": "basic",
   "cSpell.words": [
@@ -30,5 +33,7 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true
   },
-  "hide-files.files": []
+  "hide-files.files": [],
+  "prettier.singleAttributePerLine": true,
+  "prettier.bracketSameLine": true
 }

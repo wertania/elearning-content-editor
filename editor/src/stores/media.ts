@@ -21,7 +21,8 @@ export const useMediaStore = defineStore("media", {
   actions: {
     /**
      * Initialize the store with data from the backend
-     * get all documents and build a tree
+     * get all media items
+     * if documentId is provided, get all media items for that document
      */
     async initialize(documentId?: undefined | string): Promise<void> {
       try {
@@ -31,5 +32,18 @@ export const useMediaStore = defineStore("media", {
         error(e + "");
       }
     },
+
+    /**
+     * Get all media items without a documentId
+     * get full list from the store
+     * each item will have "documents" property which is an array of documentIds
+     * filter out all items that have a documentId or an "originId" which means that they are translations
+     */
+    async getMediaWithoutDocument() {
+      const data = await dataProvider.getMediums();
+      this.$state.media = data.filter(
+        (item) => (!item.documents || item.documents.length === 0) && (!item.originId || item.originId === "")
+      );
+    }
   },
 });

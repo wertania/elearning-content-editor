@@ -120,14 +120,9 @@
     </template>
 
     <template #appname>
-      <GradientFont
-        direction="rtl"
-        :start-color="logoStartColor"
-        :end-color="logoEndColor"
-        style="font-weight: 800; font-size: 25px"
-      >
+      <h2>
         {{ appName }}
-      </GradientFont>
+      </h2>
     </template>
 
     <template #start>
@@ -197,9 +192,7 @@
         "
       >
         <h1>
-          <GradientFont :start-color="logoStartColor" :end-color="logoEndColor">
-            {{ $doc.selectedDocument?.header }}
-          </GradientFont>
+          {{ $doc.selectedDocument?.header }}
         </h1>
         <BlockEditor
           :read-only="true"
@@ -220,7 +213,6 @@ import { useDocumentStore } from '../stores/documents';
 import { DocumentTreeItem } from '../services/data/types';
 import { useGlobalStore } from '../stores/global';
 import AppLayout from './../components/AppLayout.vue';
-import GradientFont from './../components/GradientFont.vue';
 import {
   BlockEditor,
   PluginHeader,
@@ -243,7 +235,8 @@ import {
   DocumentSearchResult,
 } from './../types/services';
 import { PluginPdf } from '../blocks/pdf';
-import logoUrl from '@/assets/logo.svg';
+const logoUrl =
+  import.meta.env.VITE_TEMPLATE_LOGO_URL ?? './../assets/logo.svg';
 
 const router = useRouter();
 const route = useRoute();
@@ -264,9 +257,6 @@ const showSearchResults = ref(false);
 const searchResults: Ref<DocumentSearchResult[]> = ref([]);
 
 const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
-const logoStartColor =
-  import.meta.env.VITE_TEMPLATE_LOGO_START_COLOR ?? '#eaa3ff';
-const logoEndColor = import.meta.env.VITE_TEMPLATE_LOGO_END_COLOR ?? '#5e085a';
 
 watch(searchText, () => {
   if (searchText.value.length > 0) {

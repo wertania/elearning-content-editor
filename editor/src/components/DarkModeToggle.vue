@@ -4,6 +4,7 @@
     <i v-if="colorMode === 'light'" class="fa-solid fa-sun" />
 
     <InputSwitch
+      v-tooltip="'Toggle Theme'"
       v-model="$global.mode"
       class="ml-3"
       :true-value="'dark'"
