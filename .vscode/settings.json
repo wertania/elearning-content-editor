@@ -9,6 +9,12 @@
   "[vue]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "isort.args": ["--profile", "black"],
   "python.analysis.typeCheckingMode": "basic",
   "cSpell.words": [
