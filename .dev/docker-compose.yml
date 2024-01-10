@@ -13,9 +13,8 @@ services:
 
   video-convert-api:
     build:
-      context: ../video-convert
-      dockerfile: docker/Dockerfile.api
-      target: dev
+      context: ..
+      dockerfile: video-convert/docker/Dockerfile.api
     volumes:
       - ../video-convert:/app
     ports:

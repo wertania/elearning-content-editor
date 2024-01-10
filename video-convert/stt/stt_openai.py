@@ -2,9 +2,12 @@ import whisper_timestamped as whisper
 import config
 from video_types import Transcript, Sentence
 
-print(f'ℹ️ Loading model "{config.OPENAI_STT_MODEL}"...')
-model = whisper.load_model(config.OPENAI_STT_MODEL, device="cpu")
-print("Done!")
+model = None
+
+if config.STT_BACKEND == "openai":
+    print(f'ℹ️ Loading model "{config.OPENAI_STT_MODEL}"...')
+    model = whisper.load_model(config.OPENAI_STT_MODEL, device="cpu")
+    print("Done!")
 
 
 def authenticate():
