@@ -1,13 +1,11 @@
 <template>
   <template v-if="isLoading"> Loading... </template>
   <template v-else-if="id && mediumUrl">
-    <img v-if="type === 'image'" :src="mediumUrl" style="width: 100%;" />
-    <audio v-if="type === 'audio'" :src="mediumUrl" style="width: 100%;" />
-    <video v-if="type === 'video'" :src="mediumUrl" style="width: 100%;" />
+    <img v-if="type === 'image'" :src="mediumUrl" style="width: 100%" />
+    <audio v-if="type === 'audio'" :src="mediumUrl" style="width: 100%" />
+    <video v-if="type === 'video'" :src="mediumUrl" style="width: 100%" />
   </template>
-  <template v-else>
-    Unknown medium type "{{ type }}".
-  </template>
+  <template v-else> Unknown medium type "{{ type }}". </template>
 </template>
 
 <script setup lang="ts">
@@ -44,9 +42,12 @@ const loadMediumUrl = async () => {
   isLoading.value = false;
 };
 
-watch(() => props.id, async () => {
-  await loadMediumUrl();
-});
+watch(
+  () => props.id,
+  async () => {
+    await loadMediumUrl();
+  },
+);
 
 onMounted(async () => {
   // Load the medium's URL.

@@ -25,7 +25,7 @@ interface GlobalState {
 }
 
 export const useGlobalStore = defineStore("global", {
-  state: () => (<GlobalState> {
+  state: () => (<GlobalState>{
     isLoading: false,
     isLoggenIn: false,
     requestPending: false,

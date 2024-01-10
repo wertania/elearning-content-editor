@@ -91,18 +91,29 @@ export interface DataProvider {
   getPDFUrl(id: string): Promise<string>;
   dropPDF(id: string): Promise<void>;
 
-  addVideoTask(file: File, sentences: string): Promise<string>;
+  addVideoTask(file: File): Promise<string>;
+  dropVideoTask(id: string): Promise<void>;
+  updateVideoStatus(id: string, status: SmartVideoStatus): Promise<void>;
+  updateVideoTranscript(
+    id: string,
+    sentences: SmartVideoTranscriptWithTimestamps[],
+  ): Promise<void>;
+  getVideoTask(id?: string): Promise<SmartVideoConvertTask[]>;
+  getVideoTasks(status: SmartVideoStatus[]): Promise<SmartVideoTask[]>;
 }
+
+export type SmartVideoStatus = 'unpreprocessed' | 'preprocessed' | 'preprocessing' | 'unprocessed' | 'processing' | 'processed' | 'done' | 'error';
 
 export interface SmartVideoConvertTask {
   id: string;
-  status: 'pending' | 'running' | 'finished' | 'error';
+  status: SmartVideoStatus;
   text: string;
+  file: string; // filename
 }
 
 export interface SmartVideoTranscriptWithTimestamps {
   text: string;
-  startTime: number;
+  start_time: number;
 }
 
 export interface SmartVideoConvertTransscript {
@@ -112,5 +123,12 @@ export interface SmartVideoConvertTransscript {
 export interface SmartVideoCreationRequest {
   id: string;
   langCode: string;
+  sentences: SmartVideoTranscriptWithTimestamps[];
+}
+
+export interface SmartVideoTask {
+  id: string;
+  status: SmartVideoStatus;
+  errors: any;
   sentences: SmartVideoTranscriptWithTimestamps[];
 }

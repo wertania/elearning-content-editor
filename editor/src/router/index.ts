@@ -23,13 +23,13 @@ const routes = [
   },
   {
     path: '/media/:documentId?',
-    component: () => import('../views/MediaBrowser.vue'),
+    component: () => import('../views/MediaViewer.vue'),
     name: 'media',
-  },
+  }, 
   {
-    path: '/smart-video-converter/',
-    component: () => import('../views/SmartVideoConverter.vue'),
-    name: 'smart-video-converter',
+    path: '/smart-video-dashboard/',
+    component: () => import('../views/SmartVideoDashboard.vue'),
+    name: 'smart-video-dashboard',
   },
   {
     path: '/demo/',

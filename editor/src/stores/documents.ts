@@ -160,9 +160,11 @@ export const useDocumentStore = defineStore("documents", {
       if (langCode === this.$state.baseLanguage) {
         document = this.$state.baseDocument;
       } // else look in subDocuments for the document with the new selected language
-      else {document = this.$state.subDocuments?.find((item) =>
+      else {
+        document = this.$state.subDocuments?.find((item) =>
           item.langCode === langCode
-        );}
+        );
+      }
 
       if (!document) {
         error(`Document with langCode ${langCode} not found`);
@@ -187,12 +189,14 @@ export const useDocumentStore = defineStore("documents", {
      */
     async updateDocument(document: DocumentItem): Promise<void> {
       try {
-        const doc = await dataProvider.updateDocument(document);
+        const doc: DocumentItem = await dataProvider.updateDocument(document);
 
         // update current tree
-        let item = getItemFromTree(document.id, this.$state.documentTree);
+        let item: null | DocumentTreeItem = getItemFromTree(document.id, this.$state.documentTree);
         if (item) {
-          item = doc;
+          item.data = doc;
+          item.label = doc.name;
+          item.name = doc.name;
         }
         info("Document updated successfully");
       } catch (e) {
@@ -415,8 +419,8 @@ export const useDocumentStore = defineStore("documents", {
         content: type === "document"
           ? [
             {
-              type: "paragraph",
-              data: { text: "" },
+              type: "markdown",
+              data: { code: "" }
             },
           ]
           : [],

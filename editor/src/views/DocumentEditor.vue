@@ -56,14 +56,7 @@
     </template>
 
     <template #appname>
-      <GradientFont
-        direction="rtl"
-        :start-color="logoStartColor"
-        :end-color="logoEndColor"
-        style="font-weight: 800; font-size: 25px"
-      >
-        {{ appName }}
-      </GradientFont>
+      <h2>{{ appName }}</h2>
     </template>
 
     <template #start>
@@ -74,6 +67,7 @@
         label="Add"
         icon="fa-solid fa-plus"
         :model="menuAdd"
+        v-tooltip="'Add entry'"
       />
       <ConfirmPopup />
       <Button
@@ -82,6 +76,7 @@
         class="ml-1 border-none"
         @click="deleteSelected($event)"
         v-show="$doc.$state.selectedDocument"
+        v-tooltip="'Delete entry'"
       />
       <!-- <span class="p-input-icon-left ml-3">
         <i class="fa-solid fa-search" />
@@ -93,11 +88,21 @@
     <template #end>
       <div class="flex flex-row gap-1">
         <Button
+          icon="fa-solid fa-arrow-up-right-from-square"
+          size="small"
+          class="border-none"
+          @click="openViewer"
+          v-show="$doc.$state.selectedDocument"
+          v-tooltip="'Show document in viewer'"
+        />
+
+        <Button
           icon="fa-solid fa-photo-film"
           size="small"
           class="border-none"
           @click="openMediaBrowser"
           v-show="$doc.$state.selectedDocument"
+          v-tooltip="'Show media for this document'"
         />
 
         <Button
@@ -106,6 +111,7 @@
           class="border-none"
           @click="saveDocument"
           v-show="$doc.$state.selectedDocument"
+          v-tooltip="'Save document'"
         />
 
         <Button
@@ -114,6 +120,7 @@
           class="border-none"
           @click="closeDocument"
           v-show="$doc.$state.selectedDocument"
+          v-tooltip="'Close document'"
         />
       </div>
     </template>
@@ -170,7 +177,7 @@
                 icon="fa-solid fa-plus"
                 @click="showAddLanguage = true"
                 :disabled="$doc.$state.missingLanguages.length < 1"
-                class=""
+                v-tooltip="'Add translation'"
               ></Button>
               <Dropdown
                 small
@@ -222,19 +229,15 @@ import ConfirmPopup from 'primevue/confirmpopup';
 import { useGlobalStore } from '../stores/global';
 import { useConfirm } from 'primevue/useconfirm';
 import AppLayout from './../components/AppLayout.vue';
-import GradientFont from './../components/GradientFont.vue';
 import { useRouter } from 'vue-router';
-import logoUrl from '../assets/logo.svg';
 
 const confirm = useConfirm(); // confirm dialog
 const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
 const router = useRouter(); // router
 const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
-// const logoUrl = import.meta.env.VITE_TEMPLATE_LOGO_URL ?? "./../assets/logo.png";
-const logoStartColor =
-  import.meta.env.VITE_TEMPLATE_LOGO_START_COLOR ?? '#eaa3ff';
-const logoEndColor = import.meta.env.VITE_TEMPLATE_LOGO_END_COLOR ?? '#5e085a';
+const logoUrl =
+  import.meta.env.VITE_TEMPLATE_LOGO_URL ?? './../assets/logo.png';
 
 const appLayoutRef = ref<InstanceType<typeof AppLayout>>();
 
@@ -250,7 +253,7 @@ const menuAdd = [
   },
   {
     label: 'Add smart video',
-    command: () => router.push({ name: 'smart-video-converter' }),
+    command: () => router.push({ name: 'smart-video-dashboard' }),
   },
 ];
 
@@ -284,7 +287,7 @@ const loadDocument = async (node: TreeNode) => {
   if ($doc.$state.missingLanguages.length > 0) {
     languageToAdd.value = $doc.$state.missingLanguages[0].code;
   }
-  
+
   $global.requestPending = false;
 
   appLayoutRef.value?.closeSidebar();
@@ -373,6 +376,13 @@ const openMediaBrowser = () => {
   // router.push({ name: 'media', params: { documentId: $doc.$state.selectedDocument?.id } });
   // open in new tab
   window.open(`/#/media/${$doc.$state.selectedDocument?.id}`, '_blank');
+};
+
+/**
+ * Open the viewer for the current document.
+ */
+const openViewer = () => {
+  window.open(`/#/view/${$doc.$state.selectedDocument?.id}`, '_blank');
 };
 
 /**
