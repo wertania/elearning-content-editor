@@ -1,4 +1,4 @@
-import { DocumentItem } from '../../types';
+import { DocumentItem, SmartVideoStatus, SmartVideoTranscriptWithTimestamps } from '../../types';
 import type {
   DataProvider,
   DocumentQuery,
@@ -18,12 +18,13 @@ export default {
   name: 'pocketbase',
 
   cache: {
-    pb: null,
+    pb: null as null | PocketBase,
     login: null,
   },
 
   async initialize() {
     this.cache.pb = new PocketBase(URL);
+    this.cache.pb.autoCancellation(false);
   },
 
   async login(data: { username: string; password: string }): Promise<boolean> {
@@ -65,9 +66,8 @@ export default {
     tree: DocumentTreeItem[];
     list: DocumentItem[];
   }> {
-    let filter = `${
-      query?.langCodes ? "content.langCode ~ '" + query.langCodes + "'" : ''
-    } `;
+    let filter = `${query?.langCodes ? "content.langCode ~ '" + query.langCodes + "'" : ''
+      } `;
     filter = filter + (query?.hasOrigin ? 'content.originId != null ' : '');
     filter =
       filter +
@@ -129,8 +129,10 @@ export default {
     for (const id of mediaIds) {
       const medium = await this.getMedium(id);
       if (!medium) continue;
-      if (medium.documents.indexOf(document.id) === -1) {
+      if (!medium.documents || medium.documents.indexOf(document.id) === -1) {
+        medium.documents = medium.documents || [];
         medium.documents.push(document.id);
+        // console.log('updating medium: ', medium);
         await this.cache.pb.collection('media').update(id, {
           content: medium,
         });
@@ -144,9 +146,8 @@ export default {
   // ---------
 
   async getMediums(query?: MediumQuery): Promise<any> {
-    let filter = `${
-      query?.documentId ? "content.documents ~ '" + query.documentId + "'" : ''
-    } `;
+    let filter = `${query?.documentId ? "content.documents ~ '" + query.documentId + "'" : ''
+      } `;
     filter =
       filter +
       (query?.originId ? "content.originId = '" + query.originId + "' " : '');
@@ -308,13 +309,46 @@ export default {
     await this.cache.pb.collection('pdfs').delete(id);
   },
 
-  async addVideoTask(file: File, sentences: string): Promise<string> {
+  // --------------
+  // | SmartVideo |
+  // --------------
+
+  async addVideoTask(file: File): Promise<string> {
     const result = await this.cache.pb.collection('videoTasks').create({
-      status: 'unprocessed',
+      status: 'unpreprocessed',
       file,
-      sentences,
     });
 
     return result.id;
   },
+
+  async getVideoTask(id: string): Promise<any> {
+    const result = await this.cache.pb.collection('videoTasks').getOne(id, {
+      requestKey: null,
+    });
+    return result.content;
+  },
+
+  async getVideoTasks(status: SmartVideoStatus[]) {
+    const result = await this.cache.pb.collection('videoTasks').getList(1, 999, {
+      filter: `${status.map((s) => `status = '${s}'`).join(' || ')}`,
+    });
+    return result.items;
+  },
+
+  async dropVideoTask(id: string): Promise<void> {
+    await this.cache.pb.collection('videoTasks').delete(id);
+  },
+
+  async updateVideoStatus(id: string, status: SmartVideoStatus): Promise<void> {
+    await this.cache.pb.collection('videoTasks').update(id, { status });
+  },
+
+  async updateVideoTranscript(
+    id: string,
+    sentences: SmartVideoTranscriptWithTimestamps[],
+  ): Promise<void> {
+    await this.cache.pb.collection('videoTasks').update(id, { sentences });
+  },
+
 } satisfies DataProvider;

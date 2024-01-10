@@ -27,6 +27,9 @@ class VideoContent:
 
 
 class VideoStatus(str, Enum):
+    UNPREPROCESSED = "unpreprocessed"
+    PREPROCESSING = "preprocessing"
+    PREPROCESSED = "preprocessed"
     UNPROCESSED = "unprocessed"
     PROCESSING = "processing"
     PROCESSED = "processed"
@@ -38,13 +41,30 @@ class BaseDataProvider:
         ...
 
     @abstractmethod
+    def read_unpreprocessed_videos(self) -> list[UnconvertedVideo]:
+        ...
+
+    @abstractmethod
     def update_video_status(self, video: UnconvertedVideo, status: VideoStatus):
         ...
 
     @abstractmethod
-    def upload_converted_video(self, filename: str, file):
+    def update_video_sentences(self, video: UnconvertedVideo, sentences: list):
+        ...
+
+    @abstractmethod
+    def update_video_media_id(self, video: UnconvertedVideo, media_id: str):
+        ...
+
+    @abstractmethod
+    def upload_converted_video(self, filename: str, file) -> str:
         ...
 
     @abstractmethod
     def add_errors(self, video: UnconvertedVideo, *errors: str):
         ...
+
+    @abstractmethod
+    def reset_errors(self, video: UnconvertedVideo):
+        ...
+

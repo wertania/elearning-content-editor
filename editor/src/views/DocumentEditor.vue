@@ -1,43 +1,83 @@
 <template>
-  <Dialog v-model:visible="showAddLanguage" modal header="Add language" :style="{ width: '40vw' }">
+  <Dialog
+    v-model:visible="showAddLanguage"
+    modal
+    header="Add language"
+    :style="{ width: '40vw' }"
+  >
     <template #default>
       <div class="p-1">
         <label>Select a language</label>
-        <Dropdown :options="$doc.$state.missingLanguages" option-label="name" option-value="code"
-          placeholder="Select a language" class="w-full mt-2" v-model="languageToAdd"
-          :disabled="$global.$state.requestPending" />
+        <Dropdown
+          :options="$doc.$state.missingLanguages"
+          option-label="name"
+          option-value="code"
+          placeholder="Select a language"
+          class="w-full mt-2"
+          v-model="languageToAdd"
+          :disabled="$global.$state.requestPending"
+        />
         <div class="flex flex-row flex-wrap h-4 mt-4">
           <label class="block">Pre-Translate via AI?</label>
-          <Checkbox :binary="true" class="ml-2" v-model="translateViaAI" :disabled="$global.$state.requestPending" />
+          <Checkbox
+            :binary="true"
+            class="ml-2"
+            v-model="translateViaAI"
+            :disabled="$global.$state.requestPending"
+          />
         </div>
         <div class="flex flex-row flex-wrap h-4 mt-5">
-          <Button icon="fa-solid fa-check" @click="addTranslationToDocument()" label="Add translation"
-            :disabled="$global.$state.requestPending">
+          <Button
+            icon="fa-solid fa-check"
+            @click="addTranslationToDocument()"
+            label="Add translation"
+            :disabled="$global.$state.requestPending"
+          >
           </Button>
-          <Button icon="fa-solid fa-close" label="Cancel" class="ml-1" @click="showAddLanguage = false"
-            :disabled="$global.$state.requestPending"></Button>
+          <Button
+            icon="fa-solid fa-close"
+            label="Cancel"
+            class="ml-1"
+            @click="showAddLanguage = false"
+            :disabled="$global.$state.requestPending"
+          ></Button>
         </div>
       </div>
     </template>
   </Dialog>
 
-  <AppLayout>
+  <AppLayout ref="appLayoutRef">
     <template #logo>
-      <img :src="logoUrl" class="w-full cursor-pointer" @click="router.push({ name: 'home' })">
+      <img
+        :src="logoUrl"
+        class="w-full cursor-pointer"
+        @click="router.push({ name: 'home' })"
+      />
     </template>
 
     <template #appname>
-      <GradientFont direction="rtl" :start-color="logoStartColor" :end-color="logoEndColor" style="font-weight: 800; font-size: 25px;">
-        {{ appName }}
-      </GradientFont>
+      <h2>{{ appName }}</h2>
     </template>
 
     <template #start>
-      <SplitButton class="ml-5" size="small" @click="addDocument('document')" label="Add" icon="fa-solid fa-plus"
-        :model="menuAdd" />
+      <SplitButton
+        class="ml-5"
+        size="small"
+        @click="addDocument('document')"
+        label="Add"
+        icon="fa-solid fa-plus"
+        :model="menuAdd"
+        v-tooltip="'Add entry'"
+      />
       <ConfirmPopup />
-      <Button size="small" icon="fa-solid fa-trash" class="ml-1 border-none" @click="deleteSelected($event)"
-        v-show="$doc.$state.selectedDocument" />
+      <Button
+        size="small"
+        icon="fa-solid fa-trash"
+        class="ml-1 border-none"
+        @click="deleteSelected($event)"
+        v-show="$doc.$state.selectedDocument"
+        v-tooltip="'Delete entry'"
+      />
       <!-- <span class="p-input-icon-left ml-3">
         <i class="fa-solid fa-search" />
         <InputText placeholder="Search" class="w-12rem surface-100 border-round-lg border-none h-3rem font-medium"
@@ -46,51 +86,109 @@
     </template>
 
     <template #end>
-      <li>
-        <Button icon="fa-solid fa-photo-film" size="small" class="border-none" @click="openMediaBrowser"
-          v-show="$doc.$state.selectedDocument" />
-      </li>
-      <li>
-        <Button icon="fa-solid fa-save" size="small" class="border-none" @click="saveDocument"
-          v-show="$doc.$state.selectedDocument" />
-      </li>
-      <li>
-        <Button icon="fa-solid fa-times" size="small" class="border-none" @click="closeDocument"
-          v-show="$doc.$state.selectedDocument" />
-      </li>
+      <div class="flex flex-row gap-1">
+        <Button
+          icon="fa-solid fa-arrow-up-right-from-square"
+          size="small"
+          class="border-none"
+          @click="openViewer"
+          v-show="$doc.$state.selectedDocument"
+          v-tooltip="'Show document in viewer'"
+        />
+
+        <Button
+          icon="fa-solid fa-photo-film"
+          size="small"
+          class="border-none"
+          @click="openMediaBrowser"
+          v-show="$doc.$state.selectedDocument"
+          v-tooltip="'Show media for this document'"
+        />
+
+        <Button
+          icon="fa-solid fa-save"
+          size="small"
+          class="border-none"
+          @click="saveDocument"
+          v-show="$doc.$state.selectedDocument"
+          v-tooltip="'Save document'"
+        />
+
+        <Button
+          icon="fa-solid fa-times"
+          size="small"
+          class="border-none"
+          @click="closeDocument"
+          v-show="$doc.$state.selectedDocument"
+          v-tooltip="'Close document'"
+        />
+      </div>
     </template>
 
     <template #sidebar>
-      <div class="flex flex-column">
+      <div class="flex flex-column h-full flex-grow-1 gap-2">
         <!-- Tree -->
-        <div style="height: calc(100vh - 6rem - 100px);" class="document-tree" @dragover="handleDragOverContainer"
-          @drop="handleContainerDrop">
-          <Tree class="document-editor__tree" selectionMode="single" v-model:selectionKeys="selection"
-            :value="$doc.documentTree" @node-select="loadDocument" :disabled="true">
+        <div
+          class="document-tree flex-grow-1"
+          @dragover="handleDragOverContainer"
+          @drop="handleContainerDrop"
+        >
+          <Tree
+            class="document-editor__tree"
+            selectionMode="single"
+            v-model:selectionKeys="selection"
+            :value="$doc.documentTree"
+            @node-select="loadDocument"
+            :disabled="true"
+          >
             <template #default="slotProps">
-              <div class="document-editor__tree-draggable" :class="{
-                'node-dragover': slotProps.node.id === draggedOver?.id,
-              }" :draggable="true" @dragover="handleDragOver(slotProps.node)"
-                @dragstart="handleDragStart($event, slotProps.node)" @drop="handleDragDrop($event, slotProps.node)"
-                @dragend="handleDragEnd">
+              <div
+                class="document-editor__tree-draggable"
+                :class="{
+                  'node-dragover': slotProps.node.id === draggedOver?.id,
+                }"
+                :draggable="true"
+                @dragover="handleDragOver(slotProps.node)"
+                @dragstart="handleDragStart($event, slotProps.node)"
+                @drop="handleDragDrop($event, slotProps.node)"
+                @dragend="handleDragEnd"
+              >
                 <span>{{ slotProps.node.name }}</span>
               </div>
             </template>
           </Tree>
         </div>
         <!-- Settings -->
-        <div class="border-round-md shadow-3"
-          v-show="$doc.$state.selectedDocument != null && $doc.$state.selectedDocument.type === 'document'">
+        <div
+          class="border-round-md shadow-3"
+          v-show="
+            $doc.$state.selectedDocument != null &&
+            $doc.$state.selectedDocument.type === 'document'
+          "
+        >
           <div class="flex flex-column card-container">
             <div class="flex m-1 h-2rem p-2">
-              <i class="fa-solid fa-language mt-1 ml-1 mr-2"></i>Assigned translations
+              <i class="fa-solid fa-language mt-1 ml-1 mr-2"></i>Assigned
+              translations
             </div>
             <div class="flex flex-row flex-wrap m-2">
-              <Button small icon="fa-solid fa-plus" @click="showAddLanguage = true"
-                :disabled="$doc.$state.missingLanguages.length < 1" class=""></Button>
-              <Dropdown small v-model="$doc.$state.selectedLanguage" :options="$doc.$state.availableLanguages"
-                option-label="name" option-value="code" class="ml-1 flex-auto"
-                :disabled="$doc.availableLanguages.length < 2" @change="switchLanguage" />
+              <Button
+                small
+                icon="fa-solid fa-plus"
+                @click="showAddLanguage = true"
+                :disabled="$doc.$state.missingLanguages.length < 1"
+                v-tooltip="'Add translation'"
+              ></Button>
+              <Dropdown
+                small
+                v-model="$doc.$state.selectedLanguage"
+                :options="$doc.$state.availableLanguages"
+                option-label="name"
+                option-value="code"
+                class="ml-1 flex-auto"
+                :disabled="$doc.availableLanguages.length < 2"
+                @change="switchLanguage"
+              />
             </div>
           </div>
         </div>
@@ -98,19 +196,25 @@
     </template>
 
     <template #content>
-      <div v-if="$global.$state.isLoading || $global.$state.requestPending"
-        class="flex justify-content-center flex-wrap mt-5">
+      <div
+        v-if="$global.$state.isLoading || $global.$state.requestPending"
+        class="flex justify-content-center flex-wrap mt-5"
+      >
         <ProgressSpinner />
       </div>
-      <ContentEditor v-else-if="$doc.$state.selectedDocument" :key="$doc.$state.selectedDocument.id" />
-      <div v-else class="text-center text-xl mt-5">Nothing to show. Please select a document node.</div>
+      <ContentEditor
+        v-else-if="$doc.$state.selectedDocument"
+        :key="$doc.$state.selectedDocument.id"
+      />
+      <div v-else class="text-center text-xl mt-5">
+        Nothing to show. Please select a document node.
+      </div>
     </template>
-
   </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import Tree, { TreeNode } from 'primevue/tree';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
@@ -123,9 +227,8 @@ import Dialog from 'primevue/dialog';
 import Checkbox from 'primevue/checkbox';
 import ConfirmPopup from 'primevue/confirmpopup';
 import { useGlobalStore } from '../stores/global';
-import { useConfirm } from "primevue/useconfirm";
+import { useConfirm } from 'primevue/useconfirm';
 import AppLayout from './../components/AppLayout.vue';
-import GradientFont from './../components/GradientFont.vue';
 import { useRouter } from 'vue-router';
 
 const confirm = useConfirm(); // confirm dialog
@@ -133,9 +236,10 @@ const $doc = useDocumentStore(); // main store
 const $global = useGlobalStore(); // global store
 const router = useRouter(); // router
 const appName = import.meta.env.VITE_TEMPLATE_APP_NAME ?? 'RevDocs';
-const logoUrl = import.meta.env.VITE_TEMPLATE_LOGO_URL ?? "./../assets/logo.png";
-const logoStartColor = import.meta.env.VITE_TEMPLATE_LOGO_START_COLOR ?? "#eaa3ff";
-const logoEndColor = import.meta.env.VITE_TEMPLATE_LOGO_END_COLOR ?? "#5e085a";
+const logoUrl =
+  import.meta.env.VITE_TEMPLATE_LOGO_URL ?? './../assets/logo.png';
+
+const appLayoutRef = ref<InstanceType<typeof AppLayout>>();
 
 // "add" split-button
 const menuAdd = [
@@ -149,7 +253,7 @@ const menuAdd = [
   },
   {
     label: 'Add smart video',
-    command: () => router.push({ name: 'smart-video-converter' }),
+    command: () => router.push({ name: 'smart-video-dashboard' }),
   },
 ];
 
@@ -168,25 +272,38 @@ const draggedOver = ref<DocumentItem | null>(null);
 /**
  * load a document from API.
  */
-const nodeSelected = ref<{ type: string; id: string, parent?: string } | null>(null);
+const nodeSelected = ref<{ type: string; id: string; parent?: string } | null>(
+  null,
+);
 const loadDocument = async (node: TreeNode) => {
   $global.requestPending = true;
+
   const n = node as DocumentTreeItem;
   nodeSelected.value = { type: n.type, id: n.id, parent: n.parent };
-  console.log('loadDocument', node.id);
   $doc.$state.editMode = 'edit';
-  await $doc.getDocument(node.id);
+
+  router.push({ name: 'edit', params: { documentId: node.id } });
+
   if ($doc.$state.missingLanguages.length > 0) {
     languageToAdd.value = $doc.$state.missingLanguages[0].code;
   }
+
   $global.requestPending = false;
+
+  appLayoutRef.value?.closeSidebar();
 };
 
 /**
  * change the language
  */
 const switchLanguage = async (data: any) => {
-  await $doc.switchLanguage(data.value);
+  router.push({
+    name: 'edit',
+    params: {
+      documentId: $doc.$state.baseDocument?.id,
+    },
+    query: { lang: data.value },
+  });
 };
 
 /**
@@ -203,7 +320,12 @@ const addTranslationToDocument = async () => {
  * Add a new document.
  */
 const addDocument = async (type: 'folder' | 'document' = 'document') => {
-  $doc.addEmtpyDocument(type, nodeSelected.value?.type === 'folder' ? nodeSelected.value?.id : nodeSelected.value?.parent);
+  $doc.addEmtpyDocument(
+    type,
+    nodeSelected.value?.type === 'folder'
+      ? nodeSelected.value?.id
+      : nodeSelected.value?.parent,
+  );
 };
 
 /**
@@ -257,7 +379,14 @@ const openMediaBrowser = () => {
 };
 
 /**
- * Drag n drop support 
+ * Open the viewer for the current document.
+ */
+const openViewer = () => {
+  window.open(`/#/view/${$doc.$state.selectedDocument?.id}`, '_blank');
+};
+
+/**
+ * Drag n drop support
  */
 const handleDragStart = (event: DragEvent, parent: any /*DocumentItem*/) => {
   if (!event.dataTransfer) return;
@@ -291,15 +420,18 @@ const handleDragOverContainer = (event: DragEvent) => {
 
   event.preventDefault();
 };
+
 const handleDragEnd = () => {
   draggedOver.value = null;
 };
-
-// App Start
-onMounted(async () => {
-  // get the document store and initialize it
-  $global.$state.isLoading = true;
-  await $doc.initialize();
-  $global.$state.isLoading = false;
-});
 </script>
+
+<style lang="scss">
+.document-editor {
+  &__tree {
+    min-width: fit-content;
+    height: 100%;
+    padding: 0.5rem;
+  }
+}
+</style>

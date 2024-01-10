@@ -1,10 +1,10 @@
-import { TreeNode } from "primevue/tree";
-import type { UniversalBlock } from "vue-blockful-editor";
+import { TreeNode } from 'primevue/tree';
+import type { UniversalBlock } from 'vue-blockful-editor';
 
 export type DocumentItem = {
   id: string;
   version: number;
-  type: "document" | "folder";
+  type: 'document' | 'folder';
   parent?: string;
   originId?: string; // id of the original document (e.g. translations)
   icon?: string; // fontawesome icon
@@ -14,10 +14,13 @@ export type DocumentItem = {
   langCode: string; // 'de', 'en', 'fr', ...
   content: UniversalBlock[];
   media: string[]; // list of medium ids
+  hidden: boolean;
 };
-export type DocumentAddRequest = Omit<DocumentItem, "id" | "version">;
 
-export type MediumType = "video" | "audio" | "image";
+export type DocumentAddRequest = Omit<DocumentItem, 'id' | 'version'>;
+
+export type MediumType = 'video' | 'audio' | 'image';
+
 export interface Medium {
   id: string;
   version: number;
@@ -31,10 +34,10 @@ export interface Medium {
   providerSpecific?: any; // provider specific data
   documents: string[]; // list of document ids
 }
-export type MediumAddRequest = Omit<Medium, "id" | "version">;
+export type MediumAddRequest = Omit<Medium, 'id' | 'version'>;
 
 export interface DocumentTreeItem extends TreeNode, DocumentItem {
-  type: "document" | "folder";
+  type: 'document' | 'folder';
   children?: DocumentTreeItem[];
 }
 
@@ -88,18 +91,29 @@ export interface DataProvider {
   getPDFUrl(id: string): Promise<string>;
   dropPDF(id: string): Promise<void>;
 
-  addVideoTask(file: File, sentences: string): Promise<string>;
+  addVideoTask(file: File): Promise<string>;
+  dropVideoTask(id: string): Promise<void>;
+  updateVideoStatus(id: string, status: SmartVideoStatus): Promise<void>;
+  updateVideoTranscript(
+    id: string,
+    sentences: SmartVideoTranscriptWithTimestamps[],
+  ): Promise<void>;
+  getVideoTask(id?: string): Promise<SmartVideoConvertTask[]>;
+  getVideoTasks(status: SmartVideoStatus[]): Promise<SmartVideoTask[]>;
 }
+
+export type SmartVideoStatus = 'unpreprocessed' | 'preprocessed' | 'preprocessing' | 'unprocessed' | 'processing' | 'processed' | 'done' | 'error';
 
 export interface SmartVideoConvertTask {
   id: string;
-  status: "pending" | "running" | "finished" | "error";
+  status: SmartVideoStatus;
   text: string;
+  file: string; // filename
 }
 
 export interface SmartVideoTranscriptWithTimestamps {
   text: string;
-  startTime: number;
+  start_time: number;
 }
 
 export interface SmartVideoConvertTransscript {
@@ -109,5 +123,12 @@ export interface SmartVideoConvertTransscript {
 export interface SmartVideoCreationRequest {
   id: string;
   langCode: string;
+  sentences: SmartVideoTranscriptWithTimestamps[];
+}
+
+export interface SmartVideoTask {
+  id: string;
+  status: SmartVideoStatus;
+  errors: any;
   sentences: SmartVideoTranscriptWithTimestamps[];
 }

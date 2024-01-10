@@ -1,9 +1,14 @@
 <script setup>
-    import MediaViewer from "/components/media-viewer.vue"
-    import UsersActivity from "/components/users-activity.vue"
-    import PdfDownload from "/components/pdf-download.vue"
-    // the components will be uses inside the renderMardownfunction which runs before that here
-    import { useData } from 'vitepress'
+  import MediaViewer from "/components/media-viewer.vue"
+  import UsersActivity from "/components/users-activity.vue"
+  import PdfDownload from "/components/pdf-download.vue"
+
+  /**
+   * The components will be used inside the renderMarkdown function which runs before this one.
+   * We need to import them here to make sure they are available.
+   */
+
+  import { useData } from 'vitepress'
 
   // These params are collected and used in `renderMarkdown.ts`.
   const { params } = useData()
@@ -11,7 +16,7 @@
 
 <UsersActivity :documentId="$params.documentId" />
 
-# {{ $params.name }}
+<!-- # {{ $params.name }} -->
 
 <!-- CONTENT AREA -->
 <!-- @content -->

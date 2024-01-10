@@ -86,7 +86,7 @@ export const useDocumentStore = defineStore("documents", {
     async getDocument(
       id: string,
       preferedLanguageCode?: string,
-    ): Promise<void> {
+    ): Promise<DocumentItem | undefined> {
       try {
         // rest first
         this.$state.selectedDocument = null;
@@ -115,13 +115,16 @@ export const useDocumentStore = defineStore("documents", {
             console.log("translation found", translation);
             this.$state.selectedDocument = translation;
             this.$state.selectedLanguage = translation.langCode;
+            return translation;
           } else {
             // else fallback to base document
             this.$state.selectedDocument = document;
+            return document;
           }
         } else {
           // set selected document
           this.$state.selectedDocument = document;
+          return document;
         }
       } catch (e) {
         error(e + "");
@@ -157,9 +160,11 @@ export const useDocumentStore = defineStore("documents", {
       if (langCode === this.$state.baseLanguage) {
         document = this.$state.baseDocument;
       } // else look in subDocuments for the document with the new selected language
-      else {document = this.$state.subDocuments?.find((item) =>
+      else {
+        document = this.$state.subDocuments?.find((item) =>
           item.langCode === langCode
-        );}
+        );
+      }
 
       if (!document) {
         error(`Document with langCode ${langCode} not found`);
@@ -184,12 +189,14 @@ export const useDocumentStore = defineStore("documents", {
      */
     async updateDocument(document: DocumentItem): Promise<void> {
       try {
-        const doc = await dataProvider.updateDocument(document);
+        const doc: DocumentItem = await dataProvider.updateDocument(document);
 
         // update current tree
-        let item = getItemFromTree(document.id, this.$state.documentTree);
+        let item: null | DocumentTreeItem = getItemFromTree(document.id, this.$state.documentTree);
         if (item) {
-          item = doc;
+          item.data = doc;
+          item.label = doc.name;
+          item.name = doc.name;
         }
         info("Document updated successfully");
       } catch (e) {
@@ -385,6 +392,7 @@ export const useDocumentStore = defineStore("documents", {
         parent: this.$state.selectedDocument?.parent ?? undefined,
         originId: translate ? this.$state.selectedDocument?.id : undefined,
         media: this.$state.selectedDocument?.media ?? [],
+        hidden: false,
       };
 
       // create document in backend
@@ -411,13 +419,14 @@ export const useDocumentStore = defineStore("documents", {
         content: type === "document"
           ? [
             {
-              type: "paragraph",
-              data: { text: "" },
+              type: "markdown",
+              data: { code: "" }
             },
           ]
           : [],
         parent: parent ?? undefined,
         media: [],
+        hidden: false,
       };
 
       this.resetSelectedDocument();

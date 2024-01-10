@@ -11,6 +11,7 @@ export type DocumentItem = {
   langCode: string; // 'de', 'en', 'fr', ...
   content: any;
   media: string[]; // list of medium ids
+  hidden: boolean;
 };
 
 export type MediumType = "video" | "audio" | "image";

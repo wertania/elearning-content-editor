@@ -2,7 +2,7 @@
   <div class="bg-svg-logo" :style="{ '--bg-image': `url(${bgSvgLogoUrl})` }">
     <div class="login">
       <GradientFont start-color="#f15bff" end-color="#780f72">
-        <h1 style="font-size: 3em;">{{ welcomeSlogan }}</h1>
+        <h1 style="font-size: 3em">{{ welcomeSlogan }}</h1>
       </GradientFont>
       <div v-if="provider === 'pocketbase'">
         <!--login with username and password -->
@@ -15,7 +15,12 @@
             <label for="password">Password</label>
             <TextInput id="password" v-model="password" type="password" />
           </div>
-          <Button @click="loginPocketbase()" :disabled="loading" class="mt-5" label="Login" />
+          <Button
+            @click="loginPocketbase()"
+            :disabled="loading"
+            class="mt-5"
+            label="Login"
+          />
         </div>
       </div>
     </div>
@@ -34,8 +39,10 @@ import GradientFont from './../components/GradientFont.vue';
 const provider = dataProvider.name;
 const store = useGlobalStore();
 
-const welcomeSlogan = import.meta.env.VITE_TEMPLATE_WELCOME_SLOGAN ?? "Welcome to RevDocs";
-const bgSvgLogoUrl = import.meta.env.VITE_TEMPLATE_START_LOGO ?? "./../assets/logo.svg";
+const welcomeSlogan =
+  import.meta.env.VITE_TEMPLATE_WELCOME_SLOGAN ?? 'Welcome to RevDocs';
+const bgSvgLogoUrl =
+  import.meta.env.VITE_TEMPLATE_START_LOGO ?? './../assets/logo.svg';
 
 // directly redirect for localdb
 if (provider === 'localdb') {
@@ -49,10 +56,13 @@ const loading = ref(false);
 const loginPocketbase = async () => {
   loading.value = true;
   try {
-    await dataProvider.login({ username: username.value, password: password.value });
+    await dataProvider.login({
+      username: username.value,
+      password: password.value,
+    });
     await store.loginRedirect();
   } catch (e) {
-    error(e + "");
+    error(e + '');
   }
   loading.value = false;
 };
@@ -74,7 +84,7 @@ const loginPocketbase = async () => {
 }
 
 .bg-svg-logo::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
