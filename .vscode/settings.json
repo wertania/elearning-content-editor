@@ -7,17 +7,21 @@
     }
   },
   "[vue]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "isort.args": [
-    "--profile",
-    "black"
-  ],
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "isort.args": ["--profile", "black"],
   "python.analysis.typeCheckingMode": "basic",
   "cSpell.words": [
     "BASELANG",
     "blockful",
     "DATAPROVIDER",
+    "fastapi",
     "mdast",
     "unist",
     "vitepress"
@@ -27,6 +31,15 @@
     "plaintext": true,
     "markdown": true
   },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true
+  },
+  "hide-files.files": [],
   "prettier.singleAttributePerLine": true,
   "prettier.bracketSameLine": true
 }
