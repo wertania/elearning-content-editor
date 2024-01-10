@@ -79,13 +79,17 @@ class PocketBaseDataProvider(BaseDataProvider):
         self.pb.collection("videoTasks").update(video.task_id, {"sentences": sentences})
 
     def upload_converted_video(self, filename: str, file):
-        self.pb.collection("media").create(
+        item = self.pb.collection("media").create(
             {
                 "file": FileUpload((filename, file)),
                 "content": VideoContent("video").to_json(),
                 # TODO: langCode
             }
         )
+        return item.id
+    
+    def update_video_media_id(self, video: PocketBaseUnconvertedVideo, media_id: str):
+        self.pb.collection("videoTasks").update(video.task_id, {"mediaId": media_id})
 
     def add_errors(self, video: PocketBaseUnconvertedVideo, *errors: str):
         self.pb.collection("videoTasks").update(

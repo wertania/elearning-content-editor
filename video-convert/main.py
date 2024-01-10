@@ -20,11 +20,16 @@ def process_video(video: UnconvertedVideo):
     new_filename = converter.create_video(id, video.sentences)
 
     # Write the results to the database.
+    new_id = None
     with open(new_filename, "rb") as file:
-        data_provider.upload_converted_video(filename, file)
+        new_id = data_provider.upload_converted_video(filename, file)
 
     # Update the video status to "processed".
-    data_provider.update_video_status(video, VideoStatus.PROCESSED)
+    try:
+        data_provider.update_video_status(video, VideoStatus.PROCESSED)    
+        data_provider.update_video_media_id(video, new_id)
+    except Exception as e:
+        logger.error("Failed to update video meta-data. " + str(e))
 
     # Clean up the temporary files.
     clean_up(id)

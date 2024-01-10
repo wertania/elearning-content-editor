@@ -53,7 +53,11 @@ class BaseDataProvider:
         ...
 
     @abstractmethod
-    def upload_converted_video(self, filename: str, file):
+    def update_video_media_id(self, video: UnconvertedVideo, media_id: str):
+        ...
+
+    @abstractmethod
+    def upload_converted_video(self, filename: str, file) -> str:
         ...
 
     @abstractmethod
