@@ -5,7 +5,7 @@ from video_types import Transcript, Sentence
 model = None
 
 if config.STT_BACKEND == "openai":
-    print(f'ℹ️ Loading model "{config.OPENAI_STT_MODEL}"...')
+    print(f'ℹ️ Loading model "{config.OPENAI_STT_MODEL}"... This might take a while.')
     model = whisper.load_model(config.OPENAI_STT_MODEL, device="cpu")
     print("Done!")
 
