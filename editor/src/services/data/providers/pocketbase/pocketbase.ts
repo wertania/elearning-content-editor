@@ -54,6 +54,7 @@ export default {
       if (res.items.length < 1) return false;
 
       // set some variables
+      $global.isContentCreator = res.items[0].isContentCreator;
       $global.jwtToken = this.cache.pb.authStore.token;
 
       return true;
@@ -83,9 +84,10 @@ export default {
     await this.requestEmailVerification(email);
   },
 
-  async requestEmailVerification(email: string): Promise<void> {
-    await this.cache.pb.collection('users').requestVerification(email);
-  },
+  // mail verification is done by background service
+  // async requestEmailVerification(email: string): Promise<void> {
+  //   await this.cache.pb.collection('users').requestVerification(email);
+  // },
 
   async requestPasswordReset(email: string): Promise<void> {
     await this.cache.pb.collection('users').requestPasswordReset(email);

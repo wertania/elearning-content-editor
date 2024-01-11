@@ -15,6 +15,7 @@ const videoConverterUrl: string = import.meta.env.VITE_VIDEOCONVERTER_URL ?? "";
 interface GlobalState {
   isLoading: boolean;
   isLoggenIn: boolean;
+  isContentCreator: boolean;
   requestPending: boolean;
   aiSearchUrl: string;
   videoConverterUrl: string;
@@ -28,6 +29,8 @@ export const useGlobalStore = defineStore("global", {
   state: () => (<GlobalState>{
     isLoading: false,
     isLoggenIn: false,
+    isContentCreator: false,
+    
     requestPending: false,
     mode: "light",
 

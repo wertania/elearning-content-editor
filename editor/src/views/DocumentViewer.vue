@@ -145,7 +145,12 @@
       <div
         class="document-viewer__language-dropdown flex align-content-center flex-grow-1"
       >
-        <Button icon="fa-solid fa-pen" class="mr-2" @click="openEditor()" />
+        <Button
+          icon="fa-solid fa-pen"
+          class="mr-2"
+          @click="openEditor()"
+          v-if="$global.isContentCreator"
+        />
         <Dropdown
           small
           :options="$doc.languages"
