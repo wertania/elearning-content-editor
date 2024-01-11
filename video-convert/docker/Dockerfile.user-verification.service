@@ -10,16 +10,16 @@ ENV PATH="/usr/bin:${PATH}"
 FROM vwf_ffmpeg AS vwf_pip
 
 # Kopiere requirements.txt in das Arbeitsverzeichnis
-COPY ./video-convert/requirements.txt .
+COPY ./video-convert/requirements-pocketbase.txt .
 
 # Installiere Abhängigkeiten
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements-pocketbase.txt
 
 # Setze Arbeitsverzeichnis
 WORKDIR /app
 
 # Run app initial. Needs a external trigger to start again
-CMD python ./main_preprocess.py
+CMD python ./main_user_verification.py
 
 FROM vwf_pip AS dev
 

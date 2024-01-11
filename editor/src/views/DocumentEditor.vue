@@ -51,7 +51,7 @@
       <img
         :src="logoUrl"
         class="w-full cursor-pointer"
-        @click="router.push({ name: 'home' })"
+        @click="router.push({ name: 'view' })"
       />
     </template>
 
@@ -215,7 +215,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import Tree, { TreeNode } from 'primevue/tree';
+import Tree from 'primevue/tree';
+import { TreeNode } from 'primevue/treenode';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';
@@ -382,7 +383,7 @@ const openMediaBrowser = () => {
  * Open the viewer for the current document.
  */
 const openViewer = () => {
-  window.open(`/#/view/${$doc.$state.selectedDocument?.id}`, '_blank');
+  window.open(`/#/view/${$doc.$state.selectedDocument?.id}`, '_self');
 };
 
 /**

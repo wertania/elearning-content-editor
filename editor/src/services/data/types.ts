@@ -1,4 +1,5 @@
-import { TreeNode } from 'primevue/tree';
+
+import { TreeNode } from 'primevue/treenode';
 import type { UniversalBlock } from 'vue-blockful-editor';
 
 export type DocumentItem = {
@@ -63,6 +64,14 @@ export interface DataProvider {
   checkLogin(): Promise<boolean>;
   login(data?: any): Promise<boolean>;
   logout(): Promise<void>;
+  register(
+    username: string,
+    password: string,
+    email: string,
+    name: string,
+  ): Promise<void>;
+  requestPasswordReset(email: string): Promise<void>;
+  updateEmail(email: string): Promise<void>;
 
   getDocuments(
     query?: DocumentQuery,
@@ -102,7 +111,15 @@ export interface DataProvider {
   getVideoTasks(status: SmartVideoStatus[]): Promise<SmartVideoTask[]>;
 }
 
-export type SmartVideoStatus = 'unpreprocessed' | 'preprocessed' | 'preprocessing' | 'unprocessed' | 'processing' | 'processed' | 'done' | 'error';
+export type SmartVideoStatus =
+  | 'unpreprocessed'
+  | 'preprocessed'
+  | 'preprocessing'
+  | 'unprocessed'
+  | 'processing'
+  | 'processed'
+  | 'done'
+  | 'error';
 
 export interface SmartVideoConvertTask {
   id: string;
