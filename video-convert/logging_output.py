@@ -3,7 +3,11 @@ This module is used to log messages to the console and to a log file.
 """
 import os
 from datetime import datetime
-from config import LOG_LEVEL
+
+from dotenv import load_dotenv
+
+load_dotenv()
+LOG_LEVEL = os.getenv("LOG_LEVEL")
 
 log_file_path = os.path.join(os.getcwd(), "working", "log.txt")
 
