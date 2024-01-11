@@ -71,5 +71,15 @@ onMounted(async () => {
   await selectDocument();
 
   $global.$state.isLoading = false;
+
+  // check initial if an documentId is given
+  if (!route.params.documentId) {
+    // try to open first page from tree
+    const firstPage = $doc.documentTree.filter((d) => d.type === 'document')[0];
+    if (firstPage) {
+      console.log('found start page');
+      router.replace({ name: mode, params: { documentId: firstPage.id } });
+    }
+  }
 });
 </script>
