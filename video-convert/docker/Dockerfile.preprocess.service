@@ -15,14 +15,18 @@ COPY ./video-convert/requirements.txt .
 # Installiere Abhängigkeiten
 RUN pip install --no-cache-dir -r requirements.txt
 
-# break cache
-FROM vwf_pip AS vwf_base
-
 # Setze Arbeitsverzeichnis
 WORKDIR /app
 
-# Copy sources
-COPY ./video-convert .
-
 # Run app initial. Needs a external trigger to start again
 CMD python ./main_preprocess.py
+
+FROM vwf_pip AS dev
+
+# Files will be mounted. No need to copy them.
+
+# break cache
+FROM vwf_pip AS vwf_base
+
+# Copy sources
+COPY ./video-convert .
