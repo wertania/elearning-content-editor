@@ -1,8 +1,15 @@
+import os
 import time
 
 import logging_output as logger
-from config import POCKETBASE_ADMIN_PASSWORD, POCKETBASE_ADMIN_USER, VIDEO_UPLOAD_URL
+from dotenv import load_dotenv
 from pocketbase import PocketBase
+
+load_dotenv()
+
+VIDEO_UPLOAD_URL = os.getenv("VIDEO_UPLOAD_URL") or ""
+POCKETBASE_ADMIN_USER = os.getenv("POCKETBASE_ADMIN_USER") or ""
+POCKETBASE_ADMIN_PASSWORD = os.getenv("POCKETBASE_ADMIN_PASSWORD") or ""
 
 
 class User:
