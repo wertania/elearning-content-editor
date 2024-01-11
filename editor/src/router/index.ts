@@ -3,8 +3,7 @@ import * as VueRouter from 'vue-router';
 const routes = [
   {
     path: '/',
-    component: () => import('../views/HomeScreen.vue'),
-    name: 'home',
+    redirect: { name: 'view' },
   },
   {
     path: '/login',
@@ -25,7 +24,7 @@ const routes = [
     path: '/media/:documentId?',
     component: () => import('../views/MediaViewer.vue'),
     name: 'media',
-  }, 
+  },
   {
     path: '/smart-video-dashboard/',
     component: () => import('../views/SmartVideoDashboard.vue'),

@@ -51,7 +51,7 @@
       <img
         :src="logoUrl"
         class="w-full cursor-pointer"
-        @click="router.push({ name: 'home' })"
+        @click="router.push({ name: 'view' })"
       />
     </template>
 
@@ -382,7 +382,7 @@ const openMediaBrowser = () => {
  * Open the viewer for the current document.
  */
 const openViewer = () => {
-  window.open(`/#/view/${$doc.$state.selectedDocument?.id}`, '_blank');
+  window.open(`/#/view/${$doc.$state.selectedDocument?.id}`, '_self');
 };
 
 /**

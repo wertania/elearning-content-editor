@@ -1,8 +1,17 @@
 <template>
   <div class="bg-svg-logo" :style="{ '--bg-image': `url(${bgSvgLogoUrl})` }">
     <div class="login" v-if="!showRegisteredInfo">
-      <h2>Welcome back to</h2>
+      <h2>Welcome back to</h2>      
       <h1 style="font-size: 3em">{{ welcomeSlogan }}</h1>
+
+      <p v-if="addUser">
+        <a
+          @click="addUser = false"
+          style="color: blue; text-decoration: underline; cursor: pointer"
+          >Back to Login
+        </a>
+      </p>
+
       <div v-if="provider === 'pocketbase'">
         <!--login with username and password -->
         <div class="p-fluid">

@@ -115,7 +115,7 @@
       <img
         :src="logoUrl"
         class="w-full cursor-pointer"
-        @click="router.push({ name: 'home' })"
+        @click="router.push({ name: 'view' })"
       />
     </template>
 
@@ -145,6 +145,7 @@
       <div
         class="document-viewer__language-dropdown flex align-content-center flex-grow-1"
       >
+        <Button icon="fa-solid fa-pen" class="mr-2" @click="openEditor()" />
         <Dropdown
           small
           :options="$doc.languages"
@@ -360,6 +361,17 @@ const openDocument = (id: string) => {
   const url = '/view/' + id;
   console.log('openDocument', url);
   router.push(url);
+};
+
+/**
+ * open editor
+ */
+const openEditor = () => {
+  const url = $doc.selectedDocument?.id
+    ? '/#/edit/' + $doc.selectedDocument?.id
+    : '/#/edit/';
+  console.log('openEditor', url);
+  window.open(url, '_self');
 };
 
 /**

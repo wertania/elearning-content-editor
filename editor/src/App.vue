@@ -2,7 +2,7 @@
   <!-- Toas Message boxes -->
   <Toast />
   <!-- Main entry point for views -->
-  <router-view />
+  <router-view :key="$route.path" />
 </template>
 
 <script setup lang="ts">
@@ -28,7 +28,7 @@ const initApp = async () => {
     console.log('logged in');
     if (route.name === 'login') {
       // redirect if on login page
-      router.push({ name: 'home' });
+      router.push({ name: 'view' });
     }
   } else {
     console.log('not logged in. redirect to login');

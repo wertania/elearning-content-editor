@@ -38,7 +38,7 @@ export const useGlobalStore = defineStore("global", {
   }),
   actions: {
     async loginRedirect() {
-      await router.push({ path: "/edit" });
+      await router.push({ path: "/view" });
     },
 
     saveUserSettings() {
