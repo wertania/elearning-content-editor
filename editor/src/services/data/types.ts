@@ -1,4 +1,5 @@
-import { TreeNode } from 'primevue/tree';
+
+import { TreeNode } from 'primevue/treenode';
 import type { UniversalBlock } from 'vue-blockful-editor';
 
 export type DocumentItem = {
@@ -71,7 +72,6 @@ export interface DataProvider {
   ): Promise<void>;
   requestPasswordReset(email: string): Promise<void>;
   updateEmail(email: string): Promise<void>;
-  requestEmailVerification(email: string): Promise<void>;
 
   getDocuments(
     query?: DocumentQuery,

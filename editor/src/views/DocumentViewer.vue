@@ -213,7 +213,8 @@
 
 <script setup lang="ts">
 import { ref, computed, ComputedRef, watch, Ref } from 'vue';
-import Tree, { TreeNode } from 'primevue/tree';
+import Tree from 'primevue/tree';
+import { TreeNode } from 'primevue/treenode';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
 import { DocumentTreeItem } from '../services/data/types';

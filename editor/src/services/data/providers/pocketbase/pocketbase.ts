@@ -14,7 +14,6 @@ import type {
 import { buildTree } from '../../helpers';
 import PocketBase from 'pocketbase';
 import { $global } from './../../../../main';
-import { request } from 'http';
 
 const URL: string =
   import.meta.env.VITE_POCKETBASE_URL || 'http://127.0.0.1:8090';
@@ -81,7 +80,6 @@ export default {
       passwordConfirm: password,
       name,
     });
-    await this.requestEmailVerification(email);
   },
 
   // mail verification is done by background service
