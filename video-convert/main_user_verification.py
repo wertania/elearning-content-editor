@@ -19,7 +19,6 @@ class User:
         username: str,
         name: str,
         invitation_code: str,
-        codeSended: bool,
         verified: bool,
     ) -> None:
         self.id = id
@@ -27,7 +26,6 @@ class User:
         self.email = email
         self.name = name
         self.invitation_code = invitation_code
-        self.codeSended = codeSended
         self.verified = verified
 
     def __str__(self):
@@ -38,7 +36,6 @@ class User:
                 self.email,
                 self.name,
                 self.invitation_code,
-                self.codeSended,
                 self.verified,
             )
         )
