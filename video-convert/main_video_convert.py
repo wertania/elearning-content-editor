@@ -1,9 +1,10 @@
-from data_providers import data_provider
-from data_providers.base import VideoStatus, UnconvertedVideo
+from datetime import datetime
+
 import converter
 import logging_output as logger
 from cleanup import clean_up
-from datetime import datetime
+from data_providers import data_provider
+from data_providers.base import UnconvertedVideo, VideoStatus
 
 
 def process_video(video: UnconvertedVideo):
@@ -22,11 +23,11 @@ def process_video(video: UnconvertedVideo):
     # Write the results to the database.
     new_id = None
     with open(new_filename, "rb") as file:
-        new_id = data_provider.upload_converted_video(filename, file)
+        new_id = data_provider.upload_converted_video(filename, file, video.sentences)
 
     # Update the video status to "processed".
     try:
-        data_provider.update_video_status(video, VideoStatus.PROCESSED)    
+        data_provider.update_video_status(video, VideoStatus.PROCESSED)
         data_provider.update_video_media_id(video, new_id)
     except Exception as e:
         logger.error("Failed to update video meta-data. " + str(e))
