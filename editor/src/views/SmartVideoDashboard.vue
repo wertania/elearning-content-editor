@@ -42,6 +42,12 @@
           <Toolbar>
             <template #end>
               <Button
+                @click="router.push({ name: 'screen-recorder' })"
+                icon="fa-solid fa-video"
+                label="Screen-Recorder"
+                class="mr-2"
+              />
+              <Button
                 label="Upload Video"
                 icon="fa-solid fa-upload"
                 @click="showUploadDialog = true"

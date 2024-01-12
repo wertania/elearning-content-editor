@@ -4,23 +4,25 @@
  * Will handle the interaction with the backend
  */
 
-import { defineStore } from "pinia";
-import { dataProvider } from "../services/data";
-import { DocumentItem, DocumentTreeItem } from "../services/data/types";
-import aiservice from "../services/openai/aiservice";
+import { defineStore } from 'pinia';
+import { dataProvider } from '../services/data';
+import { DocumentItem, DocumentTreeItem } from '../services/data/types';
+import aiservice from '../services/openai/aiservice';
 import {
   availableLanguages,
   baseLanguage,
   getLanguageItem,
   LanguageItem,
   mapLangCodesToLanguageItems,
-} from "./../services/language/languageService";
-import { UniversalBlock } from "vue-blockful-editor";
-import { getItemFromTree, isDescendant } from "./helper";
-import { error, info } from "./../services/toast";
-import { buildTreeItem } from "./../services/data/helpers";
+} from './../services/language/languageService';
+import { UniversalBlock } from 'vue-blockful-editor';
+import { getItemFromTree, isDescendant } from './helper';
+import { error, info } from './../services/toast';
+import { buildTreeItem } from './../services/data/helpers';
+import { useGlobalStore } from './global';
 
-const DATASOURCE: string = import.meta.env.VITE_DOCUMENT_DATASOURCE ?? "mock";
+const DATASOURCE: string = import.meta.env.VITE_DOCUMENT_DATASOURCE ?? 'mock';
+const $global = useGlobalStore();
 
 interface DocumentState {
   dataSource: string;
@@ -31,7 +33,7 @@ interface DocumentState {
   selectedDocument: DocumentItem | null;
   baseDocument: DocumentItem | null;
   subDocuments: DocumentItem[] | null;
-  editMode: "new" | "edit";
+  editMode: 'new' | 'edit';
   changesDetected: boolean;
   // languages
   languages: LanguageItem[];
@@ -39,9 +41,13 @@ interface DocumentState {
   availableLanguages: LanguageItem[];
   missingLanguages: LanguageItem[];
   selectedLanguage: string;
+
+  // time tracking on page
+  timeOnPage: number;
+  lastDocumentId: string;
 }
 
-export const useDocumentStore = defineStore("documents", {
+export const useDocumentStore = defineStore('documents', {
   state: () =>
     ({
       // general states
@@ -53,7 +59,7 @@ export const useDocumentStore = defineStore("documents", {
       selectedDocument: null,
       baseDocument: null,
       subDocuments: null,
-      editMode: "new",
+      editMode: 'new',
       changesDetected: false,
       // languages for selected document
       languages: availableLanguages, // all available languages in app
@@ -61,6 +67,10 @@ export const useDocumentStore = defineStore("documents", {
       availableLanguages: [], // available languages for selected document
       missingLanguages: [], // missing languages for selected document
       selectedLanguage: baseLanguage, // selected language for selected document
+
+      // time tracking on page
+      timeOnPage: 0,
+      lastDocumentId: '',
     }) as DocumentState,
 
   actions: {
@@ -76,7 +86,7 @@ export const useDocumentStore = defineStore("documents", {
         this.$state.documentTree = data.tree;
         this.$state.documentsFlat = data.list;
       } catch (e) {
-        error(e + "");
+        error(e + '');
       }
     },
 
@@ -88,7 +98,29 @@ export const useDocumentStore = defineStore("documents", {
       preferedLanguageCode?: string,
     ): Promise<DocumentItem | undefined> {
       try {
-        // rest first
+        // check if a document was already selected before to save time
+        if (this.$state.lastDocumentId !== id) {
+          console.log('document changed');
+          console.log('lastDocumentId', this.$state.lastDocumentId);
+          console.log(this.$state.timeOnPage);
+          if (this.$state.lastDocumentId !== '') {
+            // save time in seconds
+            const usedTime = Math.round(
+              (Date.now() - this.$state.timeOnPage) / 1000,
+            );
+            dataProvider.addTrackingEntry({
+              document: this.$state.lastDocumentId,
+              time: usedTime,
+              user: $global.$state.userId,
+              type: 'watched',
+            });
+          }
+          // (re-)start timer
+          this.$state.timeOnPage = Date.now();
+          this.$state.lastDocumentId = id;
+        }
+
+        // reset first
         this.$state.selectedDocument = null;
         // get new document
         const document = await dataProvider.getDataForDocument(id);
@@ -107,12 +139,12 @@ export const useDocumentStore = defineStore("documents", {
 
         // set prefered language if available
         if (preferedLanguageCode && preferedLanguageCode !== baseLanguage) {
-          console.log("preferedLanguageCode", preferedLanguageCode);
-          const translation = this.$state.subDocuments?.find((item) =>
-            item.langCode === preferedLanguageCode
+          console.log('preferedLanguageCode', preferedLanguageCode);
+          const translation = this.$state.subDocuments?.find(
+            (item) => item.langCode === preferedLanguageCode,
           );
           if (translation) {
-            console.log("translation found", translation);
+            console.log('translation found', translation);
             this.$state.selectedDocument = translation;
             this.$state.selectedLanguage = translation.langCode;
             return translation;
@@ -127,7 +159,7 @@ export const useDocumentStore = defineStore("documents", {
           return document;
         }
       } catch (e) {
-        error(e + "");
+        error(e + '');
       }
     },
 
@@ -144,8 +176,8 @@ export const useDocumentStore = defineStore("documents", {
       // missing languages
       this.$state.missingLanguages = this.$state.languages.filter(
         (item) =>
-          !this.$state.availableLanguages.find((lang) =>
-            lang.code === item.code
+          !this.$state.availableLanguages.find(
+            (lang) => lang.code === item.code,
           ),
       );
     },
@@ -161,8 +193,8 @@ export const useDocumentStore = defineStore("documents", {
         document = this.$state.baseDocument;
       } // else look in subDocuments for the document with the new selected language
       else {
-        document = this.$state.subDocuments?.find((item) =>
-          item.langCode === langCode
+        document = this.$state.subDocuments?.find(
+          (item) => item.langCode === langCode,
         );
       }
 
@@ -192,15 +224,18 @@ export const useDocumentStore = defineStore("documents", {
         const doc: DocumentItem = await dataProvider.updateDocument(document);
 
         // update current tree
-        let item: null | DocumentTreeItem = getItemFromTree(document.id, this.$state.documentTree);
+        let item: null | DocumentTreeItem = getItemFromTree(
+          document.id,
+          this.$state.documentTree,
+        );
         if (item) {
           item.data = doc;
           item.label = doc.name;
           item.name = doc.name;
         }
-        info("Document updated successfully");
+        info('Document updated successfully');
       } catch (e) {
-        error(e + "");
+        error(e + '');
       }
     },
 
@@ -215,9 +250,9 @@ export const useDocumentStore = defineStore("documents", {
         this.resetSelectedDocument();
         // update current tree
         await this.initialize();
-        info("Document deleted successfully");
+        info('Document deleted successfully');
       } catch (e) {
-        error(e + "");
+        error(e + '');
       }
     },
 
@@ -229,7 +264,7 @@ export const useDocumentStore = defineStore("documents", {
         // get all mediumIds from content
         const mediumIds: string[] = [];
         document.content.forEach((block) => {
-          if (block.type === "medium" && block.data.id) {
+          if (block.type === 'medium' && block.data.id) {
             mediumIds.push(block.data.id);
           }
         });
@@ -248,7 +283,7 @@ export const useDocumentStore = defineStore("documents", {
           this.$state.documentTree.push(treeItem);
         }
       } catch (e) {
-        error(e + "");
+        error(e + '');
       }
     },
 
@@ -261,9 +296,9 @@ export const useDocumentStore = defineStore("documents", {
         this.resetSelectedDocument();
         // update current tree
         await this.initialize();
-        info("Node deleted successfully");
+        info('Node deleted successfully');
       } catch (e) {
-        error(e + "");
+        error(e + '');
       }
     },
 
@@ -282,7 +317,7 @@ export const useDocumentStore = defineStore("documents", {
       }
       await dataProvider.moveNode(nodeId.id, parentId.id);
       await this.initialize();
-      info("Node moved successfully");
+      info('Node moved successfully');
     },
 
     /**
@@ -295,71 +330,74 @@ export const useDocumentStore = defineStore("documents", {
       // new empty content
       let content: UniversalBlock[] = [
         {
-          type: "paragraph",
-          data: { text: "go here..." },
+          type: 'paragraph',
+          data: { text: 'go here...' },
         },
       ];
 
-      let name = "", description = "", header = "";
+      let name = '',
+        description = '',
+        header = '';
 
       // should a translation be created?
       if (translate && destLangCode && this.$state.selectedDocument) {
-        console.log("Translation will be created");
+        console.log('Translation will be created');
         const translationBaseDocument: DocumentItem =
           this.$state.selectedDocument;
 
         // get full names of languageCodes
-        const langName = (this.$state.languages.find((item) =>
-          item.code === destLangCode
-        )?.name) ?? destLangCode;
-        const sourceLangName = (this.$state.languages.find((item) =>
-          item.code === translationBaseDocument.langCode
-        )?.name) ?? translationBaseDocument.langCode;
+        const langName =
+          this.$state.languages.find((item) => item.code === destLangCode)
+            ?.name ?? destLangCode;
+        const sourceLangName =
+          this.$state.languages.find(
+            (item) => item.code === translationBaseDocument.langCode,
+          )?.name ?? translationBaseDocument.langCode;
 
         const translatedContent = translationBaseDocument.content;
         // iterate through all blocks and translate the texts
         for (const block of translatedContent) {
-          if (block.type === "paragraph") {
+          if (block.type === 'paragraph') {
             const translation = await aiservice.getTranslation(
               block.data.text,
               sourceLangName,
               langName,
             );
-            console.log("paragraph translated to", translation);
+            console.log('paragraph translated to', translation);
             block.data.text = translation;
-          } else if (block.type === "header") {
+          } else if (block.type === 'header') {
             const translation = await aiservice.getTranslation(
               block.data.text,
               sourceLangName,
               langName,
             );
-            console.log("header translated to", translation);
+            console.log('header translated to', translation);
             block.data.text = translation;
-          } else if (block.type === "markdown") {
+          } else if (block.type === 'markdown') {
             const translation = await aiservice.getTranslation(
               block.data.code,
               sourceLangName,
               langName,
             );
-            console.log("markdown translated to", translation);
+            console.log('markdown translated to', translation);
             block.data.code = translation;
           } else {
-            console.error("unknown block type", block.type);
+            console.error('unknown block type', block.type);
           }
         }
         content = translatedContent;
 
-        if (translationBaseDocument.name !== "") {
-          console.log("translate name", translationBaseDocument.name);
+        if (translationBaseDocument.name !== '') {
+          console.log('translate name', translationBaseDocument.name);
           name = await aiservice.getTranslation(
             translationBaseDocument.name,
             sourceLangName,
             langName,
           );
         }
-        if (translationBaseDocument.description !== "") {
+        if (translationBaseDocument.description !== '') {
           console.log(
-            "translate description",
+            'translate description',
             translationBaseDocument.description,
           );
           description = await aiservice.getTranslation(
@@ -368,8 +406,8 @@ export const useDocumentStore = defineStore("documents", {
             langName,
           );
         }
-        if (translationBaseDocument.header !== "") {
-          console.log("translate header", translationBaseDocument.header);
+        if (translationBaseDocument.header !== '') {
+          console.log('translate header', translationBaseDocument.header);
           header = await aiservice.getTranslation(
             translationBaseDocument.header,
             sourceLangName,
@@ -379,15 +417,14 @@ export const useDocumentStore = defineStore("documents", {
       }
 
       const document: DocumentItem = {
-        id: "",
+        id: '',
         version: 1,
         name,
         description,
         header,
-        type: "document",
-        langCode: translate && destLangCode
-          ? destLangCode
-          : this.$state.baseLanguage,
+        type: 'document',
+        langCode:
+          translate && destLangCode ? destLangCode : this.$state.baseLanguage,
         content,
         parent: this.$state.selectedDocument?.parent ?? undefined,
         originId: translate ? this.$state.selectedDocument?.id : undefined,
@@ -396,7 +433,7 @@ export const useDocumentStore = defineStore("documents", {
       };
 
       // create document in backend
-      console.log("addTranslation", document);
+      console.log('addTranslation', document);
       const doc = await dataProvider.addDocument(document);
       this.$state.selectedDocument = doc;
       this.$state.subDocuments = [...(this.$state.subDocuments ?? []), doc];
@@ -407,30 +444,31 @@ export const useDocumentStore = defineStore("documents", {
     /**
      * add a new empty document. only add to the editor. do not save to backend initially
      */
-    addEmtpyDocument(type: "document" | "folder", parent?: string) {
+    addEmtpyDocument(type: 'document' | 'folder', parent?: string) {
       const document: DocumentItem = {
-        id: "",
+        id: '',
         version: 1,
-        name: "",
-        description: "",
-        header: "",
+        name: '',
+        description: '',
+        header: '',
         type,
         langCode: this.$state.baseLanguage,
-        content: type === "document"
-          ? [
-            {
-              type: "markdown",
-              data: { code: "" }
-            },
-          ]
-          : [],
+        content:
+          type === 'document'
+            ? [
+                {
+                  type: 'markdown',
+                  data: { code: '' },
+                },
+              ]
+            : [],
         parent: parent ?? undefined,
         media: [],
         hidden: false,
       };
 
       this.resetSelectedDocument();
-      this.$state.editMode = "new";
+      this.$state.editMode = 'new';
       this.$state.selectedDocument = document;
       this.$state.selectedLanguage = baseLanguage;
       this.refreshLanguagesCache();

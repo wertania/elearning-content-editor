@@ -1,4 +1,3 @@
-
 import { TreeNode } from 'primevue/treenode';
 import type { UniversalBlock } from 'vue-blockful-editor';
 
@@ -26,6 +25,7 @@ export interface Medium {
   id: string;
   version: number;
   type: MediumType;
+  transcript?: SmartVideoTranscriptWithTimestamps[]; // transcript for videos
   langCode: string;
   name: string;
   url: string;
@@ -53,6 +53,15 @@ export interface MediumQuery {
   type?: MediumType;
   documentId?: string;
   originId?: string;
+}
+
+export interface TrackingItem {
+  id?: string; // auto generated
+  created?: string; // auto generated
+  user: string; // id of the user
+  document: string; // id of the document
+  type: 'watched';
+  time: number; // seconds  
 }
 
 export interface DataProvider {
@@ -109,6 +118,8 @@ export interface DataProvider {
   ): Promise<void>;
   getVideoTask(id?: string): Promise<SmartVideoConvertTask[]>;
   getVideoTasks(status: SmartVideoStatus[]): Promise<SmartVideoTask[]>;
+
+  addTrackingEntry(item: TrackingItem): Promise<void>;
 }
 
 export type SmartVideoStatus =
