@@ -1,4 +1,3 @@
-
 import { TreeNode } from 'primevue/treenode';
 import type { UniversalBlock } from 'vue-blockful-editor';
 
@@ -26,6 +25,7 @@ export interface Medium {
   id: string;
   version: number;
   type: MediumType;
+  transcript?: SmartVideoTranscriptWithTimestamps[]; // transcript for videos
   langCode: string;
   name: string;
   url: string;
