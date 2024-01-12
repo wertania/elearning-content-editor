@@ -31,9 +31,9 @@ const routes = [
     name: 'smart-video-dashboard',
   },
   {
-    path: '/demo/',
-    component: () => import('../views/DemoView.vue'),
-    name: 'demo',
+    path: '/screen-recorder/',
+    component: () => import('../views/ScreenRecorder.vue'),
+    name: 'screen-recorder',
   },
 ];
 
