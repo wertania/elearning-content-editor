@@ -55,6 +55,15 @@ export interface MediumQuery {
   originId?: string;
 }
 
+export interface TrackingItem {
+  id?: string; // auto generated
+  created?: string; // auto generated
+  user: string; // id of the user
+  document: string; // id of the document
+  type: 'watched';
+  time: number; // seconds  
+}
+
 export interface DataProvider {
   name: string;
 
@@ -109,6 +118,8 @@ export interface DataProvider {
   ): Promise<void>;
   getVideoTask(id?: string): Promise<SmartVideoConvertTask[]>;
   getVideoTasks(status: SmartVideoStatus[]): Promise<SmartVideoTask[]>;
+
+  addTrackingEntry(item: TrackingItem): Promise<void>;
 }
 
 export type SmartVideoStatus =

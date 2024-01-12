@@ -10,6 +10,7 @@ import type {
   Medium,
   MediumQuery,
   MediumType,
+  TrackingItem,
 } from '../../types';
 import { buildTree } from '../../helpers';
 import PocketBase from 'pocketbase';
@@ -55,6 +56,8 @@ export default {
       // set some variables
       $global.isContentCreator = res.items[0].isContentCreator;
       $global.jwtToken = this.cache.pb.authStore.token;
+      $global.userId = res.items[0].id;
+      $global.userName = res.items[0].username;
 
       return true;
     } catch (error) {
@@ -387,5 +390,9 @@ export default {
     sentences: SmartVideoTranscriptWithTimestamps[],
   ): Promise<void> {
     await this.cache.pb.collection('videoTasks').update(id, { sentences });
+  },
+
+  async addTrackingEntry(item: TrackingItem): Promise<void> {
+    await this.cache.pb.collection('tracking').create(item);
   },
 } satisfies DataProvider;

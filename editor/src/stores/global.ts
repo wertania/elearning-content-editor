@@ -19,6 +19,8 @@ interface GlobalState {
   requestPending: boolean;
   aiSearchUrl: string;
   videoConverterUrl: string;
+  userId: string;
+  userName: string;
   jwtToken: string;
 
   // user settings
@@ -37,6 +39,8 @@ export const useGlobalStore = defineStore("global", {
     aiSearchUrl,
     videoConverterUrl,
 
+    userId: "",
+    userName: "",
     jwtToken: "",
   }),
   actions: {

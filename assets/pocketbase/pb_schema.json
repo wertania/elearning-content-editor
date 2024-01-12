@@ -403,5 +403,81 @@
         "updateRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
         "deleteRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
         "options": {}
+    },
+    {
+        "id": "2fhd1wwndqcsdte",
+        "name": "tracking",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "system": false,
+                "id": "ce4xxb7k",
+                "name": "user",
+                "type": "relation",
+                "required": true,
+                "presentable": true,
+                "unique": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": null
+                }
+            },
+            {
+                "system": false,
+                "id": "ow3e91es",
+                "name": "document",
+                "type": "relation",
+                "required": true,
+                "presentable": true,
+                "unique": false,
+                "options": {
+                    "collectionId": "xl07xlbvd1rx9nx",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": null
+                }
+            },
+            {
+                "system": false,
+                "id": "nllb9xmc",
+                "name": "type",
+                "type": "select",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "maxSelect": 1,
+                    "values": [
+                        "watched"
+                    ]
+                }
+            },
+            {
+                "system": false,
+                "id": "ahypvklg",
+                "name": "time",
+                "type": "number",
+                "required": true,
+                "presentable": true,
+                "unique": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "noDecimal": false
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
+        "viewRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
+        "createRule": "@request.auth.id != \"\" && @request.auth.id = @request.data.user.id",
+        "updateRule": null,
+        "deleteRule": null,
+        "options": {}
     }
 ]
