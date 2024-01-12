@@ -27,7 +27,7 @@ WORKDIR /app
 
 FROM vwf_pip AS dev
 
-CMD python ./main.py
+CMD python ./main_video_convert.py
 
 # break cache
 FROM vwf_pip AS vwf_base
@@ -36,4 +36,4 @@ FROM vwf_pip AS vwf_base
 COPY ./video-convert .
 
 # Run app initial. Needs a external trigger to start again
-CMD python ./main.py
+CMD python ./main_video_convert.py

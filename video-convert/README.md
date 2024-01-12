@@ -2,7 +2,12 @@
 
 An AI language chain to transform a freely spoken video tutorial into a high-quality instructional video using advanced AI technologies.
 
-## Overview
+This contains three independent services:
+- "user-verification": Will verify new users depending on ther invitation code and mail-domain.
+- "video-convert": The main service that handles the conversion of video files and push the result to the database.
+- "vide-transcribe": A service that will transcribe the audio of a video file and push the result to the database.
+
+## video-convert
 
 Chain:
 
@@ -14,12 +19,7 @@ Chain:
 - Utilize the existing video file and layer in the newly created audio.
 - Export the final product as a new video in any language.
 
-The API (`api.py`) exposes the following endpoints:
-
-- `/processVideo`: for transcribing a video file and optimizing the transcript
-- `/createVideo`: for creating a new video file from a transcript
-
-You can also use a one-off service that fetches unprocessed video tasks from the data provider, processes them and writes them back to the database. Refer to the file `main.py`.
+=> `main_video_convert.py`
 
 ## Running
 
@@ -30,7 +30,7 @@ If you want to start the service manually, you can do so by running the followin
 ```sh
 TARGET=production|dev
 IMAGE_NAME=video-convert
-APP_TYPE=service|api
+APP_TYPE=user-verification.service|video-convert.service|preprocess.service
 
 # Build the image.
 docker build --target $TARGET -t $IMAGE_NAME -f docker/Dockerfile.$APP_TYPE
