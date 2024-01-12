@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 
 import converter
@@ -82,3 +83,8 @@ if __name__ == "__main__":
 
             # Add error message.
             data_provider.add_errors(video, message)
+
+    # wait 15s
+    # service will restart and run again. so this sleep will prevent the service from running too fast
+    logger.info("Waiting 15s...")
+    time.sleep(15)

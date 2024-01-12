@@ -1,19 +1,21 @@
-from data_providers import data_provider
-from data_providers.base import VideoStatus, UnconvertedVideo
+import time
+from datetime import datetime
+
+import config
 import converter
 import logging_output as logger
 from cleanup import clean_up
-from datetime import datetime
-from stt import speech_to_text
 from convert_ffmpeg import extract_audio
-import config
+from data_providers import data_provider
+from data_providers.base import UnconvertedVideo, VideoStatus
 from refinement_openai import refine
+from stt import speech_to_text
+
 
 def process_video(video: UnconvertedVideo):
-    
     # Store the original video file and process it.
     id, filename = converter.store_video_file(video.data, video.file_extension)
-    
+
     audio_file = extract_audio(filename)
     logger.debug("Audio file: " + audio_file)
 
@@ -26,7 +28,7 @@ def process_video(video: UnconvertedVideo):
     else:
         logger.debug("Skipping transcript optimization because it is disabled.")
 
-     # convert to json and save to session state
+    # convert to json and save to session state
     transcript_obj = transcript.to_dict()
     logger.debug("Transcript optimized")
 
@@ -34,7 +36,7 @@ def process_video(video: UnconvertedVideo):
     data_provider.update_video_sentences(video, transcript_obj["sentences"])
     data_provider.update_video_status(video, VideoStatus.PREPROCESSED)
     data_provider.reset_errors(video)
-    
+
     logger.debug("Video status updated successfully")
 
     # Clean up the temporary files.
@@ -89,3 +91,8 @@ if __name__ == "__main__":
 
             # Add error message.
             data_provider.add_errors(video, message)
+
+    # wait 15s
+    # service will restart and run again. so this sleep will prevent the service from running too fast
+    logger.info("Waiting 15s...")
+    time.sleep(15)
