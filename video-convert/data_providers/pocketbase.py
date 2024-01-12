@@ -1,14 +1,15 @@
-from pocketbase import PocketBase
-from pocketbase.client import FileUpload
+import urllib.request
+from typing import Optional
+
+from config import VIDEO_UPLOAD_PASSWORD, VIDEO_UPLOAD_URL, VIDEO_UPLOAD_USER
 from data_providers.base import (
     BaseDataProvider,
     UnconvertedVideo,
-    VideoStatus,
     VideoContent,
+    VideoStatus,
 )
-from config import VIDEO_UPLOAD_URL, VIDEO_UPLOAD_USER, VIDEO_UPLOAD_PASSWORD
-from typing import Optional
-import urllib.request
+from pocketbase import PocketBase
+from pocketbase.client import FileUpload
 
 
 class PocketBaseUnconvertedVideo(UnconvertedVideo):
@@ -61,7 +62,7 @@ class PocketBaseDataProvider(BaseDataProvider):
             200, {"filter": f'status = "{VideoStatus.UNPROCESSED}"'}
         )
         return list(map(lambda task: _create_unconverted_video(self.pb, task), tasks))
-    
+
     def read_unpreprocessed_videos(self) -> list[PocketBaseUnconvertedVideo]:
         tasks = self.pb.collection("videoTasks").get_full_list(
             200, {"filter": f'status = "{VideoStatus.UNPREPROCESSED}"'}
@@ -78,16 +79,16 @@ class PocketBaseDataProvider(BaseDataProvider):
     ):
         self.pb.collection("videoTasks").update(video.task_id, {"sentences": sentences})
 
-    def upload_converted_video(self, filename: str, file):
+    def upload_converted_video(self, filename: str, file, transcript: list):
         item = self.pb.collection("media").create(
             {
                 "file": FileUpload((filename, file)),
-                "content": VideoContent("video").to_json(),
+                "content": VideoContent("video", transcript).to_json(),
                 # TODO: langCode
             }
         )
         return item.id
-    
+
     def update_video_media_id(self, video: PocketBaseUnconvertedVideo, media_id: str):
         self.pb.collection("videoTasks").update(video.task_id, {"mediaId": media_id})
 

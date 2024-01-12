@@ -1,6 +1,6 @@
+from data_providers.base import BaseDataProvider, UnconvertedVideo, VideoStatus
+
 from .base import UnconvertedVideo
-from data_providers.base import BaseDataProvider
-from data_providers.base import UnconvertedVideo, VideoStatus
 
 
 class MockDataProvider(BaseDataProvider):
@@ -27,7 +27,7 @@ class MockDataProvider(BaseDataProvider):
                 self.videoTasks,
             )
         )
-    
+
     def read_unpreprocessed_videos(self) -> list[UnconvertedVideo]:
         filename = "demo_input.mp4"
 
@@ -46,7 +46,7 @@ class MockDataProvider(BaseDataProvider):
     def update_video_status(self, video_id: str, status: VideoStatus):
         ...
 
-    def upload_converted_video(self, filename: str, data):
+    def upload_converted_video(self, filename: str, data, transcript: list):
         ...
 
     def add_errors(self, video_id: str, *errors: str):

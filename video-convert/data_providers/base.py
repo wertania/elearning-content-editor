@@ -1,7 +1,7 @@
+import json
 from abc import abstractmethod
 from enum import Enum
-from typing import Optional, Literal
-import json
+from typing import Literal, Optional
 
 
 class UnconvertedVideo:
@@ -19,8 +19,9 @@ class UnconvertedVideo:
 
 
 class VideoContent:
-    def __init__(self, type: Literal["image", "video", "audio"]):
+    def __init__(self, type: Literal["image", "video", "audio"], transcript):
         self.type = type
+        self.transcript = transcript
 
     def to_json(self) -> str:
         return json.dumps(self.__dict__)
@@ -57,7 +58,7 @@ class BaseDataProvider:
         ...
 
     @abstractmethod
-    def upload_converted_video(self, filename: str, file) -> str:
+    def upload_converted_video(self, filename: str, file, transcript: list) -> str:
         ...
 
     @abstractmethod
@@ -67,4 +68,3 @@ class BaseDataProvider:
     @abstractmethod
     def reset_errors(self, video: UnconvertedVideo):
         ...
-
