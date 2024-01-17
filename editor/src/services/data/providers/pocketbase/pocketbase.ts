@@ -392,6 +392,13 @@ export default {
     await this.cache.pb.collection('videoTasks').update(id, { sentences });
   },
 
+  async getVideoTaskBlobUrl(id: string): Promise<string> {
+    const item = await this.cache.pb.collection('videoTasks').getOne(id, {
+      requestKey: null,
+    });
+    return this.cache.pb.files.getUrl(item, item.file, { requestKey: null });
+  },
+
   async addTrackingEntry(item: TrackingItem): Promise<void> {
     await this.cache.pb.collection('tracking').create(item);
   },

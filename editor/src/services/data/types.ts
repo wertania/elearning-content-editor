@@ -61,7 +61,7 @@ export interface TrackingItem {
   user: string; // id of the user
   document: string; // id of the document
   type: 'watched';
-  time: number; // seconds  
+  time: number; // seconds
 }
 
 export interface DataProvider {
@@ -111,6 +111,7 @@ export interface DataProvider {
 
   addVideoTask(file: File): Promise<string>;
   dropVideoTask(id: string): Promise<void>;
+  getVideoTaskBlobUrl(id: string): Promise<string>;
   updateVideoStatus(id: string, status: SmartVideoStatus): Promise<void>;
   updateVideoTranscript(
     id: string,
@@ -159,4 +160,5 @@ export interface SmartVideoTask {
   status: SmartVideoStatus;
   errors: any;
   sentences: SmartVideoTranscriptWithTimestamps[];
+  mediaId: null | string;
 }

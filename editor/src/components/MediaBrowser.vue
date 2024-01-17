@@ -186,7 +186,7 @@ const _documentId = ref<string | null>(props.documentId ?? null);
 // "add" split-button
 const menuAdd = [
   {
-    label: 'Add smart video',
+    label: 'Manage smart videos',
     command: () => window.open('/#/smart-video-dashboard', '_blank'),
   },
   {

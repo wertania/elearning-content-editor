@@ -253,7 +253,7 @@ const menuAdd = [
     command: () => addDocument('folder'),
   },
   {
-    label: 'Add smart video',
+    label: 'Manage smart videos',
     command: () => router.push({ name: 'smart-video-dashboard' }),
   },
 ];

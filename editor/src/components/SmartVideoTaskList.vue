@@ -19,11 +19,25 @@
       <Column header="" :style="{ width: '32px' }">
         <template #body="{ data }">
           <ConfirmPopup></ConfirmPopup>
-          <Button
-            v-if="showDelete"
-            icon="fa-solid fa-trash"
-            @click="deleteTask($event, data.id)"
-          />
+          <div class="flex">
+            <Button
+              v-if="showDelete"
+              icon="fa-solid fa-trash"
+              @click="deleteTask($event, data.id)"
+              class="mr-1"
+            />
+            <Button
+              v-if="showDownload"
+              icon="fa-solid fa-download"
+              @click="downloadVideo(data)"
+            />
+            <Button
+              v-if="data && data.status === 'processed'"
+              icon="fa-solid fa-check"
+              @click="markAsFinished(data)"
+              class="ml-1"
+            />
+          </div>
         </template>
       </Column>
     </DataTable>
@@ -48,6 +62,7 @@ const props = defineProps<{
   triggerReload?: number;
   showDelete?: boolean;
   showMediaId?: boolean;
+  showDownload?: boolean;
 }>();
 
 // const emit = defineEmits<{
@@ -59,6 +74,14 @@ const selectedItem: Ref<SmartVideoTask | null> = ref(null);
 const selectRow = (row: DataTableRowSelectEvent) => {
   console.log('send', row);
   emit('select-item', row.data);
+};
+
+/**
+ * main data
+ */
+const data: Ref<SmartVideoTask[]> = ref([]);
+const getData = async () => {
+  data.value = await dataProvider.getVideoTasks(props.status);
 };
 
 /**
@@ -83,6 +106,37 @@ const deleteTask = async (event: Event, id: string) => {
 };
 
 /**
+ * download video
+ */
+const downloadVideo = async (data: SmartVideoTask) => {
+  console.log('download', data);
+  if (data.mediaId && data.mediaId !== '') {
+    const url = await dataProvider.getMediumUrl(data.mediaId);
+    console.log('download', url);
+    window.open(url, '_blank');
+    return;
+  } else {
+    const url = await dataProvider.getVideoTaskBlobUrl(data.id);
+    console.log('download', url);
+    window.open(url, '_blank');
+  }
+};
+
+/**
+ * mark as finished. this will update the status to "done"
+ */
+const markAsFinished = async (data: SmartVideoTask) => {
+  try {
+    await dataProvider.updateVideoStatus(data.id, 'done');
+    info('Updated', 'The video task has been updated');
+    await getData();
+  } catch (e) {
+    error('Error', 'Could not update the video task. ' + e);
+    return;
+  }
+};
+
+/**
  * reload trigger
  */
 watch(
@@ -92,21 +146,13 @@ watch(
   },
 );
 
-/**
- * main data
- */
-const data: Ref<SmartVideoTask[]> = ref([]);
-const getData = async () => {
-  data.value = await dataProvider.getVideoTasks(props.status);
-};
-
 onMounted(() => {
   getData();
 });
 // reload data every 30 seconds
 const interval = setInterval(() => {
   getData();
-}, 30000);
+}, 10000);
 // restart interval on unmount
 onUnmounted(() => {
   clearInterval(interval);
