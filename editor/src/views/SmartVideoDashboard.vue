@@ -193,6 +193,7 @@ const uploadRawVideo = async (e: FileUploadUploaderEvent) => {
  */
 const sentences = ref<SmartVideoTranscriptWithTimestamps[]>([]);
 const selectItem = (data: SmartVideoTask) => {
+  if (data.id == null) return;
   console.log('selected', data);
   sentences.value = [];
   selectedId.value = data.id;

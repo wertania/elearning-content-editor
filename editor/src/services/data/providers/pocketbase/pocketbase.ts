@@ -2,6 +2,7 @@ import {
   DocumentItem,
   SmartVideoStatus,
   SmartVideoTranscriptWithTimestamps,
+  SmartVideoTask,
 } from '../../types';
 import type {
   DataProvider,
@@ -15,6 +16,7 @@ import type {
 import { buildTree } from '../../helpers';
 import PocketBase from 'pocketbase';
 import { $global } from './../../../../main';
+import translationService from './../../../openai/aiservice';
 
 const URL: string =
   import.meta.env.VITE_POCKETBASE_URL || 'http://127.0.0.1:8090';
@@ -361,11 +363,11 @@ export default {
     return result.id;
   },
 
-  async getVideoTask(id: string): Promise<any> {
+  async getVideoTask(id: string): Promise<SmartVideoTask> {
     const result = await this.cache.pb.collection('videoTasks').getOne(id, {
       requestKey: null,
     });
-    return result.content;
+    return result;
   },
 
   async getVideoTasks(status: SmartVideoStatus[]) {
@@ -397,6 +399,52 @@ export default {
       requestKey: null,
     });
     return this.cache.pb.files.getUrl(item, item.file, { requestKey: null });
+  },
+
+  async addDuplicateWithTranslation(
+    id: string,
+    targetLangCode: string,
+    translate = true,
+  ) {
+    const item = await this.getVideoTask(id);
+    const fileUrl = await this.getVideoTaskBlobUrl(id);
+
+    if (item.sentences == null || item.sentences.length === 0) {
+      throw new Error('No sentences found in video task');
+    }
+
+    const response = await fetch(fileUrl);
+    const blob = await response.blob();
+    const file = new File([blob], item.file ?? blob.name, { type: blob.type }); // item.file is a string here at this point
+
+    // edit item
+    delete item.id;
+    delete item.file;
+    item.status = 'preprocessed';
+    item.targetLangCode = targetLangCode;
+
+    // translate all sentences
+    let sentences = item.sentences;
+    if (translate) {
+      const translateSentence = async (
+        sentenceItem: SmartVideoTranscriptWithTimestamps,
+      ): Promise<SmartVideoTranscriptWithTimestamps> => {
+        const answer = await translationService.getTranslation(
+          sentenceItem.text,
+          '',
+          targetLangCode,
+        );
+        return { start_time: sentenceItem.start_time, text: answer };
+      };
+      // iterate over all sentences and translate them with Promise.all
+      sentences = await Promise.all(item.sentences.map(translateSentence));
+    }
+
+    // @ts-ignore
+    item.sentences = JSON.stringify(sentences);
+    // @ts-ignore
+    item.file = file;
+    await this.cache.pb.collection('videoTasks').create(item);
   },
 
   async addTrackingEntry(item: TrackingItem): Promise<void> {
