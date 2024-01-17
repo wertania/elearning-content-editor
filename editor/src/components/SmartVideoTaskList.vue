@@ -230,7 +230,7 @@ const addTranslation = async (data: null | SmartVideoTask) => {
   try {
     await dataProvider.addDuplicateWithTranslation(
       data.id,
-      'en',
+      languageToAdd.value.name,
       translateViaAI.value,
     );
     info('Updated', 'The new video task has been created as "preprocessed"');
