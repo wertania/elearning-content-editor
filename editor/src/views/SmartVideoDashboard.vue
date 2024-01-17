@@ -68,6 +68,8 @@
             :status="['preprocessed']"
             @select-item="selectItem"
             :trigger-reload="triggerReload"
+            :show-download="true"
+            :show-delete="true"
           />
 
           <Dialog
@@ -122,11 +124,19 @@
         </TabPanel>
 
         <TabPanel header="Converted Videos">
-          <SmartVideoTaskList :status="['processed']" :showMediaId="true" />
+          <SmartVideoTaskList
+            :status="['processed']"
+            :showMediaId="true"
+            :show-download="true"
+            :show-delete="true"
+          />
         </TabPanel>
 
         <TabPanel header="(Processing)">
-          <SmartVideoTaskList :status="['preprocessing', 'processing']" />
+          <SmartVideoTaskList
+            :status="['preprocessing', 'processing']"
+            :show-download="true"
+          />
         </TabPanel>
       </TabView>
     </template>
@@ -183,6 +193,7 @@ const uploadRawVideo = async (e: FileUploadUploaderEvent) => {
  */
 const sentences = ref<SmartVideoTranscriptWithTimestamps[]>([]);
 const selectItem = (data: SmartVideoTask) => {
+  if (data.id == null) return;
   console.log('selected', data);
   sentences.value = [];
   selectedId.value = data.id;

@@ -61,7 +61,7 @@ export interface TrackingItem {
   user: string; // id of the user
   document: string; // id of the document
   type: 'watched';
-  time: number; // seconds  
+  time: number; // seconds
 }
 
 export interface DataProvider {
@@ -111,13 +111,19 @@ export interface DataProvider {
 
   addVideoTask(file: File): Promise<string>;
   dropVideoTask(id: string): Promise<void>;
+  getVideoTaskBlobUrl(id: string): Promise<string>;
   updateVideoStatus(id: string, status: SmartVideoStatus): Promise<void>;
   updateVideoTranscript(
     id: string,
     sentences: SmartVideoTranscriptWithTimestamps[],
   ): Promise<void>;
-  getVideoTask(id?: string): Promise<SmartVideoConvertTask[]>;
+  getVideoTask(id?: string): Promise<SmartVideoTask>;
   getVideoTasks(status: SmartVideoStatus[]): Promise<SmartVideoTask[]>;
+  addDuplicateWithTranslation(
+    id: string,
+    targetLangCode: string,
+    translate: boolean,
+  ): Promise<void>;
 
   addTrackingEntry(item: TrackingItem): Promise<void>;
 }
@@ -132,31 +138,17 @@ export type SmartVideoStatus =
   | 'done'
   | 'error';
 
-export interface SmartVideoConvertTask {
-  id: string;
-  status: SmartVideoStatus;
-  text: string;
-  file: string; // filename
-}
-
 export interface SmartVideoTranscriptWithTimestamps {
   text: string;
   start_time: number;
 }
 
-export interface SmartVideoConvertTransscript {
-  sentences: SmartVideoTranscriptWithTimestamps[];
-}
-
-export interface SmartVideoCreationRequest {
-  id: string;
-  langCode: string;
-  sentences: SmartVideoTranscriptWithTimestamps[];
-}
-
 export interface SmartVideoTask {
-  id: string;
+  id?: string;
   status: SmartVideoStatus;
   errors: any;
   sentences: SmartVideoTranscriptWithTimestamps[];
+  mediaId: null | string;
+  targetLangCode: null | string;
+  file?: string;
 }
