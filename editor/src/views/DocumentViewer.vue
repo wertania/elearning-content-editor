@@ -170,6 +170,7 @@
             class="pt-2 pb-3 pr-2"
             selectionMode="single"
             v-model:selectionKeys="selection"
+            v-model:expandedKeys="$doc.expandedKeys"
             :value="$doc.documentTree"
             @node-select="loadDocument"
             :disabled="true"
@@ -214,7 +215,7 @@
 <script setup lang="ts">
 import { ref, computed, ComputedRef, watch, Ref } from 'vue';
 import Tree from 'primevue/tree';
-import { TreeNode } from 'primevue/treenode';
+import { TreeNode } from 'primevue/tree';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
 import { DocumentTreeItem } from '../services/data/types';
@@ -366,7 +367,7 @@ const aiSearch = async () => {
 const openDocument = (id: string) => {
   const url = '/view/' + id;
   console.log('openDocument', url);
-  router.push(url);
+  router.push({ name: 'view', params: { documentId: id } });
 };
 
 /**

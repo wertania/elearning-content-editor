@@ -12,5 +12,8 @@
     "dev-vp": "npm --prefix .\\.viewer\\ run vitepress"
   },
   "author": "BE",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "primevue": "^3.47.2"
+  }
 }

@@ -137,6 +137,7 @@
             class="document-editor__tree"
             selectionMode="single"
             v-model:selectionKeys="selection"
+            v-model:expanded-keys="$doc.expandedKeys"
             :value="$doc.documentTree"
             @node-select="loadDocument"
             :disabled="true"
@@ -215,8 +216,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import Tree from 'primevue/tree';
-import { TreeNode } from 'primevue/treenode';
+import Tree, { TreeNode } from 'primevue/tree';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
 import Button from 'primevue/button';

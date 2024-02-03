@@ -31,6 +31,7 @@ interface DocumentState {
   documentsFlat: DocumentItem[];
   // states for selected document
   selectedDocument: DocumentItem | null;
+  expandedKeys: { [key: string]: boolean };
   baseDocument: DocumentItem | null;
   subDocuments: DocumentItem[] | null;
   editMode: 'new' | 'edit';
@@ -57,6 +58,7 @@ export const useDocumentStore = defineStore('documents', {
       documentsFlat: [],
       // states for selected document
       selectedDocument: null,
+      expandedKeys: {},
       baseDocument: null,
       subDocuments: null,
       editMode: 'new',
