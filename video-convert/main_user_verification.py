@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 
 import logging_output as logger
@@ -86,7 +87,7 @@ class PocketBaseDataProvider:
         return codes
 
 
-if __name__ == "__main__":
+def main():
     # get users. check if the inviationcode and domain is valid. then update the user
     try:
         logger.info("Starting user verification.")
@@ -133,3 +134,9 @@ if __name__ == "__main__":
     # service will restart and run again. so this sleep will prevent the service from running too fast
     logger.info("Waiting 15s...")
     time.sleep(15)
+
+
+if __name__ == "__main__":
+    # run main in a endless loop
+    while True:
+        main()

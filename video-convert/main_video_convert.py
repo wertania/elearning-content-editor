@@ -37,7 +37,7 @@ def process_video(video: UnconvertedVideo):
     clean_up(id)
 
 
-if __name__ == "__main__":
+def main():
     # Fetch videos to convert.
     unconverted_videos = data_provider.read_unconverted_videos()
 
@@ -59,8 +59,6 @@ if __name__ == "__main__":
         for video in unconverted_videos:
             data_provider.update_video_status(video, VideoStatus.UNPROCESSED)
             data_provider.add_errors(video, message)
-
-        exit(1)
 
     # Work on all videos.
     for video in unconverted_videos:
@@ -88,3 +86,9 @@ if __name__ == "__main__":
     # service will restart and run again. so this sleep will prevent the service from running too fast
     logger.info("Waiting 15s...")
     time.sleep(15)
+
+
+if __name__ == "__main__":
+    # run main in a endless loop
+    while True:
+        main()

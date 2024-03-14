@@ -9,8 +9,8 @@ ENV PATH="/usr/bin:${PATH}"
 
 FROM vwf_ffmpeg AS vwf_pip
 
-# Kopiere requirements.txt in das Arbeitsverzeichnis
-COPY ./video-convert/requirements.txt .
+# Kopiere requirements.preprocess.txt in das Arbeitsverzeichnis
+COPY ./video-convert/requirements.preprocess.txt .
 
 # Install CPU dependencies before whisper_timestamped to avoid installing CUDA.
 # See https://github.com/linto-ai/whisper-timestamped?tab=readme-ov-file#light-installation-for-cpu.
@@ -20,20 +20,11 @@ RUN pip3 install \
   -f https://download.pytorch.org/whl/torch_stable.html
 
 # Installiere Abhängigkeiten
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.preprocess.txt
 
 # Setze Arbeitsverzeichnis
 WORKDIR /app
 
 FROM vwf_pip AS dev
 
-CMD python ./main_video_convert.py
-
-# break cache
-FROM vwf_pip AS vwf_base
-
-# Copy sources
-COPY ./video-convert .
-
-# Run app initial. Needs a external trigger to start again
-CMD python ./main_video_convert.py
+CMD ["python", "-u", "main_video_convert.py"]

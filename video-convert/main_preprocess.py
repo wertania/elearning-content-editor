@@ -43,7 +43,7 @@ def process_video(video: UnconvertedVideo):
     clean_up(id)
 
 
-if __name__ == "__main__":
+def main():
     # Fetch videos to transcribe.
     unconverted_videos = data_provider.read_unpreprocessed_videos()
 
@@ -67,8 +67,6 @@ if __name__ == "__main__":
         for video in unconverted_videos:
             data_provider.update_video_status(video, VideoStatus.UNPREPROCESSED)
             data_provider.add_errors(video, message)
-
-        exit(1)
 
     # Work on all videos.
     for video in unconverted_videos:
@@ -94,5 +92,15 @@ if __name__ == "__main__":
 
     # wait 15s
     # service will restart and run again. so this sleep will prevent the service from running too fast
-    logger.info("Waiting 15s...")
+    logger.info("Waiting 15s until stop")
     time.sleep(15)
+
+    # print timestamp
+    logger.info("Timestamp: " + str(datetime.now()))
+    print("Done")
+
+
+if __name__ == "__main__":
+    # run main in a endless loop
+    while True:
+        main()

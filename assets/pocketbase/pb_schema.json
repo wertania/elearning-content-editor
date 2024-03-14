@@ -240,97 +240,6 @@
         "options": {}
     },
     {
-        "id": "doaq1jhcma9kf79",
-        "name": "videoTasks",
-        "type": "base",
-        "system": false,
-        "schema": [
-            {
-                "system": false,
-                "id": "zqixmvs4",
-                "name": "status",
-                "type": "select",
-                "required": false,
-                "presentable": false,
-                "unique": false,
-                "options": {
-                    "maxSelect": 1,
-                    "values": [
-                        "unpreprocessed",
-                        "preprocessing",
-                        "preprocessed",
-                        "unprocessed",
-                        "processing",
-                        "processed",
-                        "done",
-                        "error"
-                    ]
-                }
-            },
-            {
-                "system": false,
-                "id": "j2jxirn4",
-                "name": "file",
-                "type": "file",
-                "required": true,
-                "presentable": false,
-                "unique": false,
-                "options": {
-                    "maxSelect": 1,
-                    "maxSize": 52428800,
-                    "mimeTypes": [
-                        "video/mp4"
-                    ],
-                    "thumbs": [],
-                    "protected": false
-                }
-            },
-            {
-                "system": false,
-                "id": "ia9foyei",
-                "name": "sentences",
-                "type": "json",
-                "required": false,
-                "presentable": false,
-                "unique": false,
-                "options": {}
-            },
-            {
-                "system": false,
-                "id": "ttldpysa",
-                "name": "errors",
-                "type": "json",
-                "required": false,
-                "presentable": false,
-                "unique": false,
-                "options": {}
-            },
-            {
-                "system": false,
-                "id": "yzvxyjzo",
-                "name": "mediaId",
-                "type": "relation",
-                "required": false,
-                "presentable": false,
-                "unique": false,
-                "options": {
-                    "collectionId": "cytmx2xnmkc8dsu",
-                    "cascadeDelete": false,
-                    "minSelect": null,
-                    "maxSelect": 1,
-                    "displayFields": null
-                }
-            }
-        ],
-        "indexes": [],
-        "listRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
-        "viewRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
-        "createRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
-        "updateRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
-        "deleteRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
-        "options": {}
-    },
-    {
         "id": "66np483gffk1gxh",
         "name": "pdfs",
         "type": "base",
@@ -478,6 +387,112 @@
         "createRule": "@request.auth.id != \"\" && @request.auth.id = @request.data.user.id",
         "updateRule": null,
         "deleteRule": null,
+        "options": {}
+    },
+    {
+        "id": "doaq1jhcma9kf79",
+        "name": "videoTasks",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "system": false,
+                "id": "zqixmvs4",
+                "name": "status",
+                "type": "select",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "maxSelect": 1,
+                    "values": [
+                        "unpreprocessed",
+                        "preprocessing",
+                        "preprocessed",
+                        "unprocessed",
+                        "processing",
+                        "processed",
+                        "done",
+                        "error"
+                    ]
+                }
+            },
+            {
+                "system": false,
+                "id": "j2jxirn4",
+                "name": "file",
+                "type": "file",
+                "required": true,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "maxSelect": 1,
+                    "maxSize": 52428800,
+                    "mimeTypes": [
+                        "video/mp4",
+                        "video/webm"
+                    ],
+                    "thumbs": [],
+                    "protected": false
+                }
+            },
+            {
+                "system": false,
+                "id": "ia9foyei",
+                "name": "sentences",
+                "type": "json",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {}
+            },
+            {
+                "system": false,
+                "id": "ttldpysa",
+                "name": "errors",
+                "type": "json",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {}
+            },
+            {
+                "system": false,
+                "id": "yzvxyjzo",
+                "name": "mediaId",
+                "type": "relation",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "collectionId": "cytmx2xnmkc8dsu",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": null
+                }
+            },
+            {
+                "system": false,
+                "id": "fejbbtja",
+                "name": "targetLangCode",
+                "type": "text",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
+        "viewRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
+        "createRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
+        "updateRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
+        "deleteRule": "@request.auth.id != \"\" && @request.auth.isContentCreator = true",
         "options": {}
     }
 ]
