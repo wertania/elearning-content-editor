@@ -7,10 +7,12 @@ import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
 import Tooltip from "primevue/tooltip";
 import { useGlobalStore } from "./stores/global";
-import "./styles/global.scss"
+// import "./styles/global.scss"
 
-// Icons
+// Font Awesome
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import 'primeicons/primeicons.css'
+
 // Utility classes by PrimeVue
 import "primeflex/primeflex.css";
 

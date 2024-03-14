@@ -40,17 +40,15 @@ initApp();
 
 <style lang="scss">
 // overwrite some browser defaults
-:root,
-body,
-#app {
-  height: 100%;
-}
-
-#app {
-  font-family: var(--font-family);
-  min-height: 100%;
-
-  display: flex;
-  flex-direction: column;
-}
+// :root,
+// body,
+// #app {
+//   height: 100%;
+// }
+// #app {
+//   font-family: var(--font-family);
+//   min-height: 100%;
+//   display: flex;
+//   flex-direction: column;
+// }
 </style>
