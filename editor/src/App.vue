@@ -25,13 +25,13 @@ const initApp = async () => {
   // check if already logged in
   const login = await dataProvider.checkLogin();
   if (login) {
-    console.log('logged in');
+    // console.log('logged in');
     if (route.name === 'login') {
       // redirect if on login page
       router.push({ name: 'view' });
     }
   } else {
-    console.log('not logged in. redirect to login');
+    // console.log('not logged in. redirect to login');
     router.push({ name: 'login' });
   }
 };

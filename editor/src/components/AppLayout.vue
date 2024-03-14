@@ -194,7 +194,6 @@ const colorMode = computed(() => {
 watch(
   () => colorMode.value,
   (newVal) => {
-    console.log('mode changed', newVal);
     if (newVal === 'light') {
       toggleToLight();
       $global.mode = 'light';
