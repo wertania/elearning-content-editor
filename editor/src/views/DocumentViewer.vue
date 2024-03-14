@@ -127,13 +127,15 @@
 
     <template #start>
       <span class="p-input-icon-left ml-3">
-        <i class="fa-solid fa-search" />
-        <InputText
-          placeholder="Search"
-          class="w-12rem surface-100 border-round-lg border-none h-3rem font-medium"
-          size="small"
-          v-model="searchText"
-        />
+        <IconField iconPosition="left">
+          <InputIcon class="fa-solid fa-search"> </InputIcon>
+          <InputText
+            placeholder="Search"
+            class="w-12rem surface-100 border-round-lg border-none h-3rem font-medium"
+            size="small"
+            v-model="searchText"
+          />
+        </IconField>
       </span>
       <i
         class="fa-solid fa-wand-magic-sparkles text-xl ml-2 mt-1 cursor-pointer"
@@ -216,6 +218,8 @@
 import { ref, computed, ComputedRef, watch, Ref } from 'vue';
 import Tree from 'primevue/tree';
 import ProgressSpinner from 'primevue/progressspinner';
+import IconField from "primevue/iconfield";
+import InputIcon from "primevue/inputicon";
 import { useDocumentStore } from '../stores/documents';
 import { DocumentTreeItem } from '../services/data/types';
 import { useGlobalStore } from '../stores/global';

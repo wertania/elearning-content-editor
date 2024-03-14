@@ -7,13 +7,12 @@ import PrimeVue from "primevue/config";
 import ConfirmationService from "primevue/confirmationservice";
 import Tooltip from "primevue/tooltip";
 import { useGlobalStore } from "./stores/global";
-// import "./styles/global.scss"
 
 // Font Awesome
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import 'primeicons/primeicons.css'
 
-// Utility classes by PrimeVue
+// PrimeVue CSS
+import 'primeicons/primeicons.css'
 import "primeflex/primeflex.css";
 
 const pinia = createPinia();
