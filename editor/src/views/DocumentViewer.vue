@@ -215,7 +215,6 @@
 <script setup lang="ts">
 import { ref, computed, ComputedRef, watch, Ref } from 'vue';
 import Tree from 'primevue/tree';
-import { TreeNode } from 'primevue/tree';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useDocumentStore } from '../stores/documents';
 import { DocumentTreeItem } from '../services/data/types';
@@ -243,6 +242,7 @@ import {
   DocumentSearchResult,
 } from './../types/services';
 import { PluginPdf } from '../blocks/pdf';
+import { TreeNode } from 'primevue/treenode';
 const logoUrl =
   import.meta.env.VITE_TEMPLATE_LOGO_URL ?? './../assets/logo.svg';
 
