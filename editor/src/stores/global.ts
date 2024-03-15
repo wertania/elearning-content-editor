@@ -10,7 +10,6 @@ import { defineStore } from "pinia";
 import { router } from "./../router/index";
 
 const aiSearchUrl: string = import.meta.env.VITE_AISEARCH_URL ?? "";
-const videoConverterUrl: string = import.meta.env.VITE_VIDEOCONVERTER_URL ?? "";
 
 interface GlobalState {
   isLoading: boolean;
@@ -18,7 +17,6 @@ interface GlobalState {
   isContentCreator: boolean;
   requestPending: boolean;
   aiSearchUrl: string;
-  videoConverterUrl: string;
   userId: string;
   userName: string;
   jwtToken: string;
@@ -37,7 +35,6 @@ export const useGlobalStore = defineStore("global", {
     mode: "light",
 
     aiSearchUrl,
-    videoConverterUrl,
 
     userId: "",
     userName: "",

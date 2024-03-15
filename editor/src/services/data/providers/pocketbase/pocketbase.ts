@@ -19,7 +19,7 @@ import { $global } from './../../../../main';
 import translationService from './../../../openai/aiservice';
 
 const URL: string =
-  import.meta.env.VITE_POCKETBASE_URL || 'http://127.0.0.1:8090';
+  import.meta.env.VITE_DATAPROVIDER_PUBLIC_URL || 'http://127.0.0.1:8090';
 
 export default {
   name: 'pocketbase',

@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_KEY;
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 /**
  * AI service for text translations

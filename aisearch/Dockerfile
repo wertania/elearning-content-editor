@@ -45,20 +45,7 @@ WORKDIR /app
 # Kopiere alle Dateien in das Arbeitsverzeichnis
 COPY ./aisearch .
 
-EXPOSE 8000
-
-# Set environment variables
-ARG DATAPROVIDER_USER
-ARG DATAPROVIDER_PASSWORD
-ARG DATAPROVIDER_URL
-ARG BASE_LANGUAGE
-ARG DEBUG
-
-ENV DATAPROVIDER_USER $DATAPROVIDER_USER
-ENV DATAPROVIDER_PASSWORD $DATAPROVIDER_PASSWORD
-ENV DATAPROVIDER_URL $DATAPROVIDER_URL
-ENV BASE_LANGUAGE $BASE_LANGUAGE
-ENV DEBUG $DEBUG
+EXPOSE 80
 
 # Führe den Streamlit-Server aus
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]

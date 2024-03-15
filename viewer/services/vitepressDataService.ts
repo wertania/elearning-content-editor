@@ -1,7 +1,7 @@
 import PocketBase from "pocketbase";
 import {
   POCKETBASE_PASSWORD,
-  POCKETBASE_URL,
+  DATAPROVIDER_PUBLIC_URL,
   POCKETBASE_USERNAME,
 } from "./env";
 import {
@@ -52,7 +52,7 @@ export const vitepressDataProvider = {
   },
 
   async initialize() {
-    this.cache.pb = new PocketBase(POCKETBASE_URL);
+    this.cache.pb = new PocketBase(DATAPROVIDER_PUBLIC_URL);
     this.cache.pb.autoCancellation(false);
   },
 

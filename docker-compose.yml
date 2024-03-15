@@ -28,43 +28,48 @@ services:
       retries: 2
     networks:
       - shared_network
-
-  aisearch:
-    build:
-      context: .
-      dockerfile: ./aisearch/Dockerfile
-      args:
-        DATAPROVIDER_USER: ${DATAPROVIDER_USER}
-        DATAPROVIDER_PASSWORD: ${DATAPROVIDER_PASSWORD}
-        DATAPROVIDER_URL: ${DATAPROVIDER_URL}
-        BASE_LANGUAGE: ${VITE_BASE_LANGUAGE}
-        DEBUG: ${DEBUG}
-    container_name: aisearch
-    restart: unless-stopped
-    ports:
-      - "8091:8000"
-    depends_on:
-      pocketbase:
-        condition: service_healthy
-    networks:
-      - shared_network
   
   editor:
     build:
       context: ./editor
       args:
-        VITE_BASE_LANGUAGE: ${VITE_BASE_LANGUAGE}
-        VITE_AVAILABLE_LANGUAGES: ${VITE_AVAILABLE_LANGUAGES}
-        VITE_DOCUMENT_DATASOURCE: ${VITE_DOCUMENT_DATASOURCE}
-        VITE_POCKETBASE_URL: ${VITE_POCKETBASE_URL}
-        VITE_OPENAI_KEY: ${VITE_OPENAI_KEY}
-        VITE_VIDEOCONVERTER_URL: ${VITE_VIDEOCONVERTER_URL}
-        VITE_TEMPLATE_START_LOGO: ${VITE_TEMPLATE_START_LOGO}
-        VITE_TEMPLATE_WELCOME_SLOGAN: ${VITE_TEMPLATE_WELCOME_SLOGAN}
-        VITE_TEMPLATE_APP_NAME: ${VITE_TEMPLATE_APP_NAME}
-        VITE_TEMPLATE_LOGO_URL: ${VITE_TEMPLATE_LOGO_URL}
+        BASE_LANGUAGE: ${BASE_LANGUAGE}
+        AVAILABLE_LANGUAGES: ${AVAILABLE_LANGUAGES}
+        DOCUMENT_DATASOURCE: ${DOCUMENT_DATASOURCE}
+        OPENAI_API_KEY: ${OPENAI_API_KEY}
+        TEMPLATE_START_LOGO: ${TEMPLATE_START_LOGO}
+        TEMPLATE_WELCOME_SLOGAN: ${TEMPLATE_WELCOME_SLOGAN}
+        TEMPLATE_APP_NAME: ${TEMPLATE_APP_NAME}
+        TEMPLATE_LOGO_URL: ${TEMPLATE_LOGO_URL}
+        DATAPROVIDER_PUBLIC_URL: ${DATAPROVIDER_PUBLIC_URL}
+        AISEARCH_URL: ${AISEARCH_URL}
     ports:
-      - "9000:80"
+      - "8081:80"
+    container_name: editor
+    restart: unless-stopped
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+
+  aisearch:
+    build:
+      context: .
+      dockerfile: ./aisearch/Dockerfile     
+    container_name: aisearch
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    networks:
+      - shared_network
+    environment:
+      - DATAPROVIDER_USER=${DATAPROVIDER_USER}
+      - DATAPROVIDER_PASSWORD=${DATAPROVIDER_PASSWORD}
+      - DATAPROVIDER_URL=${DATAPROVIDER_URL}
+      - BASE_LANGUAGE=${BASE_LANGUAGE}
+      - DEBUG=${DEBUG}
 
   video-convert-service-preprocess:
     build:
@@ -77,6 +82,23 @@ services:
     depends_on:
       pocketbase:
         condition: service_healthy
+    networks:
+      - shared_network
+    environment:
+      - DOCUMENT_DATASOURCE=${DOCUMENT_DATASOURCE}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - DATAPROVIDER_USER=${DATAPROVIDER_USER}
+      - DATAPROVIDER_PASSWORD=${DATAPROVIDER_PASSWORD}
+      - DATAPROVIDER_URL=${DATAPROVIDER_URL}
+      - OPTIMIZE_TRANSCRIPT=${OPTIMIZE_TRANSCRIPT}
+      - GOOGLE_BLOB_BUCKET=${GOOGLE_BLOB_BUCKET}
+      - GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID}
+      - GOOGLE_PRIV_KEY_ID=${GOOGLE_PRIV_KEY_ID}
+      - GOOGLE_PRIV_KEY=${GOOGLE_PRIV_KEY}
+      - GOOGLE_CLIENT_EMAIL=${GOOGLE_CLIENT_EMAIL}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_X509_CERT_URL=${GOOGLE_CLIENT_X509_CERT_URL}
 
   video-convert-service:
     build:
@@ -89,6 +111,23 @@ services:
     depends_on:
       pocketbase:
         condition: service_healthy
+    networks:
+      - shared_network
+    environment:
+      - DOCUMENT_DATASOURCE=${DOCUMENT_DATASOURCE}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - DATAPROVIDER_USER=${DATAPROVIDER_USER}
+      - DATAPROVIDER_PASSWORD=${DATAPROVIDER_PASSWORD}
+      - DATAPROVIDER_URL=${DATAPROVIDER_URL}
+      - OPTIMIZE_TRANSCRIPT=${OPTIMIZE_TRANSCRIPT}
+      - GOOGLE_BLOB_BUCKET=${GOOGLE_BLOB_BUCKET}
+      - GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID}
+      - GOOGLE_PRIV_KEY_ID=${GOOGLE_PRIV_KEY_ID}
+      - GOOGLE_PRIV_KEY=${GOOGLE_PRIV_KEY}
+      - GOOGLE_CLIENT_EMAIL=${GOOGLE_CLIENT_EMAIL}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_X509_CERT_URL=${GOOGLE_CLIENT_X509_CERT_URL}
 
   user-verification:
     build:
@@ -101,3 +140,9 @@ services:
     depends_on:
       pocketbase:
         condition: service_healthy
+    networks:
+      - shared_network
+    environment:
+      - DATAPROVIDER_URL=${DATAPROVIDER_URL}
+      - DATAPROVIDER_ADMINUSER=${DATAPROVIDER_ADMINUSER}
+      - DATAPROVIDER_ADMINPASSWORD=${DATAPROVIDER_ADMINPASSWORD}
