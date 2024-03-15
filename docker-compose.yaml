@@ -53,8 +53,8 @@ services:
 
   aisearch:
     build:
-      context: .
-      dockerfile: ./aisearch/Dockerfile     
+      context: ./aisearch
+      dockerfile: ./Dockerfile
     container_name: aisearch
     restart: unless-stopped
     ports:

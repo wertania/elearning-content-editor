@@ -24,28 +24,16 @@ RUN \
   make && \
   make install \
   && \
-  # Smoke test
   sqlite3 --version
 
-# Basisimage
 FROM base AS ai-search-elearning-base
-
-# Kopiere requirements.txt in das Arbeitsverzeichnis
-COPY ./aisearch/requirements.txt .
-
-# Installiere Abhängigkeiten
+COPY ./requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# break cache
 FROM ai-search-elearning-base AS ai-search-elearning-api
 
-# Setze Arbeitsverzeichnis
 WORKDIR /app
-
-# Kopiere alle Dateien in das Arbeitsverzeichnis
-COPY ./aisearch .
+COPY . .
 
 EXPOSE 80
-
-# Führe den Streamlit-Server aus
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
