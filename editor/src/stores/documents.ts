@@ -16,7 +16,7 @@ import {
   mapLangCodesToLanguageItems,
 } from './../services/language/languageService';
 import { UniversalBlock } from 'vue-blockful-editor';
-import { getItemFromTree, isDescendant } from './helper';
+import { getItemFromTree } from './helper';
 import { error, info } from './../services/toast';
 import { buildTreeItem } from './../services/data/helpers';
 import { useGlobalStore } from './global';
