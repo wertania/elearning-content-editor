@@ -27,3 +27,4 @@ local/pb/data/*
 !local/pb/data/placeholder
 
 editor/.env.*
+video-convert/.env.test
