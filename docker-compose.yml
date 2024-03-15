@@ -1,0 +1,149 @@
+version: "3.8"
+name: e-learning-plattform
+
+networks:
+  shared_network:
+    driver: bridge
+
+services:
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    container_name: pocketbase
+    restart: unless-stopped
+    # command:
+      # - --encryptionEnv
+      # - ENCRYPTION
+    # environment:
+      # ENCRYPTION: example
+    ports:
+      - "8080:8090"
+    volumes:
+      - ./local/pb/data:/pb_data
+      # - ./local/pb/public:/pb_public
+      # - ./local/pb/hooks:/pb_hooks
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8090/api/health || exit 1
+      interval: 3s
+      timeout: 3s
+      retries: 2
+    networks:
+      - shared_network
+  
+  editor:
+    build:
+      context: ./editor
+      args:
+        BASE_LANGUAGE: ${BASE_LANGUAGE}
+        AVAILABLE_LANGUAGES: ${AVAILABLE_LANGUAGES}
+        DOCUMENT_DATASOURCE: ${DOCUMENT_DATASOURCE}
+        OPENAI_API_KEY: ${OPENAI_API_KEY}
+        TEMPLATE_START_LOGO: ${TEMPLATE_START_LOGO}
+        TEMPLATE_WELCOME_SLOGAN: ${TEMPLATE_WELCOME_SLOGAN}
+        TEMPLATE_APP_NAME: ${TEMPLATE_APP_NAME}
+        TEMPLATE_LOGO_URL: ${TEMPLATE_LOGO_URL}
+        DATAPROVIDER_PUBLIC_URL: ${DATAPROVIDER_PUBLIC_URL}
+        AISEARCH_URL: ${AISEARCH_URL}
+    ports:
+      - "8081:80"
+    container_name: editor
+    restart: unless-stopped
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+
+  aisearch:
+    build:
+      context: .
+      dockerfile: ./aisearch/Dockerfile     
+    container_name: aisearch
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    networks:
+      - shared_network
+    environment:
+      - DATAPROVIDER_USER=${DATAPROVIDER_USER}
+      - DATAPROVIDER_PASSWORD=${DATAPROVIDER_PASSWORD}
+      - DATAPROVIDER_URL=${DATAPROVIDER_URL}
+      - BASE_LANGUAGE=${BASE_LANGUAGE}
+      - DEBUG=${DEBUG}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+  video-convert-service-preprocess:
+    build:
+      context: .
+      dockerfile: ./video-convert/docker/Dockerfile.video-convert.service
+    volumes:
+      - ./video-convert:/app
+    restart: always
+    # cpus: 2
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    networks:
+      - shared_network
+    environment:
+      - DOCUMENT_DATASOURCE=${DOCUMENT_DATASOURCE}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - DATAPROVIDER_USER=${DATAPROVIDER_USER}
+      - DATAPROVIDER_PASSWORD=${DATAPROVIDER_PASSWORD}
+      - DATAPROVIDER_URL=${DATAPROVIDER_URL}
+      - OPTIMIZE_TRANSCRIPT=${OPTIMIZE_TRANSCRIPT}
+      - GOOGLE_BLOB_BUCKET=${GOOGLE_BLOB_BUCKET}
+      - GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID}
+      - GOOGLE_PRIV_KEY_ID=${GOOGLE_PRIV_KEY_ID}
+      - GOOGLE_PRIV_KEY=${GOOGLE_PRIV_KEY}
+      - GOOGLE_CLIENT_EMAIL=${GOOGLE_CLIENT_EMAIL}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_X509_CERT_URL=${GOOGLE_CLIENT_X509_CERT_URL}
+
+  video-convert-service:
+    build:
+      context: .
+      dockerfile: ./video-convert/docker/Dockerfile.preprocess.service
+    volumes:
+      - ./video-convert:/app
+    restart: always
+    # cpus: 2
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    networks:
+      - shared_network
+    environment:
+      - DOCUMENT_DATASOURCE=${DOCUMENT_DATASOURCE}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - DATAPROVIDER_USER=${DATAPROVIDER_USER}
+      - DATAPROVIDER_PASSWORD=${DATAPROVIDER_PASSWORD}
+      - DATAPROVIDER_URL=${DATAPROVIDER_URL}
+      - OPTIMIZE_TRANSCRIPT=${OPTIMIZE_TRANSCRIPT}
+      - GOOGLE_BLOB_BUCKET=${GOOGLE_BLOB_BUCKET}
+      - GOOGLE_PROJECT_ID=${GOOGLE_PROJECT_ID}
+      - GOOGLE_PRIV_KEY_ID=${GOOGLE_PRIV_KEY_ID}
+      - GOOGLE_PRIV_KEY=${GOOGLE_PRIV_KEY}
+      - GOOGLE_CLIENT_EMAIL=${GOOGLE_CLIENT_EMAIL}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_X509_CERT_URL=${GOOGLE_CLIENT_X509_CERT_URL}
+
+  user-verification:
+    build:
+      context: .
+      dockerfile: ./video-convert/docker/Dockerfile.user-verification.service
+    volumes:
+      - ./video-convert:/app
+    restart: on-failure
+    # cpus: 2
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    networks:
+      - shared_network
+    environment:
+      - DATAPROVIDER_URL=${DATAPROVIDER_URL}
+      - DATAPROVIDER_ADMINUSER=${DATAPROVIDER_ADMINUSER}
+      - DATAPROVIDER_ADMINPASSWORD=${DATAPROVIDER_ADMINPASSWORD}

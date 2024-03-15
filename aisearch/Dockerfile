@@ -31,7 +31,7 @@ RUN \
 FROM base AS ai-search-elearning-base
 
 # Kopiere requirements.txt in das Arbeitsverzeichnis
-COPY requirements.txt .
+COPY ./aisearch/requirements.txt .
 
 # Installiere Abhängigkeiten
 RUN pip install --no-cache-dir -r requirements.txt
@@ -43,9 +43,9 @@ FROM ai-search-elearning-base AS ai-search-elearning-api
 WORKDIR /app
 
 # Kopiere alle Dateien in das Arbeitsverzeichnis
-COPY . .
+COPY ./aisearch .
 
-EXPOSE 8000
+EXPOSE 80
 
 # Führe den Streamlit-Server aus
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]

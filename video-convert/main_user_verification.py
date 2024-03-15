@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 
 import logging_output as logger
@@ -7,9 +8,9 @@ from pocketbase import PocketBase
 
 load_dotenv()
 
-VIDEO_UPLOAD_URL = os.getenv("VIDEO_UPLOAD_URL") or ""
-POCKETBASE_ADMIN_USER = os.getenv("POCKETBASE_ADMIN_USER") or ""
-POCKETBASE_ADMIN_PASSWORD = os.getenv("POCKETBASE_ADMIN_PASSWORD") or ""
+DATAPROVIDER_URL = os.getenv("DATAPROVIDER_URL") or ""
+DATAPROVIDER_ADMINUSER = os.getenv("DATAPROVIDER_ADMINUSER") or ""
+DATAPROVIDER_ADMINPASSWORD = os.getenv("DATAPROVIDER_ADMINPASSWORD") or ""
 
 
 class User:
@@ -66,10 +67,10 @@ class PocketBaseDataProvider:
     def __init__(self) -> None:
         super().__init__()
 
-        logger.info("Connecting to PocketBase, to: " + VIDEO_UPLOAD_URL)
-        self.pb = PocketBase(VIDEO_UPLOAD_URL)
+        logger.info("Connecting to PocketBase, to: " + DATAPROVIDER_URL)
+        self.pb = PocketBase(DATAPROVIDER_URL)
         self.pb.admins.auth_with_password(
-            POCKETBASE_ADMIN_USER, POCKETBASE_ADMIN_PASSWORD
+            DATAPROVIDER_ADMINUSER, DATAPROVIDER_ADMINPASSWORD
         )
 
     def read_unverified_users(self) -> list[User]:
@@ -86,7 +87,7 @@ class PocketBaseDataProvider:
         return codes
 
 
-if __name__ == "__main__":
+def main():
     # get users. check if the inviationcode and domain is valid. then update the user
     try:
         logger.info("Starting user verification.")
@@ -133,3 +134,9 @@ if __name__ == "__main__":
     # service will restart and run again. so this sleep will prevent the service from running too fast
     logger.info("Waiting 15s...")
     time.sleep(15)
+
+
+if __name__ == "__main__":
+    # run main in a endless loop
+    while True:
+        main()

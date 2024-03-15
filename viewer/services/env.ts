@@ -10,7 +10,7 @@ if (!inBrowser) {
 
 const getEnv = (key: string) => (inBrowser ? "" : process.env[key] ?? "");
 
-export const POCKETBASE_URL = getEnv("POCKETBASE_URL");
+export const DATAPROVIDER_PUBLIC_URL = getEnv("DATAPROVIDER_PUBLIC_URL");
 export const POCKETBASE_USERNAME = getEnv("POCKETBASE_USERNAME");
 export const POCKETBASE_PASSWORD = getEnv("POCKETBASE_PASSWORD");
 export const BASELANG = getEnv("BASELANG");

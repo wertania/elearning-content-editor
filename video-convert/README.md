@@ -50,12 +50,12 @@ There are multiple text-to-speech (TTS) and speech-to-text (STT) backends availa
 
 ### Data provider
 
-The data provider is abstracted so that multiple implementations can be used. You can configure which one to use by setting the environment variable `DATA_PROVIDER` (`mock | pocketbase` at the time of writing).
+The data provider is abstracted so that multiple implementations can be used. You can configure which one to use by setting the environment variable `DOCUMENT_DATASOURCE` (`mock | pocketbase` at the time of writing).
 
-- `DATA_PROVIDER`: The data provider to use.
-- `VIDEO_UPLOAD_USER`
-- `VIDEO_UPLOAD_PASSWORD`
-- `VIDEO_UPLOAD_URL`
+- `DOCUMENT_DATASOURCE`: The data provider to use.
+- `DATAPROVIDER_USER`
+- `DATAPROVIDER_PASSWORD`
+- `DATAPROVIDER_URL`
 
 ### OpenAI backend
 

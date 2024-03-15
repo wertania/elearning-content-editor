@@ -1,17 +1,18 @@
 # Wiki-Content-Editor
 
-Visual editor to generate Markdown-based documentation for non-developers.
+Full toolset for you documentation with text, video, PDF and more.
+Also includes an editor and a viewer for the documentation.
 
-## BETA!
+An AI-Search is also included to search the whole wiki for a specific question.
 
-Do not use.
+## Attention!!!
 
-## Repository
+This app is still in development and not ready for production use.
 
-An app that
+## This Repository
 
-Mono Repo for all necessary tools for the e-learning platform.
-Dependencies cannot be shared since Vercel and Railway do not support that!
+This contains a Mono Repo for all necessary tools for the e-learning platform.
+Dependencies cannot be shared since Vercel and Railway do not support that.
 
 ```
 .
@@ -22,13 +23,31 @@ Dependencies cannot be shared since Vercel and Railway do not support that!
 -| viewer = VitePress Static renderer
 ```
 
-## Running using `docker compose`
+## Installation via docker-compose
 
-To start all services needed to run the project, run the following commands:
+### .env
+
+Copy the `.env.example` to `.env` and fill in the necessary information.
+
+## Start and build
 
 ```sh
-cd .dev
-docker compose up
+docker-compose up
 ```
 
-Note that `video-convert-service` is a one-off service. It terminates when it has finished its work. Therefore, it has to be restarted manually using `docker compose up video-convert-service` inside `.dev/`.
+## Init the database
+
+You must now install the database in pocketbase. For that go to:
+```
+http://localhost:8080/_/
+```
+
+Register with some user. That will be droped in the next steps.
+
+Go to "Settings" > "Backups" > and restore the backup from `./assets/empty-pb-template.zip` here.
+
+Now the default login will be:
+```
+b.enders@mydomain.com
+hello-there-123
+```

@@ -1,7 +1,7 @@
 <template>
   <div class="dark-mode-toggle flex justify-content-end">
     <i v-if="colorMode === 'dark'" class="fa-solid fa-moon" />
-    <i v-if="colorMode === 'light'" class="fa-solid fa-sun" />
+    <i v-if="colorMode === 'light'" class="fa-solid fa-sun mt-1" />
 
     <InputSwitch
       v-tooltip="'Toggle Theme'"

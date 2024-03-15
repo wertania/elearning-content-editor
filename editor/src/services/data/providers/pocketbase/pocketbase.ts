@@ -19,7 +19,7 @@ import { $global } from './../../../../main';
 import translationService from './../../../openai/aiservice';
 
 const URL: string =
-  import.meta.env.VITE_POCKETBASE_URL || 'http://127.0.0.1:8090';
+  import.meta.env.VITE_DATAPROVIDER_PUBLIC_URL || 'http://127.0.0.1:8090';
 
 export default {
   name: 'pocketbase',
@@ -47,7 +47,6 @@ export default {
   },
 
   async checkLogin(): Promise<boolean> {
-    console.log('checking login');
     try {
       // console.log("token: ", this.pb.authStore.token);
       const res = await this.cache.pb.collection('users').getList(1, 1, {
@@ -77,6 +76,7 @@ export default {
     password: string,
     email: string,
     name: string,
+    invitationCode: string,
   ): Promise<void> {
     await this.cache.pb.collection('users').create({
       email,
@@ -84,6 +84,7 @@ export default {
       password,
       passwordConfirm: password,
       name,
+      invitationCode,
     });
   },
 
@@ -136,7 +137,6 @@ export default {
 
   async getDataForDocument(id: string): Promise<DocumentItem> {
     const result = await this.cache.pb.collection('documents').getOne(id);
-    console.log(result);
     const document = { ...result.content, id: result.id };
     return document;
   },
@@ -218,7 +218,7 @@ export default {
   async getMedium(id) {
     const pb: PocketBase = this.cache.pb;
 
-    console.log('getMedium from pocketbase', id);
+    // console.log('getMedium from pocketbase', id);
     const result = await pb
       .collection('media')
       .getOne(id, { requestKey: null });
@@ -267,7 +267,7 @@ export default {
         .update(result.id, {
           content: dbEntry,
         });
-      console.log(updatedMedium);
+      // console.log(updatedMedium);
       return updatedMedium.content;
     } catch (e) {
       throw Error(`Medium ${file.name} could not be uploaded. ${e}`);
@@ -280,7 +280,7 @@ export default {
       file,
     });
     const url = await this.cache.pb.files.getUrl(result, result.file);
-    console.log('new url: ', url);
+    // ('new url: ', url);
     // get actual db entry
     const medium = await this.getMedium(id);
     if (!medium) {
@@ -321,11 +321,18 @@ export default {
     }
   },
 
-  async moveNode(id: string, parentId: string): Promise<void> {
-    // to do
-    console.log(id, parentId);
+  /**
+   * update the given id. set parentId to new value
+   * if parentId is null, the node will be a root node
+   */
+  async moveNode(id: string, parent: string): Promise<void> {
+    const item = await this.cache.pb.collection('documents').getOne(id);
+    item.content.parent = parent;
+    await this.cache.pb
+      .collection('documents')
+      .update(id, { content: item.content });
+    return;
   },
-  // end
 
   // -------
   // | PDF |

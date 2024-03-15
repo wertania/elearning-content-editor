@@ -25,13 +25,13 @@ const initApp = async () => {
   // check if already logged in
   const login = await dataProvider.checkLogin();
   if (login) {
-    console.log('logged in');
+    // console.log('logged in');
     if (route.name === 'login') {
       // redirect if on login page
       router.push({ name: 'view' });
     }
   } else {
-    console.log('not logged in. redirect to login');
+    // console.log('not logged in. redirect to login');
     router.push({ name: 'login' });
   }
 };
@@ -40,17 +40,15 @@ initApp();
 
 <style lang="scss">
 // overwrite some browser defaults
-:root,
-body,
-#app {
-  height: 100%;
-}
-
-#app {
-  font-family: var(--font-family);
-  min-height: 100%;
-
-  display: flex;
-  flex-direction: column;
-}
+// :root,
+// body,
+// #app {
+//   height: 100%;
+// }
+// #app {
+//   font-family: var(--font-family);
+//   min-height: 100%;
+//   display: flex;
+//   flex-direction: column;
+// }
 </style>

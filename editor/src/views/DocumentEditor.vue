@@ -137,6 +137,7 @@
             class="document-editor__tree"
             selectionMode="single"
             v-model:selectionKeys="selection"
+            v-model:expanded-keys="$doc.expandedKeys"
             :value="$doc.documentTree"
             @node-select="loadDocument"
             :disabled="true"
@@ -168,8 +169,8 @@
         >
           <div class="flex flex-column card-container">
             <div class="flex m-1 h-2rem p-2">
-              <i class="fa-solid fa-language mt-1 ml-1 mr-2"></i>Assigned
-              translations
+              <i class="fa-solid fa-language mt-1 ml-1 mr-2"></i>
+              Assigned translations
             </div>
             <div class="flex flex-row flex-wrap m-2">
               <Button
@@ -358,7 +359,7 @@ const closeDocument = () => {
  * Delete the selected document.
  */
 const deleteSelected = (event: any) => {
-  console.log('deleteSelected', event);
+  // console.log('deleteSelected', event);
   confirm.require({
     target: event.currentTarget,
     message: 'Are you sure you want to proceed?',
@@ -400,14 +401,15 @@ const handleDragDrop = (event: DragEvent, parent: any /*DocumentItem*/) => {
   if (!event.dataTransfer) return;
   if (!draggedNode.value) return;
 
-  $doc.moveNode(draggedNode.value, parent);
+  $doc.moveNodeInTree(draggedNode.value.id, parent.id);
 };
 const handleContainerDrop = (event: DragEvent) => {
   if (event.target !== event.currentTarget) return;
   if (!event.dataTransfer) return;
   if (!draggedNode.value) return;
 
-  $doc.moveNode(draggedNode.value, undefined);
+  // console.log('to implement: move to root');
+  $doc.moveNodeInTree(draggedNode.value.id, undefined);
 };
 const handleDragOver = (node: any /*DocumentItem*/) => {
   draggedOver.value = node;

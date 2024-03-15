@@ -23,3 +23,7 @@ aisearch/importer/test
 .venv/
 
 node_modules/
+local/pb/data/*
+!local/pb/data/placeholder
+
+editor/.env.*

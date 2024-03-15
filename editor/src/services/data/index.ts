@@ -9,7 +9,6 @@ const providerOptions: DataProvider[] = [
 // Instantiate a provider.
 export const dataProvider = (() => {
   const providerName = import.meta.env.VITE_DOCUMENT_DATASOURCE;
-  console.log(`Using data provider '${providerName}'.`);
 
   for (const p of providerOptions) {
     if (p.name === providerName) {

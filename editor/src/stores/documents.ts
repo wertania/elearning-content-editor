@@ -16,7 +16,7 @@ import {
   mapLangCodesToLanguageItems,
 } from './../services/language/languageService';
 import { UniversalBlock } from 'vue-blockful-editor';
-import { getItemFromTree, isDescendant } from './helper';
+import { getItemFromTree } from './helper';
 import { error, info } from './../services/toast';
 import { buildTreeItem } from './../services/data/helpers';
 import { useGlobalStore } from './global';
@@ -31,6 +31,7 @@ interface DocumentState {
   documentsFlat: DocumentItem[];
   // states for selected document
   selectedDocument: DocumentItem | null;
+  expandedKeys: { [key: string]: boolean };
   baseDocument: DocumentItem | null;
   subDocuments: DocumentItem[] | null;
   editMode: 'new' | 'edit';
@@ -57,6 +58,7 @@ export const useDocumentStore = defineStore('documents', {
       documentsFlat: [],
       // states for selected document
       selectedDocument: null,
+      expandedKeys: {},
       baseDocument: null,
       subDocuments: null,
       editMode: 'new',
@@ -100,9 +102,6 @@ export const useDocumentStore = defineStore('documents', {
       try {
         // check if a document was already selected before to save time
         if (this.$state.lastDocumentId !== id) {
-          console.log('document changed');
-          console.log('lastDocumentId', this.$state.lastDocumentId);
-          console.log(this.$state.timeOnPage);
           if (this.$state.lastDocumentId !== '') {
             // save time in seconds
             const usedTime = Math.round(
@@ -302,24 +301,6 @@ export const useDocumentStore = defineStore('documents', {
       }
     },
 
-    async moveNode(nodeId: DocumentItem, parentId: DocumentItem | undefined) {
-      if (!parentId) {
-        // If parentId is undefined, it's probably being moved to the root or is not being moved to a different parent.
-        // Depending on your requirements, you might allow or disallow this.
-        // Assuming it is allowed, proceed with the move:
-        await dataProvider.moveNode(nodeId.id, undefined);
-        await this.initialize();
-        return;
-      }
-      // If parentId is defined, check if the node is being moved to a descendant of itself.
-      if (isDescendant(nodeId, parentId.id)) {
-        return;
-      }
-      await dataProvider.moveNode(nodeId.id, parentId.id);
-      await this.initialize();
-      info('Node moved successfully');
-    },
-
     /**
      * add a new empty document to the backend and show it in the editor
      */
@@ -472,6 +453,69 @@ export const useDocumentStore = defineStore('documents', {
       this.$state.selectedDocument = document;
       this.$state.selectedLanguage = baseLanguage;
       this.refreshLanguagesCache();
+    },
+
+    /**
+     * move a node in the tree
+     * will add the node to the new parent and remove it from the old parent
+     */
+    async moveNodeInTree(sourceId: string, targetId?: string) {
+      // console.log('moveNodeInTree', sourceId, targetId);
+      // /**
+      //  * helper to find a node in a tree
+      //  */
+      // const findNode = (
+      //   id: string,
+      //   tree: DocumentTreeItem[],
+      // ): DocumentTreeItem | null => {
+      //   for (const item of tree) {
+      //     if (item.id === id) {
+      //       return item;
+      //     }
+      //     if (item.children) {
+      //       const found = findNode(id, item.children);
+      //       if (found) {
+      //         return found;
+      //       }
+      //     }
+      //   }
+      //   return null;
+      // };
+      // const noteToMode = findNode(sourceId, this.$state.documentTree);
+      // if (!noteToMode) {
+      //   console.error('noteToMode not found');
+      //   return;
+      // }
+      // // move to root if no targetId is given
+      // if (!targetId) {
+      //   console.log('move to root');
+      //   this.$state.documentTree[0].children?.push(noteToMode);
+      // }
+      // // else move to targetId
+      // else {
+      //   console.log('move to targetId', targetId);
+      //   const newParent = findNode(targetId, this.$state.documentTree);
+      //   if (newParent) {
+      //     console.log('newParent', newParent);
+      //     newParent.children
+      //       ? newParent.children.push(noteToMode)
+      //       : (newParent.children = [noteToMode]);
+
+      //     // remove from old parent
+      //     const oldParent = findNode(noteToMode.id, this.$state.documentTree);
+      //     if (oldParent) {
+      //       console.log('oldParent', oldParent);
+      //       oldParent.children = oldParent.children?.filter(
+      //         (item) => item.id !== noteToMode.id,
+      //       );
+      //     }
+      //   } else {
+      //     throw new Error('newParent not found');
+      //   }
+      // }
+      // also update data in backend
+      await dataProvider.moveNode(sourceId, targetId);
+      await this.initialize();
     },
   },
 });

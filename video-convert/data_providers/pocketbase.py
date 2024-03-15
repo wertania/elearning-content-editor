@@ -1,7 +1,7 @@
 import urllib.request
 from typing import Optional
 
-from config import VIDEO_UPLOAD_PASSWORD, VIDEO_UPLOAD_URL, VIDEO_UPLOAD_USER
+from config import DATAPROVIDER_PASSWORD, DATAPROVIDER_URL, DATAPROVIDER_USER
 from data_providers.base import (
     BaseDataProvider,
     UnconvertedVideo,
@@ -52,9 +52,9 @@ class PocketBaseDataProvider(BaseDataProvider):
     def __init__(self) -> None:
         super().__init__()
 
-        self.pb = PocketBase(VIDEO_UPLOAD_URL)
+        self.pb = PocketBase(DATAPROVIDER_URL)
         self.pb.collection("users").auth_with_password(
-            VIDEO_UPLOAD_USER, VIDEO_UPLOAD_PASSWORD
+            DATAPROVIDER_USER, DATAPROVIDER_PASSWORD
         )
 
     def read_unconverted_videos(self) -> list[PocketBaseUnconvertedVideo]:

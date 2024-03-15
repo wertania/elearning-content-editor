@@ -78,6 +78,7 @@ export interface DataProvider {
     password: string,
     email: string,
     name: string,
+    invitationCode: string,
   ): Promise<void>;
   requestPasswordReset(email: string): Promise<void>;
   updateEmail(email: string): Promise<void>;

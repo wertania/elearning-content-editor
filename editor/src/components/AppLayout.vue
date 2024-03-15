@@ -194,7 +194,6 @@ const colorMode = computed(() => {
 watch(
   () => colorMode.value,
   (newVal) => {
-    console.log('mode changed', newVal);
     if (newVal === 'light') {
       toggleToLight();
       $global.mode = 'light';
@@ -217,9 +216,9 @@ watch(
 //     document.getElementsByTagName('html')[0].style.fontSize = fontSize.value + 'px';
 // }
 
-const theme: Ref<'md-light-indigo' | 'md-dark-indigo'> = ref('md-light-indigo');
+const theme: Ref<string> = ref('aura-light-blue');
 
-const loadStylesheet = (themeName: 'md-light-indigo' | 'md-dark-indigo') => {
+const loadStylesheet = (themeName: 'aura-dark-blue' | 'aura-light-blue') => {
   // Remove the existing theme if it's present
   const existingTheme = document.getElementById('theme-toggle');
   if (existingTheme) {
@@ -232,20 +231,19 @@ const loadStylesheet = (themeName: 'md-light-indigo' | 'md-dark-indigo') => {
   const link = document.createElement('link');
   link.id = 'theme-toggle';
   link.rel = 'stylesheet';
-  // /themes/md-light-indigo.css
-  link.href = `./themes/${themeName}.css`; // adjust the path if needed
+  link.href = `./themes/${themeName}/theme.css`; // adjust the path if needed
   // add to header at first position to not overwrite other styles
   document.head.insertBefore(link, document.head.firstChild);
 };
 
 const toggleToDark = () => {
   $global.saveUserSettings();
-  loadStylesheet('md-dark-indigo');
+  loadStylesheet('aura-dark-blue');
   // PV.changeTheme("md-light-indigo", "md-dark-indigo", "theme-toggle", () => { });
 };
 const toggleToLight = () => {
   $global.saveUserSettings();
-  loadStylesheet('md-light-indigo');
+  loadStylesheet('aura-light-blue');
   // PV.changeTheme("md-dark-indigo", "md-light-indigo", "theme-toggle", () => { });
 };
 

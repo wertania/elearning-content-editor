@@ -127,13 +127,15 @@
 
     <template #start>
       <span class="p-input-icon-left ml-3">
-        <i class="fa-solid fa-search" />
-        <InputText
-          placeholder="Search"
-          class="w-12rem surface-100 border-round-lg border-none h-3rem font-medium"
-          size="small"
-          v-model="searchText"
-        />
+        <IconField iconPosition="left">
+          <InputIcon class="fa-solid fa-search"> </InputIcon>
+          <InputText
+            placeholder="Search"
+            class="w-12rem surface-100 border-round-lg border-none h-3rem font-medium"
+            size="small"
+            v-model="searchText"
+          />
+        </IconField>
       </span>
       <i
         class="fa-solid fa-wand-magic-sparkles text-xl ml-2 mt-1 cursor-pointer"
@@ -170,6 +172,7 @@
             class="pt-2 pb-3 pr-2"
             selectionMode="single"
             v-model:selectionKeys="selection"
+            v-model:expandedKeys="$doc.expandedKeys"
             :value="$doc.documentTree"
             @node-select="loadDocument"
             :disabled="true"
@@ -214,8 +217,9 @@
 <script setup lang="ts">
 import { ref, computed, ComputedRef, watch, Ref } from 'vue';
 import Tree from 'primevue/tree';
-import { TreeNode } from 'primevue/treenode';
 import ProgressSpinner from 'primevue/progressspinner';
+import IconField from "primevue/iconfield";
+import InputIcon from "primevue/inputicon";
 import { useDocumentStore } from '../stores/documents';
 import { DocumentTreeItem } from '../services/data/types';
 import { useGlobalStore } from '../stores/global';
@@ -242,6 +246,7 @@ import {
   DocumentSearchResult,
 } from './../types/services';
 import { PluginPdf } from '../blocks/pdf';
+import { TreeNode } from 'primevue/treenode';
 const logoUrl =
   import.meta.env.VITE_TEMPLATE_LOGO_URL ?? './../assets/logo.svg';
 
@@ -366,7 +371,7 @@ const aiSearch = async () => {
 const openDocument = (id: string) => {
   const url = '/view/' + id;
   console.log('openDocument', url);
-  router.push(url);
+  router.push({ name: 'view', params: { documentId: id } });
 };
 
 /**

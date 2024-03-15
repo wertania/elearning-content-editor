@@ -1,0 +1,43 @@
+# Build stage
+FROM node:lts-alpine as build-stage
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+# Set environment variables
+ARG BASE_LANGUAGE
+ARG AVAILABLE_LANGUAGES
+ARG DOCUMENT_DATASOURCE
+ARG DATAPROVIDER_PUBLIC_URL
+ARG OPENAI_API_KEY
+ARG VIDEOCONVERTER_URL
+ARG TEMPLATE_START_LOGO
+ARG TEMPLATE_WELCOME_SLOGAN
+ARG TEMPLATE_APP_NAME
+ARG TEMPLATE_LOGO_URL
+ARG AISEARCH_URL
+
+# write all environment variables to .env file
+RUN echo "VITE_BASE_LANGUAGE=$BASE_LANGUAGE" > .env
+RUN echo "VITE_AVAILABLE_LANGUAGES=$AVAILABLE_LANGUAGES" >> .env
+RUN echo "VITE_DOCUMENT_DATASOURCE=$DOCUMENT_DATASOURCE" >> .env
+RUN echo "VITE_DATAPROVIDER_PUBLIC_URL=$DATAPROVIDER_PUBLIC_URL" >> .env
+RUN echo "VITE_OPENAI_API_KEY=$OPENAI_API_KEY" >> .env
+RUN echo "VITE_VIDEOCONVERTER_URL=$VIDEOCONVERTER_URL" >> .env
+RUN echo "VITE_TEMPLATE_START_LOGO=$TEMPLATE_START_LOGO" >> .env
+RUN echo "VITE_TEMPLATE_WELCOME_SLOGAN=$TEMPLATE_WELCOME_SLOGAN" >> .env
+RUN echo "VITE_TEMPLATE_APP_NAME=$TEMPLATE_APP_NAME" >> .env
+RUN echo "VITE_TEMPLATE_LOGO_URL=$TEMPLATE_LOGO_URL" >> .env
+RUN echo "VITE_AISEARCH_URL=$AISEARCH_URL" >> .env
+RUN cat .env
+
+# Build the app
+RUN echo "Building the app"
+RUN npm run build
+
+# Production stage
+FROM nginx:stable-alpine as production-stage
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
