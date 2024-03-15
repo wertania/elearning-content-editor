@@ -16,7 +16,7 @@ services:
     # environment:
       # ENCRYPTION: example
     ports:
-      - "8080:8090"
+      - "9051:8090"
     volumes:
       - ./local/pb/data:/pb_data
       # - ./local/pb/public:/pb_public
@@ -44,7 +44,7 @@ services:
         DATAPROVIDER_PUBLIC_URL: ${DATAPROVIDER_PUBLIC_URL}
         AISEARCH_URL: ${AISEARCH_URL}
     ports:
-      - "8081:80"
+      - "9052:80"
     container_name: editor
     restart: unless-stopped
     depends_on:
@@ -58,7 +58,7 @@ services:
     container_name: aisearch
     restart: unless-stopped
     ports:
-      - "8082:80"
+      - "9053:80"
     depends_on:
       pocketbase:
         condition: service_healthy
