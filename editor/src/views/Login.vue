@@ -1,7 +1,7 @@
 <template>
   <div class="bg-svg-logo" :style="{ '--bg-image': `url(${bgSvgLogoUrl})` }">
     <div class="login" v-if="!showRegisteredInfo">
-      <h2>Welcome back to</h2>      
+      <h2>Welcome back to</h2>
       <h1 style="font-size: 3em">{{ welcomeSlogan }}</h1>
 
       <p v-if="addUser">
@@ -27,12 +27,16 @@
             <label for="fullname">Full name</label>
             <TextInput id="fullname" v-model="fullname" />
           </div>
+          <div class="p-field" v-if="addUser">
+            <label for="invitationCode">Invitation Code (needed)</label>
+            <TextInput id="invitationCode" v-model="invitationCode" />
+          </div>
           <div class="p-field mt-2">
             <label for="password">Password</label>
             <TextInput id="password" v-model="password" type="password" />
           </div>
           <div v-if="addUser" class="p-field mt-2">
-            <label for="repeat-password">Password</label>
+            <label for="repeat-password">Password (repeat)</label>
             <TextInput
               id="repeat-password"
               v-model="repeatPassword"
@@ -51,7 +55,7 @@
           />
           <Button
             v-else
-            @click="registerPocketbase()"
+            @click="registerUser()"
             :disabled="
               loading ||
               password !== repeatPassword ||
@@ -115,6 +119,7 @@ const password = ref('');
 const repeatPassword = ref('');
 const fullname = ref('');
 const loading = ref(false);
+const invitationCode = ref('');
 
 const loginPocketbase = async () => {
   loading.value = true;
@@ -130,7 +135,7 @@ const loginPocketbase = async () => {
   loading.value = false;
 };
 
-const registerPocketbase = async () => {
+const registerUser = async () => {
   loading.value = true;
   try {
     await dataProvider.register(
@@ -138,10 +143,14 @@ const registerPocketbase = async () => {
       password.value,
       email.value,
       fullname.value,
+      invitationCode.value
     );
     showRegisteredInfo.value = true;
-  } catch (e) {
+  } catch (e: any) {
     error(e + '');
+    if (e.data) {
+      error(e.data);
+    }
   }
   loading.value = false;
 };

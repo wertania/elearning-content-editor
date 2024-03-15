@@ -8,7 +8,7 @@ dataprovider_user = os.getenv("DATAPROVIDER_USER")
 dataprovider_password = os.getenv("DATAPROVIDER_PASSWORD")
 dataprovider_url = os.getenv("DATAPROVIDER_URL")
 base_language = os.getenv("BASE_LANGUAGE")
-open_ai_key = os.getenv("OPEN_AI_KEY")
+open_ai_key = os.getenv("OPENAI_API_KEY")
 cors = os.getenv("CORS") or "*"
 _debug = os.getenv("DEBUG")
 # parse to bool

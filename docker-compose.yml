@@ -10,7 +10,7 @@ services:
     image: ghcr.io/muchobien/pocketbase:latest
     container_name: pocketbase
     restart: unless-stopped
-    command:
+    # command:
       # - --encryptionEnv
       # - ENCRYPTION
     # environment:
@@ -70,6 +70,7 @@ services:
       - DATAPROVIDER_URL=${DATAPROVIDER_URL}
       - BASE_LANGUAGE=${BASE_LANGUAGE}
       - DEBUG=${DEBUG}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
 
   video-convert-service-preprocess:
     build:

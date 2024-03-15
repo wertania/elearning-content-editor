@@ -76,6 +76,7 @@ export default {
     password: string,
     email: string,
     name: string,
+    invitationCode: string,
   ): Promise<void> {
     await this.cache.pb.collection('users').create({
       email,
@@ -83,6 +84,7 @@ export default {
       password,
       passwordConfirm: password,
       name,
+      invitationCode,
     });
   },
 
