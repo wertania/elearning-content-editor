@@ -76,8 +76,6 @@ services:
     build:
       context: .
       dockerfile: ./video-convert/docker/Dockerfile.video-convert.service
-    volumes:
-      - ./video-convert:/app
     restart: always
     # cpus: 2
     depends_on:
@@ -105,8 +103,6 @@ services:
     build:
       context: .
       dockerfile: ./video-convert/docker/Dockerfile.preprocess.service
-    volumes:
-      - ./video-convert:/app
     restart: always
     # cpus: 2
     depends_on:
@@ -134,8 +130,6 @@ services:
     build:
       context: .
       dockerfile: ./video-convert/docker/Dockerfile.user-verification.service
-    volumes:
-      - ./video-convert:/app
     restart: on-failure
     # cpus: 2
     depends_on:
