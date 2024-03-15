@@ -10,7 +10,7 @@ ENV PATH="/usr/bin:${PATH}"
 FROM vwf_ffmpeg AS vwf_pip
 
 # Kopiere requirements.preprocess.txt in das Arbeitsverzeichnis
-COPY ./video-convert/requirements.preprocess.txt .
+COPY ./requirements.preprocess.txt .
 
 # Install CPU dependencies before whisper_timestamped to avoid installing CUDA.
 # See https://github.com/linto-ai/whisper-timestamped?tab=readme-ov-file#light-installation-for-cpu.
@@ -25,6 +25,7 @@ RUN pip install --no-cache-dir -r requirements.preprocess.txt
 # Setze Arbeitsverzeichnis
 WORKDIR /app
 
-FROM vwf_pip AS dev
+# Copy
+COPY . .
 
 CMD ["python", "-u", "main_video_convert.py"]

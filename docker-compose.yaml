@@ -29,53 +29,53 @@ services:
     networks:
       - shared_network
   
-  editor:
-    build:
-      context: ./editor
-      args:
-        BASE_LANGUAGE: ${BASE_LANGUAGE}
-        AVAILABLE_LANGUAGES: ${AVAILABLE_LANGUAGES}
-        DOCUMENT_DATASOURCE: ${DOCUMENT_DATASOURCE}
-        OPENAI_API_KEY: ${OPENAI_API_KEY}
-        TEMPLATE_START_LOGO: ${TEMPLATE_START_LOGO}
-        TEMPLATE_WELCOME_SLOGAN: ${TEMPLATE_WELCOME_SLOGAN}
-        TEMPLATE_APP_NAME: ${TEMPLATE_APP_NAME}
-        TEMPLATE_LOGO_URL: ${TEMPLATE_LOGO_URL}
-        DATAPROVIDER_PUBLIC_URL: ${DATAPROVIDER_PUBLIC_URL}
-        AISEARCH_URL: ${AISEARCH_URL}
-    ports:
-      - "9052:80"
-    container_name: editor
-    restart: unless-stopped
-    depends_on:
-      pocketbase:
-        condition: service_healthy
+  # editor:
+  #   build:
+  #     context: ./editor
+  #     args:
+  #       BASE_LANGUAGE: ${BASE_LANGUAGE}
+  #       AVAILABLE_LANGUAGES: ${AVAILABLE_LANGUAGES}
+  #       DOCUMENT_DATASOURCE: ${DOCUMENT_DATASOURCE}
+  #       OPENAI_API_KEY: ${OPENAI_API_KEY}
+  #       TEMPLATE_START_LOGO: ${TEMPLATE_START_LOGO}
+  #       TEMPLATE_WELCOME_SLOGAN: ${TEMPLATE_WELCOME_SLOGAN}
+  #       TEMPLATE_APP_NAME: ${TEMPLATE_APP_NAME}
+  #       TEMPLATE_LOGO_URL: ${TEMPLATE_LOGO_URL}
+  #       DATAPROVIDER_PUBLIC_URL: ${DATAPROVIDER_PUBLIC_URL}
+  #       AISEARCH_URL: ${AISEARCH_URL}
+  #   ports:
+  #     - "9052:80"
+  #   container_name: editor
+  #   restart: unless-stopped
+  #   depends_on:
+  #     pocketbase:
+  #       condition: service_healthy
 
-  aisearch:
-    build:
-      context: .
-      dockerfile: ./aisearch/Dockerfile     
-    container_name: aisearch
-    restart: unless-stopped
-    ports:
-      - "9053:80"
-    depends_on:
-      pocketbase:
-        condition: service_healthy
-    networks:
-      - shared_network
-    environment:
-      - DATAPROVIDER_USER=${DATAPROVIDER_USER}
-      - DATAPROVIDER_PASSWORD=${DATAPROVIDER_PASSWORD}
-      - DATAPROVIDER_URL=${DATAPROVIDER_URL}
-      - BASE_LANGUAGE=${BASE_LANGUAGE}
-      - DEBUG=${DEBUG}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+  # aisearch:
+  #   build:
+  #     context: .
+  #     dockerfile: ./aisearch/Dockerfile     
+  #   container_name: aisearch
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9053:80"
+  #   depends_on:
+  #     pocketbase:
+  #       condition: service_healthy
+  #   networks:
+  #     - shared_network
+  #   environment:
+  #     - DATAPROVIDER_USER=${DATAPROVIDER_USER}
+  #     - DATAPROVIDER_PASSWORD=${DATAPROVIDER_PASSWORD}
+  #     - DATAPROVIDER_URL=${DATAPROVIDER_URL}
+  #     - BASE_LANGUAGE=${BASE_LANGUAGE}
+  #     - DEBUG=${DEBUG}
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
 
   video-convert-service-preprocess:
     build:
-      context: .
-      dockerfile: ./video-convert/docker/Dockerfile.video-convert.service
+      context: ./video-convert
+      dockerfile: ./Dockerfile.video-convert.service
     restart: always
     # cpus: 2
     depends_on:
@@ -101,8 +101,8 @@ services:
 
   video-convert-service:
     build:
-      context: .
-      dockerfile: ./video-convert/docker/Dockerfile.preprocess.service
+      context: ./video-convert
+      dockerfile: ./Dockerfile.preprocess.service
     restart: always
     # cpus: 2
     depends_on:
@@ -128,8 +128,8 @@ services:
 
   user-verification:
     build:
-      context: .
-      dockerfile: ./video-convert/docker/Dockerfile.user-verification.service
+      context: ./video-convert
+      dockerfile: ./Dockerfile.user-verification.service
     restart: on-failure
     # cpus: 2
     depends_on:
